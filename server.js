@@ -13,19 +13,22 @@ const db = initDB("./data.sqlite");
 
 const PORT = Number(process.env.PORT || 3000);
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin";
-const COOKIE_SECRET = process.env.COOKIE_SECRET || "change_me";
+const COOKIE_SECRET = process.env.COOKIE_SECRET || "ChangeThisCookieSecret";
 
-const panelConfig = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json"), "utf8"));
+const panelConfig = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "config.json"), "utf8")
+);
+
 const ADMIN_PATH = `/${panelConfig.adminPath || "secure-admin-9283"}`;
-
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
 
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser(COOKIE_SECRET));
 app.use("/public", express.static(path.join(__dirname, "public")));
+
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
 
 function isAuthed(req) {
   return req.signedCookies?.admin === "1";
@@ -46,40 +49,24 @@ const APPS = {
     windows: "https://getoutline.org/get-started/#download",
     mac: "https://getoutline.org/get-started/#download",
     android: "https://play.google.com/store/apps/details?id=org.outline.android.client",
-    ios: "https://apps.apple.com/app/outline-app/id1356177741"
+    ios: "https://apps.apple.com/app/outline-app/id1356177741",
   },
   V2RAY: {
     windows: "https://github.com/2dust/v2rayN/releases",
     android: "https://github.com/2dust/v2rayNG/releases",
     mac: "https://github.com/yanue/V2rayU/releases",
-    ios: "https://apps.apple.com/app/shadowrocket/id932747118"
-  }
+    ios: "https://apps.apple.com/app/shadowrocket/id932747118",
+  },
 };
 
+// -------- PUBLIC --------
 app.get("/", (req, res) => {
-  const type = (req.query.type || "").toUpperCase();
-  const region = (req.query.region || "").trim();
+  const rows = db
+    .prepare("SELECT * FROM vpn_keys ORDER BY id DESC")
+    .all()
+    .map((r) => ({ ...r, status: normalizeStatus(r.expire_date) }));
 
-  const clauses = [];
-  const params = [];
-
-  if (type === "OUTLINE" || type === "V2RAY") {
-    clauses.push("key_type = ?");
-    params.push(type);
-  }
-  if (region) {
-    clauses.push("region_name = ?");
-    params.push(region);
-  }
-
-  const sql = clauses.length
-    ? `SELECT * FROM vpn_keys WHERE ${clauses.join(" AND ")} ORDER BY id DESC`
-    : `SELECT * FROM vpn_keys ORDER BY id DESC`;
-
-  const rows = db.prepare(sql).all(...params).map(r => ({ ...r, status: normalizeStatus(r.expire_date) }));
-  const regions = db.prepare("SELECT DISTINCT region_name, region_flag FROM vpn_keys ORDER BY region_name ASC").all();
-
-  res.render("index", { rows, regions, query: { type, region }, panelConfig, ADMIN_PATH });
+  res.render("index", { rows, panelConfig });
 });
 
 app.get("/k/:id", (req, res) => {
@@ -87,23 +74,34 @@ app.get("/k/:id", (req, res) => {
   const row = db.prepare("SELECT * FROM vpn_keys WHERE id = ?").get(id);
   if (!row) return res.status(404).send("Not found");
 
-  res.render("detail", {
-    row,
-    status: normalizeStatus(row.expire_date),
-    apps: APPS[row.key_type],
-    panelConfig,
-    ADMIN_PATH
-  });
+  const status = normalizeStatus(row.expire_date);
+  const apps = APPS[row.key_type];
+
+  res.render("detail", { row, status, apps, panelConfig });
 });
 
-// Admin
-app.get(`${ADMIN_PATH}/login`, (req, res) => res.render("login", { error: null, panelConfig, ADMIN_PATH }));
+// -------- ADMIN --------
+app.get(`${ADMIN_PATH}/login`, (req, res) => {
+  res.render("login", { error: null, panelConfig, ADMIN_PATH });
+});
 
 app.post(`${ADMIN_PATH}/login`, (req, res) => {
   const pw = String(req.body.password || "");
-  if (pw !== ADMIN_PASSWORD) return res.render("login", { error: "Password မမှန်ပါ", panelConfig, ADMIN_PATH });
+  if (pw !== ADMIN_PASSWORD) {
+    return res.render("login", {
+      error: "Password မမှန်ပါ",
+      panelConfig,
+      ADMIN_PATH,
+    });
+  }
 
-  res.cookie("admin", "1", { signed: true, httpOnly: true, sameSite: "lax", secure: false });
+  res.cookie("admin", "1", {
+    signed: true,
+    httpOnly: true,
+    sameSite: "lax",
+    secure: false, // if https enable => true
+  });
+
   res.redirect(`${ADMIN_PATH}`);
 });
 
@@ -113,7 +111,11 @@ app.post(`${ADMIN_PATH}/logout`, (req, res) => {
 });
 
 app.get(`${ADMIN_PATH}`, requireAuth, (req, res) => {
-  const rows = db.prepare("SELECT * FROM vpn_keys ORDER BY id DESC").all().map(r => ({ ...r, status: normalizeStatus(r.expire_date) }));
+  const rows = db
+    .prepare("SELECT * FROM vpn_keys ORDER BY id DESC")
+    .all()
+    .map((r) => ({ ...r, status: normalizeStatus(r.expire_date) }));
+
   res.render("admin", { rows, panelConfig, ADMIN_PATH });
 });
 
@@ -126,12 +128,13 @@ app.post(`${ADMIN_PATH}/add`, requireAuth, (req, res) => {
   const key_string = String(req.body.key_string || "").trim();
 
   if (!["OUTLINE", "V2RAY"].includes(key_type)) return res.status(400).send("Bad key_type");
-  if (!region_name || !region_flag || !expire_date || !key_string || !gb_limit) return res.status(400).send("Missing fields");
+  if (!region_name || !region_flag || !expire_date || !key_string || !gb_limit)
+    return res.status(400).send("Missing fields");
 
-  db.prepare(`
-    INSERT INTO vpn_keys (key_type, region_name, region_flag, gb_limit, expire_date, key_string)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `).run(key_type, region_name, region_flag, gb_limit, expire_date, key_string);
+  db.prepare(
+    `INSERT INTO vpn_keys (key_type, region_name, region_flag, gb_limit, expire_date, key_string)
+     VALUES (?, ?, ?, ?, ?, ?)`
+  ).run(key_type, region_name, region_flag, gb_limit, expire_date, key_string);
 
   res.redirect(`${ADMIN_PATH}`);
 });
