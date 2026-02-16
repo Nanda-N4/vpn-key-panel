@@ -313,3 +313,89 @@ textarea.input{min-height:110px;}
 .empty{text-align:center; padding:22px;}
 .emptyTitle{font-weight:900;}
 .emptySub{margin-top:6px; color:var(--muted);}
+/* -------- PRO / COMPACT HERO -------- */
+.heroPro{padding:14px;}
+.heroProTop{
+  display:flex;
+  gap:12px;
+  justify-content:space-between;
+  align-items:flex-start;
+  flex-wrap:wrap;
+}
+.kicker{
+  font-size:12px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color: var(--muted);
+}
+.heroTitle{
+  margin:6px 0 0;
+  font-size:22px;
+  letter-spacing:.2px;
+}
+.heroSub{
+  margin:8px 0 0;
+  color: var(--muted);
+  line-height:1.45;
+  max-width: 70ch;
+}
+
+.heroActions{display:flex; gap:10px; align-items:center;}
+.pill{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border-radius: 999px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(11,18,36,.35);
+  color:#fff;
+  text-decoration:none;
+}
+.pill:hover{
+  border-color: rgba(0,229,255,.26);
+  box-shadow:0 0 0 3px rgba(0,229,255,.08);
+}
+.pill.primary{
+  border-color: rgba(0,229,255,.28);
+  background: linear-gradient(90deg, rgba(0,229,255,.18), rgba(179,0,255,.12));
+  box-shadow:0 0 0 3px rgba(0,229,255,.08);
+}
+
+.chipRow{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+.chip{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 10px;
+  border-radius: 999px;
+  border:1px solid rgba(255,255,255,.08);
+  background: rgba(11,18,36,.28);
+  color: var(--muted);
+  font-size:13px;
+}
+.chip b{
+  width:18px; height:18px;
+  border-radius: 999px;
+  display:grid; place-items:center;
+  font-size:12px;
+  color:#fff;
+  background: rgba(0,229,255,.16);
+  border:1px solid rgba(0,229,255,.18);
+}
+
+.hintLine{
+  margin-top:10px;
+  color: var(--muted);
+  font-size:13px;
+}
+.hintLink{
+  color: var(--neon);
+  text-decoration:none;
+}
+.hintLink:hover{text-decoration:underline;}
