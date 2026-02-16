@@ -1,46 +1,94 @@
-<%- include("layout", { 
-  title: "Detail",
-  panelConfig,
-  body: `
-<div class="card">
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Key • <%= panelConfig.brandName %></title>
+  <link rel="stylesheet" href="/public/style.css"/>
+</head>
+<body>
+  <div class="bg"></div>
 
-<h2>${row.key_type} • ${row.region_flag} ${row.region_name}</h2>
+  <header class="topbar">
+    <a class="brand" href="/">
+      <span class="brandMark">⚡</span>
+      <span class="brandText"><%= panelConfig.brandName %></span>
+    </a>
+    <nav class="topnav">
+      <a class="navlink" href="/">User</a>
+      <a class="navlink" href="/<%= panelConfig.adminPath %>">Admin</a>
+    </nav>
+  </header>
 
-<div class="info">
-GB: ${row.gb_limit} • Exp: ${row.expire_date}
-<span class="badge ${status==="ACTIVE"?"active":"expired"}">${status}</span>
-</div>
+  <main class="wrap">
+    <section class="card">
+      <div class="rowBetween">
+        <div>
+          <h2 class="h2"><%= row.key_type %> • <%= row.region_flag %> <%= row.region_name %></h2>
+          <div class="metaLine">
+            <span>GB: <b><%= row.gb_limit %></b></span>
+            <span class="dot">•</span>
+            <span>Exp: <b><%= row.expire_date %></b></span>
+            <span class="dot">•</span>
+            <span class="badge <%= status === 'ACTIVE' ? 'ok' : 'bad' %>"><%= status %></span>
+          </div>
+        </div>
+        <a class="btn btnGhost" href="/">← Back</a>
+      </div>
 
-<div class="copy-box">
-  <input id="vpnKey" readonly value="${row.key_string}">
-  <button onclick="copyKey()">Copy</button>
-</div>
+      <div class="divider"></div>
 
-<h3>Download Apps</h3>
-<ul>
-<li><a href="${apps.windows}" target="_blank">Windows</a></li>
-<li><a href="${apps.mac}" target="_blank">Mac</a></li>
-<li><a href="${apps.android}" target="_blank">Android</a></li>
-<li><a href="${apps.ios}" target="_blank">iPhone</a></li>
-</ul>
+      <div class="field">
+        <div class="label">Key</div>
+        <div class="copyRow">
+          <input id="vpnKey" class="input mono" readonly value="<%= row.key_string %>"/>
+          <button class="btn btnPrimary" type="button" onclick="copyKey()">Copy</button>
+        </div>
+      </div>
 
-<hr>
+      <div class="divider"></div>
 
-<div class="buy-section">
-  <h3>Buy This VPN</h3>
-  <a class="btn neon" href="${panelConfig.telegramAdminUrl}" target="_blank">
-    Telegram Admin
-  </a>
-</div>
+      <h3 class="h3">Download Apps</h3>
+      <div class="appsGrid">
+        <a class="appCard" href="<%= apps.windows %>" target="_blank">Windows</a>
+        <a class="appCard" href="<%= apps.mac %>" target="_blank">Mac</a>
+        <a class="appCard" href="<%= apps.android %>" target="_blank">Android</a>
+        <a class="appCard" href="<%= apps.ios %>" target="_blank">iPhone/iPad</a>
+      </div>
 
-</div>
+      <div class="divider"></div>
 
-<script>
-function copyKey(){
-  const el=document.getElementById("vpnKey");
-  navigator.clipboard.writeText(el.value);
-  showToast("Copied!");
-}
-</script>
-`
-}) %>
+      <div class="callout">
+        <div class="callTitle">Buy / Support</div>
+        <div class="callSub">ဝယ်ယူလိုပါက Telegram မှ ဆက်သွယ်ပါ</div>
+        <div class="btnRow">
+          <a class="btn btnPrimary" href="<%= panelConfig.telegramAdminUrl %>" target="_blank">
+            <span class="tgDot">TG</span> Telegram Admin
+          </a>
+          <a class="btn btnGhost" href="<%= panelConfig.telegramChannelUrl %>" target="_blank">
+            Join Channel
+          </a>
+        </div>
+      </div>
+
+    </section>
+
+    <div id="toast" class="toast">Copied ✅</div>
+  </main>
+
+  <script>
+    async function copyKey(){
+      const el = document.getElementById("vpnKey");
+      try{
+        await navigator.clipboard.writeText(el.value);
+      }catch(e){
+        el.focus(); el.select();
+        document.execCommand("copy");
+      }
+      const t = document.getElementById("toast");
+      t.classList.add("show");
+      setTimeout(()=>t.classList.remove("show"),1200);
+    }
+  </script>
+</body>
+</html>
