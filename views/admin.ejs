@@ -1,64 +1,114 @@
-<%- include("layout", { title: "Admin Dashboard", body: `
-  <div class="row">
-    <div class="card">
-      <h2>Add VPN Key</h2>
-      <form method="POST" action="/admin/add">
-        <label>Key Type</label>
-        <select name="key_type" required>
-          <option value="OUTLINE">OUTLINE (Shadowsocks)</option>
-          <option value="V2RAY">V2RAY</option>
-        </select>
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Admin • <%= panelConfig.brandName %></title>
+  <link rel="stylesheet" href="/public/style.css"/>
+</head>
+<body>
+  <div class="bg"></div>
 
-        <label>Region Name</label>
-        <input name="region_name" placeholder="Singapore" required />
+  <header class="topbar">
+    <a class="brand" href="/">
+      <span class="brandMark">⚡</span>
+      <span class="brandText"><%= panelConfig.brandName %></span>
+    </a>
+    <nav class="topnav">
+      <a class="navlink" href="/">User</a>
+      <a class="navlink" href="/<%= panelConfig.adminPath %>">Admin</a>
+    </nav>
+  </header>
 
-        <label>Region Flag</label>
-        <input name="region_flag" placeholder="🇸🇬" required />
+  <main class="wrap">
+    <section class="card">
+      <div class="rowBetween">
+        <h2 class="h2">Admin Dashboard</h2>
+        <form method="POST" action="/<%= panelConfig.adminPath %>/logout">
+          <button class="btn btnDanger" type="submit">Logout</button>
+        </form>
+      </div>
 
-        <label>GB Limit</label>
-        <input type="number" name="gb_limit" placeholder="2048" required />
+      <div class="divider"></div>
 
-        <label>Expire Date (YYYY-MM-DD)</label>
-        <input name="expire_date" placeholder="2026-03-25" required />
+      <div class="adminGrid">
+        <div class="panel">
+          <h3 class="h3">Add VPN Key</h3>
 
-        <label>Key String</label>
-        <textarea name="key_string" placeholder="ss://... or vless://..." required></textarea>
+          <form method="POST" action="/<%= panelConfig.adminPath %>/add" class="form">
+            <div class="formGrid">
+              <div class="field">
+                <div class="label">Key Type</div>
+                <select name="key_type" class="input" required>
+                  <option value="OUTLINE">OUTLINE (Shadowsocks)</option>
+                  <option value="V2RAY">V2RAY</option>
+                </select>
+              </div>
 
-        <button class="btn" type="submit">Add</button>
-      </form>
+              <div class="field">
+                <div class="label">GB Limit</div>
+                <input type="number" name="gb_limit" class="input" placeholder="2048" required/>
+              </div>
 
-      <form method="POST" action="/admin/logout" style="margin-top:10px;">
-        <button class="btn secondary" type="submit">Logout</button>
-      </form>
-    </div>
+              <div class="field">
+                <div class="label">Region Name</div>
+                <input name="region_name" class="input" placeholder="Singapore" required/>
+              </div>
 
-    <div class="card">
-      <h2>Keys</h2>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>ID</th><th>Type</th><th>Region</th><th>GB</th><th>Expire</th><th>Status</th><th>Link</th><th></th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows.map(r => `
-            <tr>
-              <td>${r.id}</td>
-              <td>${r.key_type}</td>
-              <td>${r.region_flag} ${r.region_name}</td>
-              <td>${r.gb_limit}</td>
-              <td>${r.expire_date}</td>
-              <td><span class="pill ${r.status === "ACTIVE" ? "ok" : "bad"}">${r.status}</span></td>
-              <td><a href="/k/${r.id}" target="_blank">/k/${r.id}</a></td>
-              <td>
-                <form method="POST" action="/admin/delete/${r.id}" onsubmit="return confirm('Delete?')">
-                  <button class="btn danger" type="submit">Delete</button>
-                </form>
-              </td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
-    </div>
-  </div>
-` }) %>
+              <div class="field">
+                <div class="label">Region Flag</div>
+                <input name="region_flag" class="input" placeholder="🇸🇬" required/>
+              </div>
+
+              <div class="field">
+                <div class="label">Expire Date (YYYY-MM-DD)</div>
+                <input name="expire_date" class="input" placeholder="2026-03-25" required/>
+              </div>
+
+              <div class="field" style="grid-column:1/-1;">
+                <div class="label">Key String</div>
+                <textarea name="key_string" class="input" placeholder="ss://... or vless://..." required></textarea>
+              </div>
+            </div>
+
+            <button class="btn btnPrimary w100" type="submit">Add Key</button>
+          </form>
+        </div>
+
+        <div class="panel">
+          <h3 class="h3">Keys</h3>
+
+          <div class="tableWrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>ID</th><th>Type</th><th>Region</th><th>GB</th><th>Expire</th><th>Status</th><th>Link</th><th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <% rows.forEach(r => { %>
+                  <tr>
+                    <td><%= r.id %></td>
+                    <td><%= r.key_type %></td>
+                    <td><%= r.region_flag %> <%= r.region_name %></td>
+                    <td><%= r.gb_limit %></td>
+                    <td><%= r.expire_date %></td>
+                    <td><span class="badge <%= r.status === 'ACTIVE' ? 'ok' : 'bad' %>"><%= r.status %></span></td>
+                    <td><a href="/k/<%= r.id %>" target="_blank">/k/<%= r.id %></a></td>
+                    <td>
+                      <form method="POST" action="/<%= panelConfig.adminPath %>/delete/<%= r.id %>" onsubmit="return confirm('Delete?')">
+                        <button class="btn btnDanger" type="submit">Delete</button>
+                      </form>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+</body>
+</html>
