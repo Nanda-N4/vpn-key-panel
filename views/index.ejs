@@ -1,0 +1,37 @@
+<%- include("layout", { title: "VPN Keys", body: `
+  <div class="card">
+    <h2>Browse Keys</h2>
+    <form method="GET" action="/" class="filters">
+      <select name="type">
+        <option value="">All Types</option>
+        <option value="OUTLINE" ${query.type === "OUTLINE" ? "selected" : ""}>Outline</option>
+        <option value="V2RAY" ${query.type === "V2RAY" ? "selected" : ""}>V2Ray</option>
+      </select>
+
+      <select name="region">
+        <option value="">All Regions</option>
+        ${regions.map(x => `
+          <option value="${x.region_name}" ${query.region === x.region_name ? "selected" : ""}>
+            ${x.region_flag} ${x.region_name}
+          </option>
+        `).join("")}
+      </select>
+
+      <button class="btn" type="submit">Filter</button>
+      <a class="btn secondary" href="/">Reset</a>
+    </form>
+  </div>
+
+  <div class="grid">
+    ${rows.map(r => `
+      <a class="keycard" href="/k/${r.id}">
+        <div class="k-top">
+          <div class="k-type">${r.key_type}</div>
+          <div class="pill ${r.status === "ACTIVE" ? "ok" : "bad"}">${r.status}</div>
+        </div>
+        <div class="k-region">${r.region_flag} ${r.region_name}</div>
+        <div class="k-meta">GB: ${r.gb_limit} • Exp: ${r.expire_date}</div>
+      </a>
+    `).join("")}
+  </div>
+` }) %>
