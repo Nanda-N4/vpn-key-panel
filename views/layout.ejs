@@ -3,22 +3,53 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title><%= title || "N4 VPN KEY" %></title>
+  <title><%= title || panelConfig?.brandName || "VPN Key Panel" %></title>
   <link rel="stylesheet" href="/public/style.css"/>
 </head>
 <body>
+  <div class="bgGrid"></div>
+  <div class="bgGlow"></div>
+  <div class="scanline"></div>
+
   <div class="container">
     <header class="topbar">
-      <a class="brand" href="/">N4 VPN KEY</a>
+      <a class="brand" href="/">
+        <span class="brandMark">⟡</span>
+        <span class="brandText"><%= panelConfig?.brandName || "VPN KEY" %></span>
+      </a>
+
       <nav class="nav">
-        <a href="/">User</a>
-        <a href="/admin">Admin</a>
+        <a class="navLink" href="/">User</a>
+        <a class="navLink" href="<%= ADMIN_PATH %>">Admin</a>
       </nav>
     </header>
-    <main>
-      <%- body %>
-    </main>
-    <footer class="footer">© <%= new Date().getFullYear() %></footer>
+
+    <main><%- body %></main>
+
+    <footer class="footer">
+      <div class="footerInner">
+        <span>© <%= new Date().getFullYear() %></span>
+        <span class="dot">•</span>
+        <a class="footerLink" href="<%= panelConfig?.telegramChannelUrl %>" target="_blank">
+          <span class="tgPill">TG</span> <%= panelConfig?.telegramChannelText || "Telegram" %>
+        </a>
+      </div>
+    </footer>
   </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script>
+    window.__toast = function(msg){
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.remove('hidden');
+      t.classList.add('show');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(()=> {
+        t.classList.remove('show');
+        t.classList.add('hidden');
+      }, 1600);
+    }
+  </script>
 </body>
 </html>
