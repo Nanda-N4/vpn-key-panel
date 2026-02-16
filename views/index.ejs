@@ -1,37 +1,43 @@
-<%- include("layout", { title: "VPN Keys", body: `
-  <div class="card">
-    <h2>Browse Keys</h2>
-    <form method="GET" action="/" class="filters">
-      <select name="type">
-        <option value="">All Types</option>
-        <option value="OUTLINE" ${query.type === "OUTLINE" ? "selected" : ""}>Outline</option>
-        <option value="V2RAY" ${query.type === "V2RAY" ? "selected" : ""}>V2Ray</option>
-      </select>
+<%- include("layout", { 
+  title: "Home",
+  panelConfig,
+  body: `
+<section class="card hero">
 
-      <select name="region">
-        <option value="">All Regions</option>
-        ${regions.map(x => `
-          <option value="${x.region_name}" ${query.region === x.region_name ? "selected" : ""}>
-            ${x.region_flag} ${x.region_name}
-          </option>
-        `).join("")}
-      </select>
+  <h1 class="title">NEON VPN PORTAL</h1>
+  <p class="sub">${panelConfig.announcement}</p>
 
-      <button class="btn" type="submit">Filter</button>
-      <a class="btn secondary" href="/">Reset</a>
-    </form>
+  <div class="tg-buttons">
+
+    <a class="btn neon" href="${panelConfig.telegramAdminUrl}" target="_blank">
+      <svg viewBox="0 0 24 24" class="icon">
+        <path fill="currentColor" d="M9.9 16.2 9.5 20.3c.7 0 1-.3 1.4-.6l3.3-3.1 6.8 5c1.2.7 2.1.3 2.4-1.1L23.9 2c.4-1.6-.6-2.3-1.8-1.9L1.3 8.5C-.2 9-0.2 9.9 1 10.3l5.4 1.7 12.5-7.9c.6-.4 1.1-.2.7.2"/>
+      </svg>
+      Contact Admin
+    </a>
+
+    <a class="btn ghost" href="${panelConfig.telegramChannelUrl}" target="_blank">
+      Join Channel
+    </a>
+
   </div>
 
-  <div class="grid">
-    ${rows.map(r => `
-      <a class="keycard" href="/k/${r.id}">
-        <div class="k-top">
-          <div class="k-type">${r.key_type}</div>
-          <div class="pill ${r.status === "ACTIVE" ? "ok" : "bad"}">${r.status}</div>
-        </div>
-        <div class="k-region">${r.region_flag} ${r.region_name}</div>
-        <div class="k-meta">GB: ${r.gb_limit} • Exp: ${r.expire_date}</div>
-      </a>
-    `).join("")}
-  </div>
-` }) %>
+</section>
+
+<section class="grid">
+
+${rows.map(r=>`
+  <a href="/k/${r.id}" class="key-card">
+    <div class="k-top">
+      <span>${r.key_type}</span>
+      <span class="badge ${r.status==="ACTIVE"?"active":"expired"}">${r.status}</span>
+    </div>
+
+    <div class="k-region">${r.region_flag} ${r.region_name}</div>
+    <div class="k-meta">GB ${r.gb_limit} • ${r.expire_date}</div>
+  </a>
+`).join("")}
+
+</section>
+`
+}) %>
