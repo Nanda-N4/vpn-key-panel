@@ -1,0 +1,11 @@
+<%- include("layout", { title: "Admin Login", body: `
+  <div class="card">
+    <h2>Admin Login</h2>
+    ${error ? `<div class="alert">${error}</div>` : ``}
+    <form method="POST" action="/admin/login">
+      <label>Password</label>
+      <input type="password" name="password" required />
+      <button class="btn" type="submit">Login</button>
+    </form>
+  </div>
+` }) %>
