@@ -1,0 +1,45 @@
+<%- include("layout", { title: "Key Detail", body: `
+  <div class="card">
+    <h2>${row.key_type} • ${row.region_flag} ${row.region_name}</h2>
+    <div class="meta">GB: ${row.gb_limit} • Expire: ${row.expire_date} • Status:
+      <span class="pill ${status === "ACTIVE" ? "ok" : "bad"}">${status}</span>
+    </div>
+
+    <label>Key</label>
+    <div class="copybox">
+      <input id="vpnKey" readonly value="${row.key_string.replace(/"/g, "&quot;")}"/>
+      <button class="btn" onclick="copyKey()">Copy</button>
+    </div>
+
+    <h3>Download Apps</h3>
+    <ul>
+      <li>Windows: <a href="${apps.windows}" target="_blank">Download</a></li>
+      <li>Mac: <a href="${apps.mac}" target="_blank">Download</a></li>
+      <li>Android: <a href="${apps.android}" target="_blank">Download</a></li>
+      <li>iPhone/iPad: <a href="${apps.ios}" target="_blank">Download</a></li>
+    </ul>
+
+    <h3>How to Use</h3>
+    <ol>
+      <li>သင့် OS အလိုက် App ကို Download ဆွဲပါ</li>
+      <li>App ထဲမှာ <b>Import</b> / <b>Add server</b> ကိုနှိပ်ပါ</li>
+      <li>ဒီစာမျက်နှာက Key ကို Copy ယူပြီး Paste ထည့်ပါ</li>
+      <li>Connect လုပ်ပြီး အသုံးပြုပါ</li>
+    </ol>
+  </div>
+
+  <script>
+    function copyKey() {
+      const el = document.getElementById("vpnKey");
+      el.focus();
+      el.select();
+      try {
+        document.execCommand("copy");
+        alert("Copied!");
+      } catch(e) {
+        navigator.clipboard.writeText(el.value);
+        alert("Copied!");
+      }
+    }
+  </script>
+` }) %>
