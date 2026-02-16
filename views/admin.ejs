@@ -1,0 +1,64 @@
+<%- include("layout", { title: "Admin Dashboard", body: `
+  <div class="row">
+    <div class="card">
+      <h2>Add VPN Key</h2>
+      <form method="POST" action="/admin/add">
+        <label>Key Type</label>
+        <select name="key_type" required>
+          <option value="OUTLINE">OUTLINE (Shadowsocks)</option>
+          <option value="V2RAY">V2RAY</option>
+        </select>
+
+        <label>Region Name</label>
+        <input name="region_name" placeholder="Singapore" required />
+
+        <label>Region Flag</label>
+        <input name="region_flag" placeholder="🇸🇬" required />
+
+        <label>GB Limit</label>
+        <input type="number" name="gb_limit" placeholder="2048" required />
+
+        <label>Expire Date (YYYY-MM-DD)</label>
+        <input name="expire_date" placeholder="2026-03-25" required />
+
+        <label>Key String</label>
+        <textarea name="key_string" placeholder="ss://... or vless://..." required></textarea>
+
+        <button class="btn" type="submit">Add</button>
+      </form>
+
+      <form method="POST" action="/admin/logout" style="margin-top:10px;">
+        <button class="btn secondary" type="submit">Logout</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Keys</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th><th>Type</th><th>Region</th><th>GB</th><th>Expire</th><th>Status</th><th>Link</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(r => `
+            <tr>
+              <td>${r.id}</td>
+              <td>${r.key_type}</td>
+              <td>${r.region_flag} ${r.region_name}</td>
+              <td>${r.gb_limit}</td>
+              <td>${r.expire_date}</td>
+              <td><span class="pill ${r.status === "ACTIVE" ? "ok" : "bad"}">${r.status}</span></td>
+              <td><a href="/k/${r.id}" target="_blank">/k/${r.id}</a></td>
+              <td>
+                <form method="POST" action="/admin/delete/${r.id}" onsubmit="return confirm('Delete?')">
+                  <button class="btn danger" type="submit">Delete</button>
+                </form>
+              </td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  </div>
+` }) %>
