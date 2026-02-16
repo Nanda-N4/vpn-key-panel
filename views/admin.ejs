@@ -14,19 +14,20 @@
       <span class="brandMark">⚡</span>
       <span class="brandText"><%= panelConfig.brandName %></span>
     </a>
-    <nav class="topnav">
-      <a class="navlink" href="/">User</a>
-      <a class="navlink" href="/<%= panelConfig.adminPath %>">Admin</a>
-    </nav>
+
+    <div class="topnav">
+      <a class="navlink" href="/">Public</a>
+      <form method="POST" action="<%= ADMIN_PATH %>/logout" style="margin:0;">
+        <button class="btn btnDanger" type="submit">Logout</button>
+      </form>
+    </div>
   </header>
 
   <main class="wrap">
     <section class="card">
       <div class="rowBetween">
         <h2 class="h2">Admin Dashboard</h2>
-        <form method="POST" action="/<%= panelConfig.adminPath %>/logout">
-          <button class="btn btnDanger" type="submit">Logout</button>
-        </form>
+        <div class="hintSmall">Manage VPN Keys</div>
       </div>
 
       <div class="divider"></div>
@@ -35,7 +36,7 @@
         <div class="panel">
           <h3 class="h3">Add VPN Key</h3>
 
-          <form method="POST" action="/<%= panelConfig.adminPath %>/add" class="form">
+          <form method="POST" action="<%= ADMIN_PATH %>/add" class="form">
             <div class="formGrid">
               <div class="field">
                 <div class="label">Key Type</div>
@@ -96,7 +97,7 @@
                     <td><span class="badge <%= r.status === 'ACTIVE' ? 'ok' : 'bad' %>"><%= r.status %></span></td>
                     <td><a href="/k/<%= r.id %>" target="_blank">/k/<%= r.id %></a></td>
                     <td>
-                      <form method="POST" action="/<%= panelConfig.adminPath %>/delete/<%= r.id %>" onsubmit="return confirm('Delete?')">
+                      <form method="POST" action="<%= ADMIN_PATH %>/delete/<%= r.id %>" onsubmit="return confirm('Delete this key?')">
                         <button class="btn btnDanger" type="submit">Delete</button>
                       </form>
                     </td>
