@@ -15,51 +15,50 @@
       <span class="brandText"><%= panelConfig.brandName %></span>
     </a>
 
-    <a class="tinyLink" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
+    <a class="pill" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
       <span class="tgDot">TG</span> Channel
     </a>
   </header>
 
   <main class="wrap">
 
-    <section class="hero card">
-      <div class="heroLeft">
-        <h1 class="h1">Welcome 👋</h1>
-
-        <p class="sub"><%= panelConfig.announcement %></p>
-
-        <div class="steps">
-          <div class="step"><b>1)</b> အောက်က Key Card ကိုနှိပ်ပါ</div>
-          <div class="step"><b>2)</b> Copy ကိုနှိပ်ပါ</div>
-          <div class="step"><b>3)</b> သုံးမယ့် App ကို Download လုပ်ပါ</div>
-          <div class="step"><b>4)</b> App ထဲ Paste → Connect</div>
+    <!-- compact hero -->
+    <section class="heroPro card">
+      <div class="heroProTop">
+        <div>
+          <div class="kicker">VPN KEY PORTAL</div>
+          <h1 class="heroTitle">Quick setup • Copy & Connect</h1>
+          <p class="heroSub"><%= panelConfig.announcement %></p>
         </div>
 
-        <div class="btnRow">
-          <a class="btn btnPrimary" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">
-            <span class="tgDot">TG</span> <%= panelConfig.telegramAdminText %>
+        <div class="heroActions">
+          <a class="pill primary" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">
+            <span class="tgDot">TG</span> Admin
           </a>
-          <a class="btn btnGhost" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
-            <%= panelConfig.telegramChannelText %>
+          <a class="pill" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
+            Channel
           </a>
         </div>
       </div>
 
-      <div class="heroRight">
-        <div class="hud">
-          <div class="hudTitle">Help / Payment / Support</div>
-          <div class="hudSub">
-            Key မရတာ၊ App ထည့်နည်း၊ ဝယ်ယူချင်တာတွေကို Telegram မှာ ဆက်သွယ်ပါ။
-          </div>
-        </div>
+      <div class="chipRow">
+        <span class="chip"><b>1</b> Choose Key</span>
+        <span class="chip"><b>2</b> Copy</span>
+        <span class="chip"><b>3</b> Download App</span>
+        <span class="chip"><b>4</b> Paste → Connect</span>
+      </div>
+
+      <div class="hintLine">
+        Need help / buy key? <a class="hintLink" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">Contact Admin</a>
       </div>
     </section>
 
+    <!-- keys -->
     <section class="keysGrid">
       <% if (!rows || rows.length === 0) { %>
         <div class="card empty">
-          <div class="emptyTitle">No keys found</div>
-          <div class="emptySub">Admin က Key ထည့်ပြီးမှ ပေါ်လာပါမယ်</div>
+          <div class="emptyTitle">No keys yet</div>
+          <div class="emptySub">Admin မှ Free Key မတင်ပေးသေးပါ။ </div>
         </div>
       <% } else { %>
         <% rows.forEach(r => { %>
