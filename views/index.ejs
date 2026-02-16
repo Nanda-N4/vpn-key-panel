@@ -1,43 +1,81 @@
-<%- include("layout", { 
-  title: "Home",
-  panelConfig,
-  body: `
-<section class="card hero">
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title><%= panelConfig.brandName %></title>
+  <link rel="stylesheet" href="/public/style.css"/>
+</head>
+<body>
+  <div class="bg"></div>
 
-  <h1 class="title">NEON VPN PORTAL</h1>
-  <p class="sub">${panelConfig.announcement}</p>
-
-  <div class="tg-buttons">
-
-    <a class="btn neon" href="${panelConfig.telegramAdminUrl}" target="_blank">
-      <svg viewBox="0 0 24 24" class="icon">
-        <path fill="currentColor" d="M9.9 16.2 9.5 20.3c.7 0 1-.3 1.4-.6l3.3-3.1 6.8 5c1.2.7 2.1.3 2.4-1.1L23.9 2c.4-1.6-.6-2.3-1.8-1.9L1.3 8.5C-.2 9-0.2 9.9 1 10.3l5.4 1.7 12.5-7.9c.6-.4 1.1-.2.7.2"/>
-      </svg>
-      Contact Admin
+  <header class="topbar">
+    <a class="brand" href="/">
+      <span class="brandMark">⚡</span>
+      <span class="brandText"><%= panelConfig.brandName %></span>
     </a>
 
-    <a class="btn ghost" href="${panelConfig.telegramChannelUrl}" target="_blank">
-      Join Channel
-    </a>
+    <nav class="topnav">
+      <a class="navlink" href="/">User</a>
+      <a class="navlink" href="/<%= panelConfig.adminPath %>">Admin</a>
+    </nav>
+  </header>
 
-  </div>
+  <main class="wrap">
 
-</section>
+    <section class="hero card">
+      <div class="heroLeft">
+        <h1 class="h1">Neon VPN Portal</h1>
+        <p class="sub"><%= panelConfig.announcement %></p>
 
-<section class="grid">
+        <div class="btnRow">
+          <a class="btn btnPrimary" href="<%= panelConfig.telegramAdminUrl %>" target="_blank">
+            <span class="tgDot">TG</span> Contact Admin
+          </a>
+          <a class="btn btnGhost" href="<%= panelConfig.telegramChannelUrl %>" target="_blank">
+            Join Channel
+          </a>
+        </div>
+      </div>
 
-${rows.map(r=>`
-  <a href="/k/${r.id}" class="key-card">
-    <div class="k-top">
-      <span>${r.key_type}</span>
-      <span class="badge ${r.status==="ACTIVE"?"active":"expired"}">${r.status}</span>
-    </div>
+      <div class="heroRight">
+        <div class="hud">
+          <div class="hudTitle">STATUS</div>
+          <div class="hudValue">ONLINE</div>
+          <div class="hudSub">Fast • Secure • Simple</div>
+        </div>
+      </div>
+    </section>
 
-    <div class="k-region">${r.region_flag} ${r.region_name}</div>
-    <div class="k-meta">GB ${r.gb_limit} • ${r.expire_date}</div>
-  </a>
-`).join("")}
+    <section class="keysGrid">
+      <% if (!rows || rows.length === 0) { %>
+        <div class="card empty">
+          <div class="emptyTitle">No keys found</div>
+          <div class="emptySub">Admin က Key ထည့်ပြီးမှ ပေါ်လာပါမယ်</div>
+        </div>
+      <% } else { %>
+        <% rows.forEach(r => { %>
+          <a class="keyCard" href="/k/<%= r.id %>">
+            <div class="keyTop">
+              <div class="keyType"><%= r.key_type %></div>
+              <div class="badge <%= r.status === 'ACTIVE' ? 'ok' : 'bad' %>"><%= r.status %></div>
+            </div>
+            <div class="keyRegion"><%= r.region_flag %> <%= r.region_name %></div>
+            <div class="keyMeta">
+              <span>GB <b><%= r.gb_limit %></b></span>
+              <span class="dot">•</span>
+              <span><b><%= r.expire_date %></b></span>
+            </div>
+          </a>
+        <% }) %>
+      <% } %>
+    </section>
 
-</section>
-`
-}) %>
+    <footer class="footer">
+      © <%= new Date().getFullYear() %> •
+      <a href="<%= panelConfig.telegramChannelUrl %>" target="_blank"><%= panelConfig.telegramChannelText %></a>
+    </footer>
+
+  </main>
+</body>
+</html>
