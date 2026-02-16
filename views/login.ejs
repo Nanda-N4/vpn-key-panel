@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Login • <%= panelConfig.brandName %></title>
+  <title>Admin Login • <%= panelConfig.brandName %></title>
   <link rel="stylesheet" href="/public/style.css"/>
 </head>
 <body>
@@ -24,7 +24,7 @@
         <div class="errorBox"><%= error %></div>
       <% } %>
 
-      <form method="POST" action="/<%= panelConfig.adminPath %>/login" class="form">
+      <form method="POST" action="<%= ADMIN_PATH %>/login" class="form">
         <div class="field">
           <div class="label">Password</div>
           <input type="password" name="password" class="input" required/>
@@ -32,7 +32,7 @@
         <button class="btn btnPrimary w100" type="submit">Login</button>
       </form>
 
-      <div class="hintSmall">Admin URL: /<%= panelConfig.adminPath %></div>
+      <div class="hintSmall">Admin URL: <b><%= ADMIN_PATH %></b></div>
     </section>
   </main>
 </body>
