@@ -1,0 +1,32 @@
+body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#0b1220; color:#e7eefc; margin:0; }
+a { color:#9cc2ff; text-decoration:none; }
+.container { max-width:1100px; margin:0 auto; padding:18px; }
+.topbar { display:flex; justify-content:space-between; align-items:center; padding:10px 0; }
+.brand { font-weight:700; font-size:18px; }
+.nav a { margin-left:12px; }
+.card { background:#121a2b; border:1px solid #22304e; border-radius:14px; padding:16px; margin:12px 0; }
+.row { display:grid; grid-template-columns: 1fr 1.6fr; gap:14px; }
+@media (max-width: 900px){ .row{ grid-template-columns:1fr; } }
+label { display:block; margin-top:10px; opacity:.9; }
+input, select, textarea { width:100%; padding:10px; border-radius:10px; border:1px solid #2b3b5f; background:#0d1526; color:#e7eefc; }
+textarea { min-height:90px; }
+.btn { display:inline-block; padding:10px 14px; border-radius:10px; border:1px solid #36518a; background:#1a2f60; color:#fff; cursor:pointer; margin-top:12px; }
+.btn.secondary { background:transparent; }
+.btn.danger { background:#6b1a1a; border-color:#a53a3a; }
+.alert { background:#3b1b1b; border:1px solid #a53a3a; padding:10px; border-radius:10px; margin:10px 0; }
+.table { width:100%; border-collapse:collapse; margin-top:10px; }
+.table th, .table td { border-bottom:1px solid #233252; padding:8px; text-align:left; }
+.pill { padding:3px 9px; border-radius:999px; font-size:12px; border:1px solid #2b3b5f; }
+.pill.ok { background:#133a1f; border-color:#2e7c44; }
+.pill.bad { background:#3b1b1b; border-color:#a53a3a; }
+.filters { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-top:12px; }
+@media (max-width: 900px){ .grid{ grid-template-columns:1fr; } }
+.keycard { display:block; background:#121a2b; border:1px solid #22304e; border-radius:14px; padding:14px; }
+.k-top { display:flex; justify-content:space-between; align-items:center; }
+.k-type { font-weight:700; }
+.k-region { margin-top:10px; font-size:18px; }
+.k-meta { margin-top:6px; opacity:.85; }
+.copybox { display:flex; gap:10px; align-items:center; }
+.copybox input { flex:1; }
+.footer { opacity:.6; text-align:center; padding:18px 0; }
