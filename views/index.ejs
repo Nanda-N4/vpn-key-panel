@@ -15,34 +15,42 @@
       <span class="brandText"><%= panelConfig.brandName %></span>
     </a>
 
-    <nav class="topnav">
-      <a class="navlink" href="/">User</a>
-      <a class="navlink" href="/<%= panelConfig.adminPath %>">Admin</a>
-    </nav>
+    <a class="tinyLink" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
+      <span class="tgDot">TG</span> Channel
+    </a>
   </header>
 
   <main class="wrap">
 
     <section class="hero card">
       <div class="heroLeft">
-        <h1 class="h1">Neon VPN Portal</h1>
+        <h1 class="h1">Welcome 👋</h1>
+
         <p class="sub"><%= panelConfig.announcement %></p>
 
+        <div class="steps">
+          <div class="step"><b>1)</b> အောက်က Key Card ကိုနှိပ်ပါ</div>
+          <div class="step"><b>2)</b> Copy ကိုနှိပ်ပါ</div>
+          <div class="step"><b>3)</b> သုံးမယ့် App ကို Download လုပ်ပါ</div>
+          <div class="step"><b>4)</b> App ထဲ Paste → Connect</div>
+        </div>
+
         <div class="btnRow">
-          <a class="btn btnPrimary" href="<%= panelConfig.telegramAdminUrl %>" target="_blank">
-            <span class="tgDot">TG</span> Contact Admin
+          <a class="btn btnPrimary" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">
+            <span class="tgDot">TG</span> <%= panelConfig.telegramAdminText %>
           </a>
-          <a class="btn btnGhost" href="<%= panelConfig.telegramChannelUrl %>" target="_blank">
-            Join Channel
+          <a class="btn btnGhost" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
+            <%= panelConfig.telegramChannelText %>
           </a>
         </div>
       </div>
 
       <div class="heroRight">
         <div class="hud">
-          <div class="hudTitle">STATUS</div>
-          <div class="hudValue">ONLINE</div>
-          <div class="hudSub">Fast • Secure • Simple</div>
+          <div class="hudTitle">Help / Payment / Support</div>
+          <div class="hudSub">
+            Key မရတာ၊ App ထည့်နည်း၊ ဝယ်ယူချင်တာတွေကို Telegram မှာ ဆက်သွယ်ပါ။
+          </div>
         </div>
       </div>
     </section>
@@ -72,8 +80,11 @@
     </section>
 
     <footer class="footer">
-      © <%= new Date().getFullYear() %> •
-      <a href="<%= panelConfig.telegramChannelUrl %>" target="_blank"><%= panelConfig.telegramChannelText %></a>
+      <span>© <%= new Date().getFullYear() %> <%= panelConfig.brandName %></span>
+      <span class="dot">•</span>
+      <a href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
+        <%= panelConfig.telegramChannelText %>
+      </a>
     </footer>
 
   </main>
