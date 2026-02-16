@@ -14,10 +14,10 @@
       <span class="brandMark">⚡</span>
       <span class="brandText"><%= panelConfig.brandName %></span>
     </a>
-    <nav class="topnav">
-      <a class="navlink" href="/">User</a>
-      <a class="navlink" href="/<%= panelConfig.adminPath %>">Admin</a>
-    </nav>
+
+    <a class="tinyLink" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">
+      <span class="tgDot">TG</span> Support
+    </a>
   </header>
 
   <main class="wrap">
@@ -33,6 +33,7 @@
             <span class="badge <%= status === 'ACTIVE' ? 'ok' : 'bad' %>"><%= status %></span>
           </div>
         </div>
+
         <a class="btn btnGhost" href="/">← Back</a>
       </div>
 
@@ -50,28 +51,35 @@
 
       <h3 class="h3">Download Apps</h3>
       <div class="appsGrid">
-        <a class="appCard" href="<%= apps.windows %>" target="_blank">Windows</a>
-        <a class="appCard" href="<%= apps.mac %>" target="_blank">Mac</a>
-        <a class="appCard" href="<%= apps.android %>" target="_blank">Android</a>
-        <a class="appCard" href="<%= apps.ios %>" target="_blank">iPhone/iPad</a>
+        <a class="appCard" href="<%= apps.windows %>" target="_blank" rel="noopener">Windows</a>
+        <a class="appCard" href="<%= apps.mac %>" target="_blank" rel="noopener">Mac</a>
+        <a class="appCard" href="<%= apps.android %>" target="_blank" rel="noopener">Android</a>
+        <a class="appCard" href="<%= apps.ios %>" target="_blank" rel="noopener">iPhone/iPad</a>
       </div>
 
       <div class="divider"></div>
 
       <div class="callout">
         <div class="callTitle">Buy / Support</div>
-        <div class="callSub">ဝယ်ယူလိုပါက Telegram မှ ဆက်သွယ်ပါ</div>
+        <div class="callSub">ဝယ်ယူ/အကူအညီလိုပါက Telegram မှ ဆက်သွယ်ပါ</div>
         <div class="btnRow">
-          <a class="btn btnPrimary" href="<%= panelConfig.telegramAdminUrl %>" target="_blank">
-            <span class="tgDot">TG</span> Telegram Admin
+          <a class="btn btnPrimary" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">
+            <span class="tgDot">TG</span> <%= panelConfig.telegramAdminText %>
           </a>
-          <a class="btn btnGhost" href="<%= panelConfig.telegramChannelUrl %>" target="_blank">
-            Join Channel
+          <a class="btn btnGhost" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
+            <%= panelConfig.telegramChannelText %>
           </a>
         </div>
       </div>
-
     </section>
+
+    <footer class="footer">
+      <span>© <%= new Date().getFullYear() %> <%= panelConfig.brandName %></span>
+      <span class="dot">•</span>
+      <a href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
+        <%= panelConfig.telegramChannelText %>
+      </a>
+    </footer>
 
     <div id="toast" class="toast">Copied ✅</div>
   </main>
