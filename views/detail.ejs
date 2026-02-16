@@ -1,45 +1,46 @@
-<%- include("layout", { title: "Key Detail", body: `
-  <div class="card">
-    <h2>${row.key_type} • ${row.region_flag} ${row.region_name}</h2>
-    <div class="meta">GB: ${row.gb_limit} • Expire: ${row.expire_date} • Status:
-      <span class="pill ${status === "ACTIVE" ? "ok" : "bad"}">${status}</span>
-    </div>
+<%- include("layout", { 
+  title: "Detail",
+  panelConfig,
+  body: `
+<div class="card">
 
-    <label>Key</label>
-    <div class="copybox">
-      <input id="vpnKey" readonly value="${row.key_string.replace(/"/g, "&quot;")}"/>
-      <button class="btn" onclick="copyKey()">Copy</button>
-    </div>
+<h2>${row.key_type} • ${row.region_flag} ${row.region_name}</h2>
 
-    <h3>Download Apps</h3>
-    <ul>
-      <li>Windows: <a href="${apps.windows}" target="_blank">Download</a></li>
-      <li>Mac: <a href="${apps.mac}" target="_blank">Download</a></li>
-      <li>Android: <a href="${apps.android}" target="_blank">Download</a></li>
-      <li>iPhone/iPad: <a href="${apps.ios}" target="_blank">Download</a></li>
-    </ul>
+<div class="info">
+GB: ${row.gb_limit} • Exp: ${row.expire_date}
+<span class="badge ${status==="ACTIVE"?"active":"expired"}">${status}</span>
+</div>
 
-    <h3>How to Use</h3>
-    <ol>
-      <li>သင့် OS အလိုက် App ကို Download ဆွဲပါ</li>
-      <li>App ထဲမှာ <b>Import</b> / <b>Add server</b> ကိုနှိပ်ပါ</li>
-      <li>ဒီစာမျက်နှာက Key ကို Copy ယူပြီး Paste ထည့်ပါ</li>
-      <li>Connect လုပ်ပြီး အသုံးပြုပါ</li>
-    </ol>
-  </div>
+<div class="copy-box">
+  <input id="vpnKey" readonly value="${row.key_string}">
+  <button onclick="copyKey()">Copy</button>
+</div>
 
-  <script>
-    function copyKey() {
-      const el = document.getElementById("vpnKey");
-      el.focus();
-      el.select();
-      try {
-        document.execCommand("copy");
-        alert("Copied!");
-      } catch(e) {
-        navigator.clipboard.writeText(el.value);
-        alert("Copied!");
-      }
-    }
-  </script>
-` }) %>
+<h3>Download Apps</h3>
+<ul>
+<li><a href="${apps.windows}" target="_blank">Windows</a></li>
+<li><a href="${apps.mac}" target="_blank">Mac</a></li>
+<li><a href="${apps.android}" target="_blank">Android</a></li>
+<li><a href="${apps.ios}" target="_blank">iPhone</a></li>
+</ul>
+
+<hr>
+
+<div class="buy-section">
+  <h3>Buy This VPN</h3>
+  <a class="btn neon" href="${panelConfig.telegramAdminUrl}" target="_blank">
+    Telegram Admin
+  </a>
+</div>
+
+</div>
+
+<script>
+function copyKey(){
+  const el=document.getElementById("vpnKey");
+  navigator.clipboard.writeText(el.value);
+  showToast("Copied!");
+}
+</script>
+`
+}) %>
