@@ -7,62 +7,96 @@
   <link rel="stylesheet" href="/public/style.css"/>
 </head>
 <body>
-  <div class="bg"></div>
-
   <header class="topbar">
-    <a class="brand" href="/">
-      <span class="brandMark">⚡</span>
-      <span class="brandText"><%= panelConfig.brandName %></span>
-    </a>
+    <div class="topbarInner">
+      <a class="brand" href="/">
+        <span class="logo">⚡</span>
+        <div>
+          <div class="brandText"><%= panelConfig.brandName %></div>
+          <div class="brandSub">Fast • Simple • Secure</div>
+        </div>
+      </a>
 
-    <a class="pill" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
-      <span class="tgDot">TG</span> Channel
-    </a>
+      <nav class="nav">
+        <a class="btn" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
+          <!-- TG icon -->
+          <svg class="ico" viewBox="0 0 24 24" fill="none">
+            <path d="M21.5 4.5L3.6 11.6c-1.2.5-1.2 1.2-.2 1.5l4.6 1.4 1.7 5.2c.2.6.1.8.7.8.5 0 .8-.2 1.1-.5l2.2-2.1 4.6 3.4c.8.4 1.4.2 1.6-.8l3-14.1c.3-1.2-.5-1.7-1.4-1.3z" fill="currentColor" opacity=".9"/>
+          </svg>
+          Channel
+        </a>
+      </nav>
+    </div>
   </header>
 
-  <main class="wrap">
+  <main class="container">
 
-    <!-- compact hero -->
-    <section class="heroPro card">
-      <div class="heroProTop">
-        <div>
-          <div class="kicker">VPN KEY PORTAL</div>
-          <h1 class="heroTitle">Quick setup • Copy & Connect</h1>
-          <p class="heroSub"><%= panelConfig.announcement %></p>
+    <section class="grid">
+      <div class="card pad">
+        <h1 class="h1">VPN Key ကို ၁ မိနစ်အတွင်း အသုံးပြုနိုင်ပါပြီ</h1>
+        <p class="p"><%= panelConfig.announcement %></p>
+
+        <div class="quickRow">
+          <span class="pill"><b>1</b> Key ကိုရွေး</span>
+          <span class="pill"><b>2</b> Copy</span>
+          <span class="pill"><b>3</b> App Download</span>
+          <span class="pill"><b>4</b> Paste → Connect</span>
         </div>
 
-        <div class="heroActions">
-          <a class="pill primary" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">
-            <span class="tgDot">TG</span> Admin
+        <div class="hr"></div>
+
+        <div class="sideLinks">
+          <a class="btn btnPrimary" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">
+            <svg class="ico" viewBox="0 0 24 24" fill="none">
+              <path d="M21.5 4.5L3.6 11.6c-1.2.5-1.2 1.2-.2 1.5l4.6 1.4 1.7 5.2c.2.6.1.8.7.8.5 0 .8-.2 1.1-.5l2.2-2.1 4.6 3.4c.8.4 1.4.2 1.6-.8l3-14.1c.3-1.2-.5-1.7-1.4-1.3z" fill="currentColor" opacity=".9"/>
+            </svg>
+            Admin
           </a>
-          <a class="pill" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
+
+          <a class="btn" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
             Channel
           </a>
         </div>
       </div>
 
-      <div class="chipRow">
-        <span class="chip"><b>1</b> Choose Key</span>
-        <span class="chip"><b>2</b> Copy</span>
-        <span class="chip"><b>3</b> Download App</span>
-        <span class="chip"><b>4</b> Paste → Connect</span>
-      </div>
-
-      <div class="hintLine">
-        Need help / buy key? <a class="hintLink" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">Contact Admin</a>
-      </div>
+      <aside class="card pad">
+        <h3 class="sideBoxTitle">Support / Buy Key</h3>
+        <p class="sideBoxSub">
+          Key မရတာ၊ App ထည့်နည်း၊ ဝယ်ယူချင်တာတွေကို Telegram မှာ ဆက်သွယ်ပါ။
+        </p>
+        <div class="sideLinks">
+          <a class="btn btnPrimary" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">Contact</a>
+          <a class="btn" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">Updates</a>
+        </div>
+      </aside>
     </section>
 
-    <!-- keys -->
-    <section class="keysGrid">
+    <div class="toolbar">
+      <input id="search" class="search" placeholder="Search region… (e.g. Singapore, Japan)"/>
+      <select id="type" class="select">
+        <option value="">All Types</option>
+        <option value="OUTLINE">OUTLINE</option>
+        <option value="V2RAY">V2RAY</option>
+      </select>
+      <select id="status" class="select">
+        <option value="">All Status</option>
+        <option value="ACTIVE">ACTIVE</option>
+        <option value="EXPIRED">EXPIRED</option>
+      </select>
+    </div>
+
+    <section id="keys" class="keys">
       <% if (!rows || rows.length === 0) { %>
-        <div class="card empty">
-          <div class="emptyTitle">No keys yet</div>
-          <div class="emptySub">Admin မှ Free Key မတင်ပေးသေးပါ။ </div>
+        <div class="card pad">
+          <div style="font-weight:900;">No keys yet</div>
+          <div style="color:rgba(255,255,255,.68); margin-top:6px;">Admin က Key ထည့်ပြီးမှ ပေါ်လာပါမယ်</div>
         </div>
       <% } else { %>
         <% rows.forEach(r => { %>
-          <a class="keyCard" href="/k/<%= r.id %>">
+          <a class="key" href="/k/<%= r.id %>"
+             data-type="<%= r.key_type %>"
+             data-status="<%= r.status %>"
+             data-region="<%= (r.region_name || '').toLowerCase() %>">
             <div class="keyTop">
               <div class="keyType"><%= r.key_type %></div>
               <div class="badge <%= r.status === 'ACTIVE' ? 'ok' : 'bad' %>"><%= r.status %></div>
@@ -71,7 +105,7 @@
             <div class="keyMeta">
               <span>GB <b><%= r.gb_limit %></b></span>
               <span class="dot">•</span>
-              <span><b><%= r.expire_date %></b></span>
+              <span>Exp <b><%= r.expire_date %></b></span>
             </div>
           </a>
         <% }) %>
@@ -81,11 +115,36 @@
     <footer class="footer">
       <span>© <%= new Date().getFullYear() %> <%= panelConfig.brandName %></span>
       <span class="dot">•</span>
-      <a href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
-        <%= panelConfig.telegramChannelText %>
-      </a>
+      <a href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener"><%= panelConfig.telegramChannelText %></a>
     </footer>
 
   </main>
+
+  <script>
+    const searchEl = document.getElementById('search');
+    const typeEl = document.getElementById('type');
+    const statusEl = document.getElementById('status');
+    const cards = Array.from(document.querySelectorAll('#keys a.key'));
+
+    function apply(){
+      const q = (searchEl.value || '').trim().toLowerCase();
+      const t = typeEl.value;
+      const s = statusEl.value;
+
+      cards.forEach(c=>{
+        const region = c.dataset.region || '';
+        const ct = c.dataset.type || '';
+        const cs = c.dataset.status || '';
+
+        const okQ = !q || region.includes(q);
+        const okT = !t || ct === t;
+        const okS = !s || cs === s;
+
+        c.style.display = (okQ && okT && okS) ? '' : 'none';
+      });
+    }
+
+    [searchEl, typeEl, statusEl].forEach(el=>el.addEventListener('input', apply));
+  </script>
 </body>
 </html>
