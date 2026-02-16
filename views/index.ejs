@@ -19,7 +19,6 @@
 
       <nav class="nav">
         <a class="btn" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
-          <!-- TG icon -->
           <svg class="ico" viewBox="0 0 24 24" fill="none">
             <path d="M21.5 4.5L3.6 11.6c-1.2.5-1.2 1.2-.2 1.5l4.6 1.4 1.7 5.2c.2.6.1.8.7.8.5 0 .8-.2 1.1-.5l2.2-2.1 4.6 3.4c.8.4 1.4.2 1.6-.8l3-14.1c.3-1.2-.5-1.7-1.4-1.3z" fill="currentColor" opacity=".9"/>
           </svg>
@@ -31,46 +30,7 @@
 
   <main class="container">
 
-    <section class="grid">
-      <div class="card pad">
-        <h1 class="h1">VPN Key ကို ၁ မိနစ်အတွင်း အသုံးပြုနိုင်ပါပြီ</h1>
-        <p class="p"><%= panelConfig.announcement %></p>
-
-        <div class="quickRow">
-          <span class="pill"><b>1</b> Key ကိုရွေး</span>
-          <span class="pill"><b>2</b> Copy</span>
-          <span class="pill"><b>3</b> App Download</span>
-          <span class="pill"><b>4</b> Paste → Connect</span>
-        </div>
-
-        <div class="hr"></div>
-
-        <div class="sideLinks">
-          <a class="btn btnPrimary" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">
-            <svg class="ico" viewBox="0 0 24 24" fill="none">
-              <path d="M21.5 4.5L3.6 11.6c-1.2.5-1.2 1.2-.2 1.5l4.6 1.4 1.7 5.2c.2.6.1.8.7.8.5 0 .8-.2 1.1-.5l2.2-2.1 4.6 3.4c.8.4 1.4.2 1.6-.8l3-14.1c.3-1.2-.5-1.7-1.4-1.3z" fill="currentColor" opacity=".9"/>
-            </svg>
-            Admin
-          </a>
-
-          <a class="btn" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
-            Channel
-          </a>
-        </div>
-      </div>
-
-      <aside class="card pad">
-        <h3 class="sideBoxTitle">Support / Buy Key</h3>
-        <p class="sideBoxSub">
-          Key မရတာ၊ App ထည့်နည်း၊ ဝယ်ယူချင်တာတွေကို Telegram မှာ ဆက်သွယ်ပါ။
-        </p>
-        <div class="sideLinks">
-          <a class="btn btnPrimary" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">Contact</a>
-          <a class="btn" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">Updates</a>
-        </div>
-      </aside>
-    </section>
-
+    <!-- FILTERS FIRST -->
     <div class="toolbar">
       <input id="search" class="search" placeholder="Search region… (e.g. Singapore, Japan)"/>
       <select id="type" class="select">
@@ -85,6 +45,7 @@
       </select>
     </div>
 
+    <!-- KEYS FIRST -->
     <section id="keys" class="keys">
       <% if (!rows || rows.length === 0) { %>
         <div class="card pad">
@@ -110,6 +71,44 @@
           </a>
         <% }) %>
       <% } %>
+    </section>
+
+    <!-- GUIDE BELOW (short, professional) -->
+    <section class="card pad" style="margin-top:14px;">
+      <h3 class="sideBoxTitle">How to get VPN Key</h3>
+      <p class="sideBoxSub"><%= panelConfig.announcement %></p>
+
+      <div class="quickRow">
+        <span class="pill"><b>1</b> Key ကိုရွေး</span>
+        <span class="pill"><b>2</b> Copy</span>
+        <span class="pill"><b>3</b> App Download</span>
+        <span class="pill"><b>4</b> Paste → Connect</span>
+      </div>
+
+      <div class="sideLinks" style="margin-top:12px;">
+        <a class="btn btnPrimary" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">
+          <svg class="ico" viewBox="0 0 24 24" fill="none">
+            <path d="M21.5 4.5L3.6 11.6c-1.2.5-1.2 1.2-.2 1.5l4.6 1.4 1.7 5.2c.2.6.1.8.7.8.5 0 .8-.2 1.1-.5l2.2-2.1 4.6 3.4c.8.4 1.4.2 1.6-.8l3-14.1c.3-1.2-.5-1.7-1.4-1.3z" fill="currentColor" opacity=".9"/>
+          </svg>
+          <%= panelConfig.telegramAdminText %>
+        </a>
+
+        <a class="btn" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
+          <%= panelConfig.telegramChannelText %>
+        </a>
+      </div>
+    </section>
+
+    <!-- SUPPORT CARD (optional but clean) -->
+    <section class="card pad" style="margin-top:12px;">
+      <h3 class="sideBoxTitle">Support / Buy Key</h3>
+      <p class="sideBoxSub">
+        Key မရတာ၊ App ထည့်နည်း၊ ဝယ်ယူချင်တာတွေကို Telegram မှာ ဆက်သွယ်ပါ။
+      </p>
+      <div class="sideLinks">
+        <a class="btn btnPrimary" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">Contact</a>
+        <a class="btn" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">Updates</a>
+      </div>
     </section>
 
     <footer class="footer">
