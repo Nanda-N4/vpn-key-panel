@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title><%= title || "N4 VPN KEY" %></title>
+  <link rel="stylesheet" href="/public/style.css"/>
+</head>
+<body>
+  <div class="container">
+    <header class="topbar">
+      <a class="brand" href="/">N4 VPN KEY</a>
+      <nav class="nav">
+        <a href="/">User</a>
+        <a href="/admin">Admin</a>
+      </nav>
+    </header>
+    <main>
+      <%- body %>
+    </main>
+    <footer class="footer">© <%= new Date().getFullYear() %></footer>
+  </div>
+</body>
+</html>
