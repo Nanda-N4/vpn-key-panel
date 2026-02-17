@@ -1,151 +1,117 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title><%= panelConfig.brandName %></title>
-  <link rel="stylesheet" href="/public/style.css"/>
-</head>
-<body>
+<%- include("layout", {
+  title: "Home",
+  panelConfig,
+  body: `
+  <section class="section">
+    <div class="glass hero">
+      <div class="heroTop">
+        <div class="heroKicker">VPN Key Portal</div>
+        <h1 class="heroTitle">Key ကို ရွေး → Copy → Paste → Connect</h1>
+        <p class="heroText">${panelConfig.announcement || ""}</p>
 
-<header class="topbar">
-  <div class="topbarInner">
-    <a class="brand" href="/">
-      <span class="logo">⚡</span>
-      <div style="min-width:0">
-        <div class="brandText"><%= panelConfig.brandName %></div>
-        <div class="brandSub">Fast • Simple • Secure</div>
+        <div class="heroActions">
+          <a class="btn primary" href="#keys">
+            <span class="btnIcon">🔑</span>
+            Key များကြည့်ရန်
+          </a>
+          <a class="btn" href="${panelConfig.telegramAdminUrl || "#"}" target="_blank" rel="noopener">
+            <span class="btnIcon">💬</span>
+            ${panelConfig.telegramAdminText || "Contact Admin"}
+          </a>
+        </div>
       </div>
-    </a>
 
-    <nav class="nav">
-      <a class="btn" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
-        <svg class="ico" viewBox="0 0 24 24" fill="none">
-          <path d="M21.5 4.5L3.6 11.6c-1.2.5-1.2 1.2-.2 1.5l4.6 1.4 1.7 5.2c.2.6.1.8.7.8.5 0 .8-.2 1.1-.5l2.2-2.1 4.6 3.4c.8.4 1.4.2 1.6-.8l3-14.1c.3-1.2-.5-1.7-1.4-1.3z" fill="currentColor" opacity=".9"/>
-        </svg>
-        Channel
-      </a>
-    </nav>
-  </div>
-</header>
-
-<main class="container">
-
-  <!-- Filters -->
-  <div class="toolbar">
-    <input id="search" class="search span2" placeholder="Search region… (e.g. Singapore, Japan)"/>
-    <select id="type" class="select">
-      <option value="">All Types</option>
-      <option value="OUTLINE">OUTLINE</option>
-      <option value="V2RAY">V2RAY</option>
-    </select>
-    <select id="status" class="select">
-      <option value="">All Status</option>
-      <option value="ACTIVE">ACTIVE</option>
-      <option value="EXPIRED">EXPIRED</option>
-    </select>
-  </div>
-
-  <!-- Keys first (main content) -->
-  <section id="keys" class="keys">
-    <% if (!rows || rows.length === 0) { %>
-      <div class="card pad">
-        <div class="hTitle">No keys yet</div>
-        <div class="hSub">Admin က Key ထည့်ပြီးမှ ဒီမှာပေါ်လာပါမယ်</div>
+      <div class="miniGuide">
+        <div class="chip"><span class="n">1</span> Key ရွေး</div>
+        <div class="chip"><span class="n">2</span> Copy</div>
+        <div class="chip"><span class="n">3</span> App ထဲထည့်</div>
+        <div class="chip"><span class="n">4</span> Connect</div>
       </div>
-    <% } else { %>
-      <% rows.forEach(r => { %>
-        <a class="key" href="/k/<%= r.id %>"
-           data-type="<%= r.key_type %>"
-           data-status="<%= r.status %>"
-           data-region="<%= (r.region_name || '').toLowerCase() %>">
-          <div class="keyTop">
-            <div class="keyType"><%= r.key_type %></div>
-            <div class="badge <%= r.status === 'ACTIVE' ? 'ok' : 'bad' %>"><%= r.status %></div>
-          </div>
-          <div class="keyRegion"><%= r.region_flag %> <%= r.region_name %></div>
-          <div class="keyMeta">
-            <span>GB <b><%= r.gb_limit %></b></span>
-            <span class="dot">•</span>
-            <span>Exp <b><%= r.expire_date %></b></span>
-          </div>
-        </a>
-      <% }) %>
-    <% } %>
-  </section>
+    </div>
 
-  <!-- Ultra clean guide (hidden by default) -->
-  <section class="card pad" style="margin-top:14px;">
-    <div class="hTitle">How to use</div>
-    <div class="hSub">Key ယူပြီး App ထဲထည့်သုံးဖို့ အောက်က Guide ကိုဖွင့်ကြည့်ပါ။</div>
+    <div class="toolbar glass" id="keys">
+      <form class="toolbarGrid" method="GET" action="/">
+        <div class="field grow">
+          <input class="input" name="q" value="${query.q || ""}" placeholder="Search location… (e.g. Singapore, Japan)" />
+        </div>
 
-    <div class="hr"></div>
+        <div class="field">
+          <select class="select" name="type">
+            <option value="">All Types</option>
+            ${types.map(t => `
+              <option value="${t}" ${query.type === t ? "selected" : ""}>${t}</option>
+            `).join("")}
+          </select>
+        </div>
 
-    <details>
-      <summary>အသုံးပြုနည်း (Tap to open)</summary>
+        <div class="field">
+          <select class="select" name="status">
+            <option value="">All Status</option>
+            ${statuses.map(s => `
+              <option value="${s}" ${query.status === s ? "selected" : ""}>${s}</option>
+            `).join("")}
+          </select>
+        </div>
 
-      <div class="steps">
-        <div class="stepRow">
-          <div class="stepNo">1</div>
-          <div class="stepTxt">အပေါ်က <b>Key စာရင်း</b> ထဲက Region ကိုနှိပ်ပြီး ဖွင့်ပါ။</div>
-        </div>
-        <div class="stepRow">
-          <div class="stepNo">2</div>
-          <div class="stepTxt">Key page ထဲမှာ <span class="kbd">Copy</span> ကိုနှိပ်ပါ။</div>
-        </div>
-        <div class="stepRow">
-          <div class="stepNo">3</div>
-          <div class="stepTxt">Key page ထဲက သင့် OS (Windows / Mac / Android / iPhone) အတွက် App ကို Download လုပ်ပါ။</div>
-        </div>
-        <div class="stepRow">
-          <div class="stepNo">4</div>
-          <div class="stepTxt">App ထဲ <span class="kbd">Import / Add</span> → Paste → <b>Connect</b> လုပ်ပါ။</div>
-        </div>
-        <div class="stepRow">
-          <div class="stepNo">!</div>
-          <div class="stepTxt">
-            မရပါက SIM/Wi-Fi + App အမည် + screenshot နဲ့ Telegram မှာပို့ပါ။
-            <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
-              <a class="btn btnPrimary" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">Contact Admin</a>
-              <a class="btn" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">Join Channel</a>
+        <button class="btn small" type="submit">
+          <span class="btnIcon">🔎</span> Filter
+        </button>
+      </form>
+    </div>
+
+    <div class="grid">
+      ${
+        items.length
+          ? items.map(x => `
+            <a class="glass keyCard" href="${x.link}">
+              <div class="keyTop">
+                <div class="keyType">${x.type}</div>
+                <div class="badge ${x.statusComputed === "ACTIVE" ? "ok" : (x.statusComputed === "EXPIRED" ? "bad" : "muted")}">
+                  ${x.statusComputed}
+                </div>
+              </div>
+
+              <div class="keyRegion">
+                <span class="flag">${x.region_flag || "🌐"}</span>
+                <span class="regionName">${x.region_name}</span>
+              </div>
+
+              <div class="keyMeta">
+                <span>${x.gb_limit ? `GB ${x.gb_limit}` : "No limit"}</span>
+                <span class="dot">•</span>
+                <span>${x.expire_date ? `Expire ${x.expire_date}` : "No expiry"}</span>
+              </div>
+
+              <div class="keyHint">Tap to open →</div>
+            </a>
+          `).join("")
+          : `
+            <div class="glass empty">
+              <div class="emptyTitle">Key မရှိသေးပါ။</div>
+              <div class="emptySub">Admin ကနေ Key ထည့်ပြီး refresh ပြန်လုပ်ပါ။</div>
             </div>
-          </div>
-        </div>
+          `
+      }
+    </div>
+
+    <div class="glass helpCard">
+      <div class="helpTitle">အသုံးပြုနည်း (အတိုချုပ်)</div>
+      <div class="helpList">
+        <div class="helpItem"><span class="b">1)</span> Key ကိုဖွင့်ပြီး <span class="kbd">Copy</span> နှိပ်ပါ</div>
+        <div class="helpItem"><span class="b">2)</span> သင်သုံးမယ့် App ထဲမှာ <span class="kbd">Import / Add</span> → Paste</div>
+        <div class="helpItem"><span class="b">3)</span> <span class="kbd">Connect</span> လုပ်ပြီး သုံးပါ</div>
       </div>
-    </details>
+
+      <div class="helpActions">
+        <a class="btn" href="${panelConfig.telegramAdminUrl || "#"}" target="_blank" rel="noopener">
+          <span class="btnIcon">🧑‍💻</span> Help / Buy Key
+        </a>
+        <a class="btn ghost" href="${panelConfig.telegramChannelUrl || "#"}" target="_blank" rel="noopener">
+          <span class="btnIcon">📢</span> Updates
+        </a>
+      </div>
+    </div>
+
   </section>
-
-  <footer class="footer">
-    <span>© <%= new Date().getFullYear() %> <%= panelConfig.brandName %></span>
-    <span class="dot">•</span>
-    <a href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener"><%= panelConfig.telegramChannelText %></a>
-  </footer>
-
-</main>
-
-<script>
-  const searchEl = document.getElementById('search');
-  const typeEl = document.getElementById('type');
-  const statusEl = document.getElementById('status');
-  const cards = Array.from(document.querySelectorAll('#keys a.key'));
-
-  function apply(){
-    const q = (searchEl.value || '').trim().toLowerCase();
-    const t = typeEl.value;
-    const s = statusEl.value;
-
-    cards.forEach(c=>{
-      const region = c.dataset.region || '';
-      const ct = c.dataset.type || '';
-      const cs = c.dataset.status || '';
-      const okQ = !q || region.includes(q);
-      const okT = !t || ct === t;
-      const okS = !s || cs === s;
-      c.style.display = (okQ && okT && okS) ? '' : 'none';
-    });
-  }
-  [searchEl, typeEl, statusEl].forEach(el=>el.addEventListener('input', apply));
-</script>
-
-</body>
-</html>
+  `
+}) %>
