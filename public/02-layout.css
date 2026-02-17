@@ -1,28 +1,98 @@
-/* FIX glass stretch bug */
-.app-shell,
-.container,
-.main,
-.keys,
-.key-card {
+/* 02-layout.css */
+
+:root{
+  --container: 820px;
+  --pad: 16px;
+  --radius: 22px;
+}
+
+.app-shell{
+  min-height: 100vh;
+}
+
+.container{
   width: 100%;
-  max-width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding-left: max(var(--pad), env(safe-area-inset-left));
+  padding-right: max(var(--pad), env(safe-area-inset-right));
 }
 
-/* Remove accidental 100vw usage */
-.key-card,
-.card {
-  width: 100%;
+.main{
+  padding-top: 14px;
+  padding-bottom: calc(22px + env(safe-area-inset-bottom));
 }
 
-/* Prevent half glass rendering bug */
-.key-card {
-  position: relative;
-  transform: none !important;
-  will-change: auto !important;
+/* Header */
+.app-header{
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  margin: 10px 12px 0 12px;
+  border-radius: 26px;
 }
 
-/* IMPORTANT: prevent weird layer clipping */
-body,
-.app-shell {
-  overflow-x: hidden;
+.header-inner{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
 }
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.brand-icon{
+  width: 36px;
+  height: 36px;
+  border-radius: 14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: rgba(255,255,255,.22);
+  border: 1px solid rgba(255,255,255,.22);
+}
+
+.brand-text{ min-width:0; }
+.brand-title{
+  font-weight: 750;
+  letter-spacing: .2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.brand-sub{
+  font-size: 12px;
+  opacity: .75;
+}
+
+.header-actions{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Sections */
+.card{
+  border-radius: var(--radius);
+  padding: 14px;
+  margin: 14px 0;
+}
+
+.keys-grid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+/* Larger screens */
+@media (min-width: 760px){
+  .keys-grid{ grid-template-columns: 1fr 1fr; }
+  .app-header{ margin: 14px auto 0 auto; max-width: calc(var(--container) + 24px); }
+  }
