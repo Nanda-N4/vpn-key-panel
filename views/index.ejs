@@ -40,19 +40,19 @@
     </div>
   </header>
 <% if (panelConfig?.announceHtml) { %>
-  <div id="announceModal" class="modal-overlay" hidden>
-    <div class="modal glass" role="dialog" aria-modal="true" aria-labelledby="announceTitle">
-      <div class="modal-head">
-        <div id="announceTitle" class="modal-title">Announcement</div>
-        <button class="modal-close glass-btn" type="button" onclick="closeAnnounce()">✕</button>
+  <div id="announceModal" class="a-overlay" hidden>
+    <div class="a-modal glass" role="dialog" aria-modal="true" aria-label="Announcement">
+      <div class="a-head">
+        <div class="a-title">Announcement</div>
+        <button id="aCloseBtn" class="a-close glass-btn" type="button" aria-label="Close">✕</button>
       </div>
 
-      <div class="modal-body">
+      <div class="a-body">
         <%- panelConfig.announceHtml %>
       </div>
 
-      <div class="modal-actions">
-        <button class="pill glass-btn" type="button" onclick="closeAnnounce()">OK</button>
+      <div class="a-actions">
+        <button id="aOkBtn" class="pill glass-btn small" type="button">OK</button>
       </div>
     </div>
   </div>
@@ -63,17 +63,32 @@
       if(!v) return;
 
       const key = "announce_dismissed_" + v;
-      const dismissed = localStorage.getItem(key) === "1";
-      if(dismissed) return;
+      if (localStorage.getItem(key) === "1") return;
 
-      const el = document.getElementById("announceModal");
-      if(!el) return;
-      el.hidden = false;
+      const overlay = document.getElementById("announceModal");
+      const closeBtn = document.getElementById("aCloseBtn");
+      const okBtn = document.getElementById("aOkBtn");
+      if(!overlay || !closeBtn || !okBtn) return;
 
-      window.closeAnnounce = function(){
+      function close(){
         localStorage.setItem(key, "1");
-        el.hidden = true;
-      };
+        overlay.hidden = true;
+      }
+
+      overlay.hidden = false;
+
+      closeBtn.addEventListener("click", close);
+      okBtn.addEventListener("click", close);
+
+      // click outside to close
+      overlay.addEventListener("click", function(e){
+        if (e.target === overlay) close();
+      });
+
+      // ESC to close
+      document.addEventListener("keydown", function(e){
+        if (e.key === "Escape") close();
+      }, { once: true });
     })();
   </script>
 <% } %>
