@@ -1,29 +1,70 @@
-/* Make the hero not too huge (clean + fast) */
+/* ==========================================================================
+   04 — PAGES (user page specific)
+   ========================================================================== */
+
+/* Hero block */
 .hero{
-  padding: 14px 16px;
+  padding: 18px;
 }
 
-.hero h1{
+.hero-kicker{
+  color: var(--muted);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.hero-title{
   margin: 6px 0 8px;
-  font-size: clamp(22px, 4.8vw, 34px);
-  letter-spacing: .2px;
+  font-size: 34px;
+  font-weight: 950;
+  line-height: 1.05;
 }
 
-.hero p{
-  margin: 0;
-  color: hsl(var(--muted));
+.hero-text{
+  margin: 0 0 12px;
+  color: var(--text-2);
   line-height: 1.5;
 }
 
-/* Filters row */
+/* Filters area */
 .filters{
-  display:grid;
+  display: grid;
   grid-template-columns: 1fr;
   gap: 10px;
 }
-@media (min-width: 640px){
-  .filters{
-    grid-template-columns: 1.6fr 1fr 1fr;
-    align-items: center;
-  }
+
+.filters-row{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 420px){
+  .filters-row{ grid-template-columns: 1fr; }
+  .hero-title{ font-size: 30px; }
+}
+
+/* Key list spacing */
+.key-list{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* How-to card */
+.howto ol{
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--text-2);
+}
+
+.howto li{ margin: 6px 0; }
+
+.actions-row{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
 }
