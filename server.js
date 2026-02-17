@@ -47,6 +47,32 @@ function computeStatus(row) {
   return s;
 }
 
+function safeJsonParse(str, fallback) {
+  try {
+    const v = JSON.parse(str);
+    return v && typeof v === "object" ? v : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+// Template: "ဒီ Key က {gb} GB သုံးနိုင်ပါတယ်။" -> replace placeholders
+function applyTemplate(tpl, vars) {
+  const s = safeStr(tpl);
+  if (!s) return "";
+  return s.replace(/\{(\w+)\}/g, (_, k) => (vars[k] ?? "").toString());
+}
+
+// "2026-03-25" -> "25/03/2026" (simple human format)
+function formatDateHuman(iso) {
+  const v = safeStr(iso);
+  if (!v) return "";
+  const m = v.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return v;
+  const yyyy = m[1], mm = m[2], dd = m[3];
+  return `${dd}/${mm}/${yyyy}`;
+}
+
 // ---------- ENV ----------
 const PORT = Number(process.env.PORT || 3000);
 const BASE_URL = safeStr(process.env.BASE_URL || "");
@@ -125,7 +151,6 @@ function sanitizeAnnouncement(html) {
     transformTags: {
       a: sanitizeHtml.simpleTransform("a", { target: "_blank", rel: "noopener" }, true),
     },
-    // Prevent inline scripts/styles
     allowedStyles: {},
     disallowedTagsMode: "discard"
   });
@@ -217,7 +242,6 @@ const qDeleteKey = db.prepare(`DELETE FROM keys WHERE id = ?`);
 const qUpdateStatus = db.prepare(`UPDATE keys SET status = @status WHERE id = @id`);
 
 // ---------- Template data ----------
-// ---------- Template data ----------
 function buildPanelData(req) {
   const cfg = loadConfig();
   const adminPath = safeStr(cfg.adminPath || "admin");
@@ -228,10 +252,47 @@ function buildPanelData(req) {
   const announceHtml = announceEnabled ? mdToSafeHtml(announceMd) : "";
   const announceVersion = announceEnabled ? computeVersion(announceMd) : "";
 
+  // UI text defaults (can be overridden by config.json OR DB setting "ui_text_json")
+  const uiDefaults = {
+    backText: "← Back",
+    labels: {
+      gbShort: "GB",
+      expireShort: "Expire",
+      keyLabel: "Key",
+      copyBtn: "Copy",
+      downloadTitle: "Download Apps",
+    },
+    templates: {
+      gbInfo: "ဒီ Key က {gb} GB သုံးနိုင်ပါတယ်။",
+      expireInfo: "Key သက်တမ်း ကုန်ဆုံးရက်က {date} ပါ။"
+    }
+  };
+
+  // config.json override
+  const uiFromConfig = (cfg.uiText && typeof cfg.uiText === "object") ? cfg.uiText : {};
+
+  // DB override (optional) => settings.k = "ui_text_json"
+  const uiJson = getSetting("ui_text_json", "");
+  const uiFromDb = uiJson ? safeJsonParse(uiJson, {}) : {};
+
+  const uiText = {
+    ...uiDefaults,
+    ...uiFromConfig,
+    ...uiFromDb,
+    labels: {
+      ...uiDefaults.labels,
+      ...(uiFromConfig.labels || {}),
+      ...(uiFromDb.labels || {}),
+    },
+    templates: {
+      ...uiDefaults.templates,
+      ...(uiFromConfig.templates || {}),
+      ...(uiFromDb.templates || {}),
+    }
+  };
+
   const panelConfig = {
     brandName: safeStr(cfg.brandName || "VPN KEY"),
-
-    // optional config.json hero announcement (if you use it)
     announcement: safeStr(cfg.announcement || ""),
 
     telegramAdminText: safeStr(cfg.telegramAdminText || "Contact Admin"),
@@ -239,9 +300,12 @@ function buildPanelData(req) {
     telegramChannelText: safeStr(cfg.telegramChannelText || "Join Channel"),
     telegramChannelUrl: safeStr(cfg.telegramChannelUrl || "#"),
 
-    // ✅ IMPORTANT: add these two lines
+    // announcement (DB)
     announceHtml,
     announceVersion,
+
+    // ✅ UI texts for pages
+    uiText
   };
 
   const origin = BASE_URL || `${req.protocol}://${req.get("host")}`;
@@ -293,7 +357,15 @@ app.get("/k/:id", (req, res) => {
     });
   }
 
-  const item = { ...row, statusComputed: computeStatus(row) };
+  const expireHuman = formatDateHuman(row.expire_date);
+  const item = {
+    ...row,
+    statusComputed: computeStatus(row),
+    expireHuman,
+    // ✅ info lines from templates (admin/config editable)
+    gbInfoText: applyTemplate(panelConfig.uiText.templates.gbInfo, { gb: row.gb_limit || 0 }),
+    expireInfoText: applyTemplate(panelConfig.uiText.templates.expireInfo, { date: expireHuman || (row.expire_date || "-") })
+  };
 
   const typeUpper = safeStr(item.type).toUpperCase();
   let apps = [];
@@ -430,7 +502,7 @@ app.post("/:adminPath/toggle/:id", (req, res) => {
   return res.redirect(`/${adminPath}`);
 });
 
-// NEW: Save announcement (Markdown)
+// Save announcement (Markdown)
 app.post("/:adminPath/announce", (req, res) => {
   const { adminPath } = buildPanelData(req);
   if (safeStr(req.params.adminPath) !== adminPath) return res.status(404).send("Not found");
