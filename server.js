@@ -15,15 +15,17 @@ const sanitizeHtml = require("sanitize-html");
 
 const app = express();
 
-// ---------- Config ----------
+// ==================================================
+// Helpers
+// ==================================================
+function safeStr(v) {
+  return (v ?? "").toString().trim();
+}
+
 function loadConfig() {
   const p = path.join(__dirname, "config.json");
   const raw = fs.readFileSync(p, "utf8");
   return JSON.parse(raw);
-}
-
-function safeStr(v) {
-  return (v ?? "").toString().trim();
 }
 
 function nowISODate() {
@@ -34,6 +36,7 @@ function nowISODate() {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+// Expect YYYY-MM-DD; lexicographic compare works ONLY in this format.
 function isExpired(expireDate) {
   const e = safeStr(expireDate);
   if (!e) return false;
@@ -63,23 +66,33 @@ function applyTemplate(tpl, vars) {
   return s.replace(/\{(\w+)\}/g, (_, k) => (vars[k] ?? "").toString());
 }
 
-// "2026-03-25" -> "25/03/2026" (simple human format)
+// "2026-03-25" -> "25/03/2026"
 function formatDateHuman(iso) {
   const v = safeStr(iso);
   if (!v) return "";
   const m = v.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!m) return v;
-  const yyyy = m[1], mm = m[2], dd = m[3];
+  const yyyy = m[1],
+    mm = m[2],
+    dd = m[3];
   return `${dd}/${mm}/${yyyy}`;
 }
 
-// ---------- ENV ----------
+function computeVersion(str) {
+  return crypto.createHash("sha1").update(str || "").digest("hex").slice(0, 10);
+}
+
+// ==================================================
+// ENV
+// ==================================================
 const PORT = Number(process.env.PORT || 3000);
 const BASE_URL = safeStr(process.env.BASE_URL || "");
 const ADMIN_PASSWORD = safeStr(process.env.ADMIN_PASSWORD || "");
 const COOKIE_SECRET = safeStr(process.env.COOKIE_SECRET || "ChangeThisCookieSecret");
 
-// ---------- DB ----------
+// ==================================================
+// DB
+// ==================================================
 const dbPath = path.join(__dirname, "data.db");
 const db = new Database(dbPath);
 db.pragma("journal_mode = WAL");
@@ -100,7 +113,6 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_keys_region ON keys(region_name);
   CREATE INDEX IF NOT EXISTS idx_keys_status ON keys(status);
 
-  -- settings table (for announcement etc.)
   CREATE TABLE IF NOT EXISTS settings (
     k TEXT PRIMARY KEY,
     v TEXT NOT NULL
@@ -121,38 +133,55 @@ function setSetting(k, v) {
   qSetSetting.run({ k, v: safeStr(v) });
 }
 
-// ---------- Announcement (Markdown -> safe HTML) ----------
+// ==================================================
+// Announcement: Markdown -> Safe HTML
+// ==================================================
 marked.setOptions({
   breaks: true,
   mangle: false,
-  headerIds: false
+  headerIds: false,
 });
 
-// allow emoji/text/link/image (safe)
 function sanitizeAnnouncement(html) {
   return sanitizeHtml(html, {
     allowedTags: [
-      "b","strong","i","em","u","s",
-      "p","br","hr","blockquote",
-      "ul","ol","li",
-      "h1","h2","h3","h4",
-      "code","pre",
-      "a","img","span"
+      "b",
+      "strong",
+      "i",
+      "em",
+      "u",
+      "s",
+      "p",
+      "br",
+      "hr",
+      "blockquote",
+      "ul",
+      "ol",
+      "li",
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "code",
+      "pre",
+      "a",
+      "img",
+      "span",
     ],
     allowedAttributes: {
-      a: ["href","target","rel"],
-      img: ["src","alt","title"],
-      span: ["class"]
+      a: ["href", "target", "rel"],
+      img: ["src", "alt", "title"],
+      span: ["class"],
     },
-    allowedSchemes: ["http","https"],
+    allowedSchemes: ["http", "https"],
     allowedSchemesByTag: {
-      img: ["http","https"]
+      img: ["http", "https"],
     },
     transformTags: {
       a: sanitizeHtml.simpleTransform("a", { target: "_blank", rel: "noopener" }, true),
     },
     allowedStyles: {},
-    disallowedTagsMode: "discard"
+    disallowedTagsMode: "discard",
   });
 }
 
@@ -161,11 +190,9 @@ function mdToSafeHtml(md) {
   return sanitizeAnnouncement(raw);
 }
 
-function computeVersion(str) {
-  return crypto.createHash("sha1").update(str || "").digest("hex").slice(0, 10);
-}
-
-// ---------- App middleware ----------
+// ==================================================
+// App middleware
+// ==================================================
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
@@ -175,10 +202,13 @@ app.use(express.json({ limit: "256kb" }));
 app.use(cookieParser(COOKIE_SECRET));
 app.use("/public", express.static(path.join(__dirname, "public"), { etag: false, maxAge: 0 }));
 
-// ---------- Auth ----------
+// ==================================================
+// Auth
+// ==================================================
 function isAuthed(req) {
   const v = req.signedCookies && req.signedCookies.admin;
   if (!v) return false;
+
   const parts = safeStr(v).split(".");
   if (parts.length !== 2) return false;
 
@@ -207,10 +237,10 @@ function setAuth(res, req) {
   res.cookie("admin", `${ts}.${sig}`, {
     httpOnly: true,
     sameSite: "lax",
-    secure: false,
+    secure: false, // set true if HTTPS + reverse proxy configured
     maxAge: 12 * 60 * 60 * 1000,
     signed: true,
-    path: "/"
+    path: "/",
   });
 }
 
@@ -218,7 +248,9 @@ function clearAuth(res) {
   res.clearCookie("admin", { path: "/" });
 }
 
-// ---------- Queries ----------
+// ==================================================
+// Queries
+// ==================================================
 const qListKeys = db.prepare(`
   SELECT * FROM keys
   WHERE
@@ -241,7 +273,9 @@ const qAddKey = db.prepare(`
 const qDeleteKey = db.prepare(`DELETE FROM keys WHERE id = ?`);
 const qUpdateStatus = db.prepare(`UPDATE keys SET status = @status WHERE id = @id`);
 
-// ---------- Template data ----------
+// ==================================================
+// Template data
+// ==================================================
 function buildPanelData(req) {
   const cfg = loadConfig();
   const adminPath = safeStr(cfg.adminPath || "admin");
@@ -252,7 +286,7 @@ function buildPanelData(req) {
   const announceHtml = announceEnabled ? mdToSafeHtml(announceMd) : "";
   const announceVersion = announceEnabled ? computeVersion(announceMd) : "";
 
-  // UI text defaults (can be overridden by config.json OR DB setting "ui_text_json")
+  // UI text defaults (override by config.json OR DB setting "ui_text_json")
   const uiDefaults = {
     backText: "← Back",
     labels: {
@@ -264,17 +298,18 @@ function buildPanelData(req) {
     },
     templates: {
       gbInfo: "ဒီ Key က {gb} GB သုံးနိုင်ပါတယ်။",
-      expireInfo: "Key သက်တမ်း ကုန်ဆုံးရက်က {date} ပါ။"
-    }
+      expireInfo: "Key သက်တမ်း ကုန်ဆုံးရက်က {date} ပါ။",
+    },
   };
 
   // config.json override
-  const uiFromConfig = (cfg.uiText && typeof cfg.uiText === "object") ? cfg.uiText : {};
+  const uiFromConfig = cfg.uiText && typeof cfg.uiText === "object" ? cfg.uiText : {};
 
-  // DB override (optional) => settings.k = "ui_text_json"
+  // DB override (settings.k = "ui_text_json")
   const uiJson = getSetting("ui_text_json", "");
   const uiFromDb = uiJson ? safeJsonParse(uiJson, {}) : {};
 
+  // merge
   const uiText = {
     ...uiDefaults,
     ...uiFromConfig,
@@ -288,7 +323,7 @@ function buildPanelData(req) {
       ...uiDefaults.templates,
       ...(uiFromConfig.templates || {}),
       ...(uiFromDb.templates || {}),
-    }
+    },
   };
 
   const panelConfig = {
@@ -304,15 +339,17 @@ function buildPanelData(req) {
     announceHtml,
     announceVersion,
 
-    // ✅ UI texts for pages
-    uiText
+    // UI texts for pages
+    uiText,
   };
 
   const origin = BASE_URL || `${req.protocol}://${req.get("host")}`;
   return { panelConfig, adminPath, origin, announceMd, announceEnabled };
 }
 
-// ---------- Public routes ----------
+// ==================================================
+// Public routes
+// ==================================================
 app.get("/", (req, res) => {
   const { panelConfig } = buildPanelData(req);
 
@@ -320,18 +357,18 @@ app.get("/", (req, res) => {
   const type = safeStr(req.query.type || "");
   const status = safeStr(req.query.status || "");
 
-  const rows = qListKeys.all({ q, type, status: "" }).map(r => ({
+  const rows = qListKeys.all({ q, type, status: "" }).map((r) => ({
     ...r,
     statusComputed: computeStatus(r),
-    link: `/k/${r.id}`
+    link: `/k/${r.id}`,
   }));
 
-  const filtered = rows.filter(r => {
+  const filtered = rows.filter((r) => {
     if (!status) return true;
     return r.statusComputed === status.toUpperCase();
   });
 
-  const types = Array.from(new Set(rows.map(r => r.type))).sort();
+  const types = Array.from(new Set(rows.map((r) => r.type))).sort();
   const statuses = ["ACTIVE", "INACTIVE", "EXPIRED"];
 
   res.render("index", {
@@ -339,12 +376,13 @@ app.get("/", (req, res) => {
     items: filtered,
     query: { q, type, status },
     types,
-    statuses
+    statuses,
   });
 });
 
 app.get("/k/:id", (req, res) => {
   const { panelConfig } = buildPanelData(req);
+
   const id = Number(req.params.id);
   const row = qGetKey.get(id);
 
@@ -353,18 +391,20 @@ app.get("/k/:id", (req, res) => {
       panelConfig,
       item: null,
       apps: [],
-      error: "Key မတွေ့ပါ။"
+      error: "Key မတွေ့ပါ။",
     });
   }
 
   const expireHuman = formatDateHuman(row.expire_date);
+
   const item = {
     ...row,
     statusComputed: computeStatus(row),
     expireHuman,
-    // ✅ info lines from templates (admin/config editable)
     gbInfoText: applyTemplate(panelConfig.uiText.templates.gbInfo, { gb: row.gb_limit || 0 }),
-    expireInfoText: applyTemplate(panelConfig.uiText.templates.expireInfo, { date: expireHuman || (row.expire_date || "-") })
+    expireInfoText: applyTemplate(panelConfig.uiText.templates.expireInfo, {
+      date: expireHuman || row.expire_date || "-",
+    }),
   };
 
   const typeUpper = safeStr(item.type).toUpperCase();
@@ -375,21 +415,23 @@ app.get("/k/:id", (req, res) => {
       { name: "Windows", sub: "Outline Client", icon: "windows", url: "https://getoutline.org/" },
       { name: "macOS", sub: "Outline Client", icon: "apple", url: "https://getoutline.org/" },
       { name: "Android", sub: "Outline App", icon: "android", url: "https://play.google.com/store/apps/details?id=org.outline.android.client" },
-      { name: "iPhone / iPad", sub: "Outline App", icon: "apple", url: "https://apps.apple.com/app/outline-app/id1356177741" }
+      { name: "iPhone / iPad", sub: "Outline App", icon: "apple", url: "https://apps.apple.com/app/outline-app/id1356177741" },
     ];
   } else {
     apps = [
       { name: "Windows", sub: "V2Ray Client", icon: "windows", url: "https://github.com/2dust/v2rayN" },
       { name: "macOS", sub: "V2Ray Client", icon: "apple", url: "https://github.com/2dust/v2rayN" },
       { name: "Android", sub: "v2rayNG", icon: "android", url: "https://github.com/2dust/v2rayNG" },
-      { name: "iPhone / iPad", sub: "Client (iOS)", icon: "apple", url: "https://apps.apple.com/" }
+      { name: "iPhone / iPad", sub: "Client (iOS)", icon: "apple", url: "https://apps.apple.com/" },
     ];
   }
 
   res.render("detail", { panelConfig, item, apps, error: "" });
 });
 
-// ---------- Admin routes ----------
+// ==================================================
+// Admin routes
+// ==================================================
 app.get("/:adminPath", (req, res) => {
   const { panelConfig, adminPath, announceMd, announceEnabled } = buildPanelData(req);
   if (safeStr(req.params.adminPath) !== adminPath) return res.status(404).send("Not found");
@@ -401,17 +443,26 @@ app.get("/:adminPath", (req, res) => {
       mode: "login",
       error: "",
       keys: [],
-      defaults: { type: "V2RAY", gb_limit: 2048, expire_date: nowISODate(), region_name: "", region_flag: "" },
+      defaults: {
+        type: "V2RAY",
+        gb_limit: 2048,
+        expire_date: nowISODate(),
+        region_name: "",
+        region_flag: "",
+      },
       announceMd,
-      announceEnabled
+      announceEnabled,
     });
   }
 
-  const keys = db.prepare(`SELECT * FROM keys ORDER BY id DESC`).all().map(r => ({
-    ...r,
-    statusComputed: computeStatus(r),
-    link: `/k/${r.id}`
-  }));
+  const keys = db
+    .prepare(`SELECT * FROM keys ORDER BY id DESC`)
+    .all()
+    .map((r) => ({
+      ...r,
+      statusComputed: computeStatus(r),
+      link: `/k/${r.id}`,
+    }));
 
   return res.render("admin", {
     panelConfig,
@@ -419,9 +470,15 @@ app.get("/:adminPath", (req, res) => {
     mode: "dashboard",
     error: safeStr(req.query.err || ""),
     keys,
-    defaults: { type: "V2RAY", gb_limit: 2048, expire_date: nowISODate(), region_name: "", region_flag: "" },
+    defaults: {
+      type: "V2RAY",
+      gb_limit: 2048,
+      expire_date: nowISODate(),
+      region_name: "",
+      region_flag: "",
+    },
     announceMd,
-    announceEnabled
+    announceEnabled,
   });
 });
 
@@ -438,9 +495,15 @@ app.post("/:adminPath/login", (req, res) => {
       mode: "login",
       error: "Password မမှန်ပါ။",
       keys: [],
-      defaults: { type: "V2RAY", gb_limit: 2048, expire_date: nowISODate(), region_name: "", region_flag: "" },
+      defaults: {
+        type: "V2RAY",
+        gb_limit: 2048,
+        expire_date: nowISODate(),
+        region_name: "",
+        region_flag: "",
+      },
       announceMd,
-      announceEnabled
+      announceEnabled,
     });
   }
 
@@ -467,7 +530,7 @@ app.post("/:adminPath/add", (req, res) => {
     gb_limit: Number(req.body.gb_limit || 0) || 0,
     expire_date: safeStr(req.body.expire_date || ""),
     key_string: safeStr(req.body.key_string || ""),
-    status: safeStr(req.body.status || "ACTIVE").toUpperCase()
+    status: safeStr(req.body.status || "ACTIVE").toUpperCase(),
   };
 
   if (!payload.key_string || payload.key_string.length < 8) {
@@ -517,7 +580,9 @@ app.post("/:adminPath/announce", (req, res) => {
   return res.redirect(`/${adminPath}`);
 });
 
-// ---------- Start ----------
+// ==================================================
+// Start
+// ==================================================
 app.listen(PORT, () => {
   console.log(`✅ running on :${PORT}`);
 });
