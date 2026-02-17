@@ -10,6 +10,9 @@ const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const Database = require("better-sqlite3");
 
+const { marked } = require("marked");
+const sanitizeHtml = require("sanitize-html");
+
 const app = express();
 
 // ---------- Config ----------
@@ -24,7 +27,6 @@ function safeStr(v) {
 }
 
 function nowISODate() {
-  // YYYY-MM-DD
   const d = new Date();
   const yyyy = d.getFullYear();
   const mm = String(d.getMonth() + 1).padStart(2, "0");
@@ -35,12 +37,10 @@ function nowISODate() {
 function isExpired(expireDate) {
   const e = safeStr(expireDate);
   if (!e) return false;
-  // Compare as strings works for YYYY-MM-DD
   return e < nowISODate();
 }
 
 function computeStatus(row) {
-  // row.status can be ACTIVE/INACTIVE. EXPIRED overrides.
   if (isExpired(row.expire_date)) return "EXPIRED";
   const s = (row.status || "ACTIVE").toUpperCase();
   if (s !== "ACTIVE" && s !== "INACTIVE") return "ACTIVE";
@@ -73,36 +73,94 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_keys_type ON keys(type);
   CREATE INDEX IF NOT EXISTS idx_keys_region ON keys(region_name);
   CREATE INDEX IF NOT EXISTS idx_keys_status ON keys(status);
+
+  -- settings table (for announcement etc.)
+  CREATE TABLE IF NOT EXISTS settings (
+    k TEXT PRIMARY KEY,
+    v TEXT NOT NULL
+  );
 `);
+
+const qGetSetting = db.prepare(`SELECT v FROM settings WHERE k = ?`);
+const qSetSetting = db.prepare(`
+  INSERT INTO settings (k,v) VALUES (@k,@v)
+  ON CONFLICT(k) DO UPDATE SET v=excluded.v
+`);
+
+function getSetting(k, fallback = "") {
+  const row = qGetSetting.get(k);
+  return row ? safeStr(row.v) : fallback;
+}
+function setSetting(k, v) {
+  qSetSetting.run({ k, v: safeStr(v) });
+}
+
+// ---------- Announcement (Markdown -> safe HTML) ----------
+marked.setOptions({
+  breaks: true,
+  mangle: false,
+  headerIds: false
+});
+
+// allow emoji/text/link/image (safe)
+function sanitizeAnnouncement(html) {
+  return sanitizeHtml(html, {
+    allowedTags: [
+      "b","strong","i","em","u","s",
+      "p","br","hr","blockquote",
+      "ul","ol","li",
+      "h1","h2","h3","h4",
+      "code","pre",
+      "a","img","span"
+    ],
+    allowedAttributes: {
+      a: ["href","target","rel"],
+      img: ["src","alt","title"],
+      span: ["class"]
+    },
+    allowedSchemes: ["http","https"],
+    allowedSchemesByTag: {
+      img: ["http","https"]
+    },
+    transformTags: {
+      a: sanitizeHtml.simpleTransform("a", { target: "_blank", rel: "noopener" }, true),
+    },
+    // Prevent inline scripts/styles
+    allowedStyles: {},
+    disallowedTagsMode: "discard"
+  });
+}
+
+function mdToSafeHtml(md) {
+  const raw = marked.parse(md || "");
+  return sanitizeAnnouncement(raw);
+}
+
+function computeVersion(str) {
+  return crypto.createHash("sha1").update(str || "").digest("hex").slice(0, 10);
+}
 
 // ---------- App middleware ----------
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-app.use(helmet({
-  contentSecurityPolicy: false, // simplest for inline svg/icons & small inline script
-}));
-app.use(express.urlencoded({ extended: true, limit: "128kb" }));
-app.use(express.json({ limit: "128kb" }));
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(express.urlencoded({ extended: true, limit: "256kb" }));
+app.use(express.json({ limit: "256kb" }));
 app.use(cookieParser(COOKIE_SECRET));
-app.use("/public", express.static(path.join(__dirname, "public"), {
-  maxAge: "7d",
-}));
+app.use("/public", express.static(path.join(__dirname, "public"), { maxAge: "7d" }));
 
-// ---------- Auth (signed cookie) ----------
+// ---------- Auth ----------
 function isAuthed(req) {
   const v = req.signedCookies && req.signedCookies.admin;
   if (!v) return false;
-  // token format: <ts>.<sig>
   const parts = safeStr(v).split(".");
   if (parts.length !== 2) return false;
-  const ts = parts[0];
-  const sig = parts[1];
 
-  // 12h session
-  const tsNum = Number(ts);
-  if (!Number.isFinite(tsNum)) return false;
-  if (Date.now() - tsNum > 12 * 60 * 60 * 1000) return false;
+  const ts = Number(parts[0]);
+  const sig = parts[1];
+  if (!Number.isFinite(ts)) return false;
+  if (Date.now() - ts > 12 * 60 * 60 * 1000) return false;
 
   const expected = crypto
     .createHmac("sha256", COOKIE_SECRET)
@@ -124,10 +182,10 @@ function setAuth(res, req) {
   res.cookie("admin", `${ts}.${sig}`, {
     httpOnly: true,
     sameSite: "lax",
-    secure: false, // set true when behind HTTPS
+    secure: false,
     maxAge: 12 * 60 * 60 * 1000,
     signed: true,
-    path: "/",
+    path: "/"
   });
 }
 
@@ -158,25 +216,37 @@ const qAddKey = db.prepare(`
 const qDeleteKey = db.prepare(`DELETE FROM keys WHERE id = ?`);
 const qUpdateStatus = db.prepare(`UPDATE keys SET status = @status WHERE id = @id`);
 
-// ---------- Helpers for templates ----------
+// ---------- Template data ----------
 function buildPanelData(req) {
   const cfg = loadConfig();
   const adminPath = safeStr(cfg.adminPath || "admin");
+
+  // Announcement from DB (markdown)
+  const announceMd = getSetting("announce_md", "");
+  const announceEnabled = getSetting("announce_enabled", "0") === "1";
+  const announceHtml = announceEnabled ? mdToSafeHtml(announceMd) : "";
+  const announceVersion = announceEnabled ? computeVersion(announceMd) : "";
+
   const panelConfig = {
     brandName: safeStr(cfg.brandName || "VPN KEY"),
+    // keep config.json announcement as hero text (optional)
     announcement: safeStr(cfg.announcement || ""),
+
     telegramAdminText: safeStr(cfg.telegramAdminText || "Contact Admin"),
     telegramAdminUrl: safeStr(cfg.telegramAdminUrl || "#"),
     telegramChannelText: safeStr(cfg.telegramChannelText || "Join Channel"),
     telegramChannelUrl: safeStr(cfg.telegramChannelUrl || "#"),
+
+    // NEW:
+    announceHtml,
+    announceVersion
   };
 
-  // If BASE_URL empty, derive from request
   const origin = BASE_URL || `${req.protocol}://${req.get("host")}`;
-  return { panelConfig, adminPath, origin };
+  return { panelConfig, adminPath, origin, announceMd, announceEnabled };
 }
 
-// ---------- Routes (Public) ----------
+// ---------- Public routes ----------
 app.get("/", (req, res) => {
   const { panelConfig } = buildPanelData(req);
 
@@ -187,17 +257,14 @@ app.get("/", (req, res) => {
   const rows = qListKeys.all({ q, type, status: "" }).map(r => ({
     ...r,
     statusComputed: computeStatus(r),
-    isExpired: computeStatus(r) === "EXPIRED",
-    link: `/k/${r.id}`,
+    link: `/k/${r.id}`
   }));
 
-  // status filter must happen after computeStatus (expired override)
   const filtered = rows.filter(r => {
     if (!status) return true;
     return r.statusComputed === status.toUpperCase();
   });
 
-  // build select options
   const types = Array.from(new Set(rows.map(r => r.type))).sort();
   const statuses = ["ACTIVE", "INACTIVE", "EXPIRED"];
 
@@ -206,7 +273,7 @@ app.get("/", (req, res) => {
     items: filtered,
     query: { q, type, status },
     types,
-    statuses,
+    statuses
   });
 });
 
@@ -220,17 +287,12 @@ app.get("/k/:id", (req, res) => {
       panelConfig,
       item: null,
       apps: [],
-      error: "Key မတွေ့ပါ။",
+      error: "Key မတွေ့ပါ။"
     });
   }
 
-  const item = {
-    ...row,
-    statusComputed: computeStatus(row),
-  };
+  const item = { ...row, statusComputed: computeStatus(row) };
 
-  // Simple app links (keep stable / official-ish)
-  // OUTLINE => Outline client, V2RAY => v2rayNG/Shadowrocket style note
   const typeUpper = safeStr(item.type).toUpperCase();
   let apps = [];
 
@@ -239,25 +301,23 @@ app.get("/k/:id", (req, res) => {
       { name: "Windows", sub: "Outline Client", icon: "windows", url: "https://getoutline.org/" },
       { name: "macOS", sub: "Outline Client", icon: "apple", url: "https://getoutline.org/" },
       { name: "Android", sub: "Outline App", icon: "android", url: "https://play.google.com/store/apps/details?id=org.outline.android.client" },
-      { name: "iPhone / iPad", sub: "Outline App", icon: "apple", url: "https://apps.apple.com/app/outline-app/id1356177741" },
+      { name: "iPhone / iPad", sub: "Outline App", icon: "apple", url: "https://apps.apple.com/app/outline-app/id1356177741" }
     ];
   } else {
-    // V2RAY / VLESS / SS mixed — provide common client category
     apps = [
       { name: "Windows", sub: "V2Ray Client", icon: "windows", url: "https://github.com/2dust/v2rayN" },
       { name: "macOS", sub: "V2Ray Client", icon: "apple", url: "https://github.com/2dust/v2rayN" },
       { name: "Android", sub: "v2rayNG", icon: "android", url: "https://github.com/2dust/v2rayNG" },
-      { name: "iPhone / iPad", sub: "Client (iOS)", icon: "apple", url: "https://apps.apple.com/" },
+      { name: "iPhone / iPad", sub: "Client (iOS)", icon: "apple", url: "https://apps.apple.com/" }
     ];
   }
 
   res.render("detail", { panelConfig, item, apps, error: "" });
 });
 
-// ---------- Routes (Admin, hidden path) ----------
+// ---------- Admin routes ----------
 app.get("/:adminPath", (req, res) => {
-  const { panelConfig, adminPath } = buildPanelData(req);
-
+  const { panelConfig, adminPath, announceMd, announceEnabled } = buildPanelData(req);
   if (safeStr(req.params.adminPath) !== adminPath) return res.status(404).send("Not found");
 
   if (!isAuthed(req)) {
@@ -268,22 +328,26 @@ app.get("/:adminPath", (req, res) => {
       error: "",
       keys: [],
       defaults: { type: "V2RAY", gb_limit: 2048, expire_date: nowISODate(), region_name: "", region_flag: "" },
+      announceMd,
+      announceEnabled
     });
   }
 
   const keys = db.prepare(`SELECT * FROM keys ORDER BY id DESC`).all().map(r => ({
     ...r,
     statusComputed: computeStatus(r),
-    link: `/k/${r.id}`,
+    link: `/k/${r.id}`
   }));
 
   return res.render("admin", {
     panelConfig,
     adminPath,
     mode: "dashboard",
-    error: "",
+    error: safeStr(req.query.err || ""),
     keys,
     defaults: { type: "V2RAY", gb_limit: 2048, expire_date: nowISODate(), region_name: "", region_flag: "" },
+    announceMd,
+    announceEnabled
   });
 });
 
@@ -293,7 +357,7 @@ app.post("/:adminPath/login", (req, res) => {
 
   const pass = safeStr(req.body.password || "");
   if (!ADMIN_PASSWORD || pass !== ADMIN_PASSWORD) {
-    const { panelConfig } = buildPanelData(req);
+    const { panelConfig, announceMd, announceEnabled } = buildPanelData(req);
     return res.status(401).render("admin", {
       panelConfig,
       adminPath,
@@ -301,6 +365,8 @@ app.post("/:adminPath/login", (req, res) => {
       error: "Password မမှန်ပါ။",
       keys: [],
       defaults: { type: "V2RAY", gb_limit: 2048, expire_date: nowISODate(), region_name: "", region_flag: "" },
+      announceMd,
+      announceEnabled
     });
   }
 
@@ -311,7 +377,6 @@ app.post("/:adminPath/login", (req, res) => {
 app.post("/:adminPath/logout", (req, res) => {
   const { adminPath } = buildPanelData(req);
   if (safeStr(req.params.adminPath) !== adminPath) return res.status(404).send("Not found");
-
   clearAuth(res);
   return res.redirect(`/${adminPath}`);
 });
@@ -328,7 +393,7 @@ app.post("/:adminPath/add", (req, res) => {
     gb_limit: Number(req.body.gb_limit || 0) || 0,
     expire_date: safeStr(req.body.expire_date || ""),
     key_string: safeStr(req.body.key_string || ""),
-    status: safeStr(req.body.status || "ACTIVE").toUpperCase(),
+    status: safeStr(req.body.status || "ACTIVE").toUpperCase()
   };
 
   if (!payload.key_string || payload.key_string.length < 8) {
@@ -360,6 +425,21 @@ app.post("/:adminPath/toggle/:id", (req, res) => {
 
   const next = (row.status || "ACTIVE").toUpperCase() === "ACTIVE" ? "INACTIVE" : "ACTIVE";
   qUpdateStatus.run({ id, status: next });
+  return res.redirect(`/${adminPath}`);
+});
+
+// NEW: Save announcement (Markdown)
+app.post("/:adminPath/announce", (req, res) => {
+  const { adminPath } = buildPanelData(req);
+  if (safeStr(req.params.adminPath) !== adminPath) return res.status(404).send("Not found");
+  if (!isAuthed(req)) return res.status(403).send("Forbidden");
+
+  const enabled = safeStr(req.body.announce_enabled || "0") === "1" ? "1" : "0";
+  const md = safeStr(req.body.announce_md || "");
+
+  setSetting("announce_enabled", enabled);
+  setSetting("announce_md", md);
+
   return res.redirect(`/${adminPath}`);
 });
 
