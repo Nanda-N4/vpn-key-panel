@@ -402,3 +402,70 @@
 .app-arrow{
   opacity:.6;
 }
+/* ===== Detail title spacing ===== */
+.detail-title{
+  margin: 8px 0 0 0;
+  letter-spacing: .4px;
+}
+
+/* ===== Apps grid: better spacing ===== */
+.apps-grid-cards{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+/* ===== App cards (keep your previous, but ensure height/spacing) ===== */
+.app-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px;
+  border-radius:22px;
+  text-decoration:none;
+  color:inherit;
+  transition:all .25s ease;
+}
+
+.app-left{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.app-icon{
+  width:26px;
+  height:26px;
+  opacity:.9;
+}
+
+.app-arrow{
+  opacity:.55;
+}
+
+/* Platform borders */
+.app-platform.windows{ border:1px solid rgba(120,180,255,.35); }
+.app-platform.android{ border:1px solid rgba(120,255,160,.35); }
+.app-platform.apple{ border:1px solid rgba(255,255,255,.35); }
+
+/* ===== ACTION BUTTONS spacing fix (Your issue) ===== */
+.detail-actions-split{
+  margin-top: 16px;
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 420px){
+  .detail-actions-split{
+    grid-template-columns: 1fr; /* small phones -> stacked */
+  }
+}
+
+.action-pill{
+  width: 100%;
+  justify-content: center;
+  padding: 12px 14px;
+  border-radius: 18px;
+  font-weight: 750;
+}
