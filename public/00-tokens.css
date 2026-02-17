@@ -36,3 +36,11 @@
   --ok: rgba(0,190,140,.16);
   --ok-border: rgba(0,190,140,.25);
 }
+body {
+  background:
+    radial-gradient(circle at 20% 20%, #dbeafe 0%, transparent 40%),
+    radial-gradient(circle at 80% 30%, #e0e7ff 0%, transparent 40%),
+    linear-gradient(180deg, #eef2ff, #e0f2fe);
+
+  min-height: 100vh;
+}
