@@ -62,37 +62,48 @@
         </ol>
       </section>
 
-      <!-- Filters -->
-      <section class="card glass filters">
-        <form method="GET" action="/" class="filters-grid">
-          <label class="field">
-            <span class="field-label">Search location...</span>
-            <input class="input" type="text" name="q" value="<%= query.q || '' %>" placeholder="e.g. Singapore, Japan" />
-          </label>
+<section class="card glass filters">
+  <details class="filter-wrap" <%= (query.q || query.type || query.status) ? "open" : "" %>>
+    <summary class="filter-summary glass-btn">
+      🔎 Filter
+      <span class="filter-hint">
+        <%= (query.q || query.type || query.status) ? "Active" : "Tap to expand" %>
+      </span>
+    </summary>
 
-          <label class="field">
-            <span class="field-label">Type</span>
-            <select class="select" name="type">
-              <option value="">All Types</option>
-              <% (types || []).forEach(t => { %>
-                <option value="<%= t %>" <%= (query.type === t) ? "selected" : "" %>><%= t %></option>
-              <% }) %>
-            </select>
-          </label>
+    <form method="GET" action="/" class="filters-grid compact">
+      <label class="field" style="grid-column: 1 / -1;">
+        <span class="field-label">Search location...</span>
+        <input class="input" type="text" name="q" value="<%= query.q || '' %>" placeholder="e.g. Singapore, Japan" />
+      </label>
 
-          <label class="field">
-            <span class="field-label">Status</span>
-            <select class="select" name="status">
-              <option value="">All Status</option>
-              <% (statuses || []).forEach(s => { %>
-                <option value="<%= s %>" <%= (query.status === s) ? "selected" : "" %>><%= s %></option>
-              <% }) %>
-            </select>
-          </label>
+      <label class="field">
+        <span class="field-label">Type</span>
+        <select class="select" name="type">
+          <option value="">All Types</option>
+          <% (types || []).forEach(t => { %>
+            <option value="<%= t %>" <%= (query.type === t) ? "selected" : "" %>><%= t %></option>
+          <% }) %>
+        </select>
+      </label>
 
-          <button class="btn glass-btn" type="submit">🔎 Filter</button>
-        </form>
-      </section>
+      <label class="field">
+        <span class="field-label">Status</span>
+        <select class="select" name="status">
+          <option value="">All Status</option>
+          <% (statuses || []).forEach(s => { %>
+            <option value="<%= s %>" <%= (query.status === s) ? "selected" : "" %>><%= s %></option>
+          <% }) %>
+        </select>
+      </label>
+
+      <div class="filter-actions">
+        <button class="btn glass-btn" type="submit">Apply</button>
+        <a class="btn glass-btn" href="/">Reset</a>
+      </div>
+    </form>
+  </details>
+</section>
 
       <!-- Keys -->
       <section class="keys-grid">
