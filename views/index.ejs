@@ -39,7 +39,44 @@
 
     </div>
   </header>
+<% if (panelConfig?.announceHtml) { %>
+  <div id="announceModal" class="modal-overlay" hidden>
+    <div class="modal glass" role="dialog" aria-modal="true" aria-labelledby="announceTitle">
+      <div class="modal-head">
+        <div id="announceTitle" class="modal-title">Announcement</div>
+        <button class="modal-close glass-btn" type="button" onclick="closeAnnounce()">✕</button>
+      </div>
 
+      <div class="modal-body">
+        <%- panelConfig.announceHtml %>
+      </div>
+
+      <div class="modal-actions">
+        <button class="pill glass-btn" type="button" onclick="closeAnnounce()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const v = "<%= panelConfig.announceVersion || '' %>";
+      if(!v) return;
+
+      const key = "announce_dismissed_" + v;
+      const dismissed = localStorage.getItem(key) === "1";
+      if(dismissed) return;
+
+      const el = document.getElementById("announceModal");
+      if(!el) return;
+      el.hidden = false;
+
+      window.closeAnnounce = function(){
+        localStorage.setItem(key, "1");
+        el.hidden = true;
+      };
+    })();
+  </script>
+<% } %>
 
   <main class="container main">
 
