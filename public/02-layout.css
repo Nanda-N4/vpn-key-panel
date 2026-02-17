@@ -1,4 +1,4 @@
-/* 02-layout.css */
+/* 02-layout.css (Clean + No conflicts) */
 
 :root{
   --container: 820px;
@@ -23,7 +23,7 @@
   padding-bottom: calc(22px + env(safe-area-inset-bottom));
 }
 
-/* Header */
+/* Header wrapper only (brand styling lives in 03-components.css) */
 .app-header{
   position: sticky;
   top: 0;
@@ -38,47 +38,19 @@
   justify-content: space-between;
   gap: 12px;
   padding: 12px 14px;
-}
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap: 10px;
   min-width: 0;
 }
 
-.brand-icon{
-  width: 36px;
-  height: 36px;
-  border-radius: 14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background: rgba(255,255,255,.22);
-  border: 1px solid rgba(255,255,255,.22);
-}
-
-.brand-text{ min-width:0; }
-.brand-title{
-  font-weight: 750;
-  letter-spacing: .2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.brand-sub{
-  font-size: 12px;
-  opacity: .75;
-}
-
+/* Keep header actions layout only */
 .header-actions{
   display:flex;
   gap: 10px;
   flex-wrap: wrap;
   justify-content: flex-end;
+  align-items: center;
 }
 
-/* Sections */
+/* Generic sections */
 .card{
   border-radius: var(--radius);
   padding: 14px;
@@ -91,8 +63,20 @@
   gap: 12px;
 }
 
+/* Optional: top row (Back button row) */
+.top-row{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  margin: 8px 0 12px 0;
+}
+
 /* Larger screens */
 @media (min-width: 760px){
   .keys-grid{ grid-template-columns: 1fr 1fr; }
-  .app-header{ margin: 14px auto 0 auto; max-width: calc(var(--container) + 24px); }
+
+  .app-header{
+    margin: 14px auto 0 auto;
+    max-width: calc(var(--container) + 24px);
   }
+}
