@@ -1,68 +1,55 @@
 .bg-aurora{
-  position: fixed;
-  inset: 0;
-  z-index: -1;
+  position:fixed;
+  inset:0;
+  z-index:-2;
   background: linear-gradient(180deg, var(--bg1), var(--bg2));
 }
 .bg-aurora::before{
   content:"";
   position:absolute;
   inset:-20%;
-  background: var(--glass);
-  filter: blur(14px);
-  opacity: .55;
-}
-.bg-aurora::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:
-    radial-gradient(1200px 650px at 50% -10%, rgba(255,255,255,.65), transparent 55%),
-    radial-gradient(900px 520px at 50% 110%, rgba(255,255,255,.25), transparent 60%);
-  opacity: .85;
+  background: radial-gradient(900px 520px at 30% 10%, rgba(255,255,255,.70), transparent 60%),
+              radial-gradient(900px 520px at 70% 0%, rgba(255,255,255,.55), transparent 60%);
+  filter: blur(18px);
+  opacity:.9;
 }
 
 .container{
-  width: min(980px, calc(100% - 24px));
-  margin: 0 auto;
+  width:min(var(--container), calc(100% - 24px));
+  margin-inline:auto;
 }
 
-.app-shell{
-  min-height: 100%;
-  padding-bottom: 26px;
-}
+.app-shell{ min-height:100%; }
 
 .app-header{
-  position: sticky;
-  top: 12px;
-  z-index: 50;
+  position:sticky;
+  top:12px;
+  z-index:50;
+  padding:12px 0;
 }
-
 .header-inner{
   display:flex;
   align-items:center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 12px 14px;
-  border-radius: var(--r-lg);
-  background: var(--glass);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
+  justify-content:space-between;
+  gap:12px;
+  padding:14px 16px;
+  border-radius: calc(var(--radius) + 10px);
+  background: var(--card);
+  border: 1px solid var(--stroke);
+  box-shadow: var(--shadow-soft);
   backdrop-filter: blur(12px);
 }
 
-.page{
-  padding-top: 16px;
+.brand{ display:flex; gap:12px; align-items:center; }
+.brand-icon{
+  width:42px;height:42px;
+  display:grid; place-items:center;
+  border-radius:14px;
+  background: rgba(255,255,255,.65);
+  border:1px solid var(--stroke);
 }
+.brand-title{ font-weight:800; font-size:18px; }
+.brand-sub{ color:var(--muted); font-size:12px; margin-top:2px; }
+.header-actions{ display:flex; gap:10px; align-items:center; }
 
-.footer{
-  margin-top: 18px;
-}
-.footer-inner{
-  display:flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items:center;
-  padding: 10px 2px;
-  color: var(--muted);
-}
+.main{ padding:14px 0 28px; }
