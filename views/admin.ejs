@@ -60,6 +60,7 @@
           <div class="toast glass"><strong>⚠</strong> <span><%= error %></span></div>
         <% } %>
 
+        <!-- ADD KEY -->
         <section class="card glass">
           <h2 style="margin:0 0 12px 0;">Add Key</h2>
 
@@ -81,6 +82,7 @@
           </form>
         </section>
 
+        <!-- ANNOUNCEMENT -->
         <section class="card glass">
           <h2 style="margin:0 0 12px 0;">Announcement (Popup)</h2>
 
@@ -102,6 +104,71 @@
           </div>
         </section>
 
+        <!-- UI TEXT EDITOR (NEW) -->
+        <section class="card glass">
+          <h2 style="margin:0 0 12px 0;">UI Text (User Page Labels)</h2>
+
+          <div class="muted" style="margin:0 0 12px 0;">
+            ဒီနေရာက စာတွေက User Page (Key list / Detail) မှာ ပေါ်မယ့် စာတွေပါ။<br/>
+            Template တွေမှာ <code>{gb}</code> နဲ့ <code>{date}</code> ကို အသုံးပြုနိုင်ပါတယ်။
+          </div>
+
+          <form method="POST" action="/<%= adminPath %>/ui-text" class="form-grid">
+            <!-- top -->
+            <label class="field" style="grid-column: 1 / -1;">
+              <span class="field-label">Back button text</span>
+              <input class="input" name="ui_backText" value="<%= panelConfig?.uiText?.backText || '← Back' %>" />
+            </label>
+
+            <!-- labels -->
+            <label class="field">
+              <span class="field-label">Label: GB (short)</span>
+              <input class="input" name="ui_label_gbShort" value="<%= panelConfig?.uiText?.labels?.gbShort || 'GB' %>" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Label: Expire (short)</span>
+              <input class="input" name="ui_label_expireShort" value="<%= panelConfig?.uiText?.labels?.expireShort || 'Expire' %>" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Label: Key</span>
+              <input class="input" name="ui_label_keyLabel" value="<%= panelConfig?.uiText?.labels?.keyLabel || 'Key' %>" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">Button: Copy</span>
+              <input class="input" name="ui_label_copyBtn" value="<%= panelConfig?.uiText?.labels?.copyBtn || 'Copy' %>" />
+            </label>
+
+            <label class="field" style="grid-column: 1 / -1;">
+              <span class="field-label">Title: Download Apps</span>
+              <input class="input" name="ui_label_downloadTitle" value="<%= panelConfig?.uiText?.labels?.downloadTitle || 'Download Apps' %>" />
+            </label>
+
+            <!-- templates -->
+            <label class="field" style="grid-column: 1 / -1;">
+              <span class="field-label">Template: GB info (use {gb})</span>
+              <input class="input" name="ui_tpl_gbInfo" value="<%= panelConfig?.uiText?.templates?.gbInfo || 'ဒီ Key က {gb} GB သုံးနိုင်ပါတယ်။' %>" />
+            </label>
+
+            <label class="field" style="grid-column: 1 / -1;">
+              <span class="field-label">Template: Expire info (use {date})</span>
+              <input class="input" name="ui_tpl_expireInfo" value="<%= panelConfig?.uiText?.templates?.expireInfo || 'Key သက်တမ်း ကုန်ဆုံးရက်က {date} ပါ။' %>" />
+            </label>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; grid-column: 1 / -1;">
+              <button class="btn glass-btn" type="submit">Save UI Text</button>
+
+              <button class="btn glass-btn danger" type="submit" name="ui_reset" value="1"
+                onclick="return confirm('UI Text ကို Default ပြန်ထားမလား?')">
+                Reset to Default
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- KEYS LIST -->
         <section class="card glass">
           <h2 style="margin:0 0 12px 0;">Keys</h2>
 
@@ -110,9 +177,13 @@
               <div class="admin-row glass">
                 <div class="admin-row-left">
                   <div class="admin-title"><%= (k.type || '').toUpperCase() %></div>
+
                   <div class="muted">
-                    <%= k.region_flag || "🌍" %> <%= k.region_name %> • GB <%= k.gb_limit %> • Exp <%= k.expire_date || "-" %>
+                    <%= k.region_flag || "🌍" %> <%= k.region_name %>
+                    • <%= (panelConfig?.uiText?.labels?.gbShort || "GB") %> <%= k.gb_limit %>
+                    • <%= (panelConfig?.uiText?.labels?.expireShort || "Expire") %> <%= k.expire_date || "-" %>
                   </div>
+
                   <div class="muted">ID: <%= k.id %> • <%= (k.statusComputed || '').toUpperCase() %></div>
                   <a class="link" href="/k/<%= k.id %>" target="_blank" rel="noopener">Open</a>
                 </div>
