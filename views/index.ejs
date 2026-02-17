@@ -1,102 +1,108 @@
-<%- include("layout", {
-  title: "Home",
-  panelConfig,
-  content: `
-    <section class="card hero">
-      <div class="hero-kicker">VPN Key Portal</div>
-      <h1 class="hero-title">Key ကို ရွေး → Copy → Paste → Connect</h1>
-      <p class="hero-sub">
-        Website မှ All SIM / WIFI အတွက် VPN Key တွေကို လွယ်လွယ်ကူကူ ယူနိုင်ပါတယ်။
-        Key ကိုရွေး → Copy → သင်သုံးမယ့် App ထဲ Paste → Connect လုပ်ပြီးသုံးနိုင်ပါတယ်။
+<div class="stack-lg">
+  <section class="card hero">
+    <div class="stack-md">
+      <div class="kicker">VPN Key Portal</div>
+      <h1 class="title">Key ကို ရွေး → Copy → Paste → Connect</h1>
+
+      <p class="muted">
+        ဤ Website မှာ All SIM WIFI အတွက် VPN Key တွေကို လွယ်လွယ်ကူကူ ရွေးပြီး Copy → သင့် App ထဲ Paste → Connect လုပ်နိုင်ပါတယ်။
       </p>
 
       <div class="hero-actions">
-        <a class="btn btn-primary btn-pill" href="#keys">🔑 Key များကြည့်ရန်</a>
-        <a class="btn btn-ghost btn-pill" href="${panelConfig.telegramAdminUrl || "#"}">
-          💬 ${panelConfig.telegramAdminText || "Contact Admin"}
-        </a>
+        <% if (panelConfig?.telegramAdminUrl && panelConfig.telegramAdminUrl !== "#") { %>
+          <a class="btn btn-soft" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">
+            💬 <span><%= panelConfig.telegramAdminText || "Contact Admin" %></span>
+          </a>
+        <% } %>
       </div>
 
       <div class="steps card-soft">
-        <div class="step"><span class="step-badge">1</span><span>Key ရွေး</span></div>
-        <div class="step"><span class="step-badge">2</span><span>Copy</span></div>
-        <div class="step"><span class="step-badge">3</span><span>App ထဲထည့်</span></div>
-        <div class="step"><span class="step-badge">4</span><span>Connect</span></div>
+        <div>1) Key ရွေး</div>
+        <div>2) Copy</div>
+        <div>3) App ထဲ Paste</div>
+        <div>4) Connect</div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section id="keys" class="card section">
-      <div class="section-head">
-        <div>
-          <div class="section-title">Available Keys</div>
-          <div class="muted">Search / Filter လုပ်ပြီး ကိုယ့်လိုချင်တဲ့ Region ကို လွယ်လွယ်ရှာနိုင်ပါတယ်။</div>
+  <section class="card">
+    <form class="filter" method="GET" action="/">
+      <input
+        class="input"
+        type="text"
+        name="q"
+        value="<%= query?.q || "" %>"
+        placeholder="Search location... (e.g. Singapore, Japan)"
+        autocomplete="off"
+      />
+
+      <select class="select" name="type">
+        <option value="">All Types</option>
+        <% (types || []).forEach(function(t){ %>
+          <option value="<%= t %>" <%= (query?.type === t) ? "selected" : "" %>><%= t %></option>
+        <% }) %>
+      </select>
+
+      <select class="select" name="status">
+        <option value="">All Status</option>
+        <% (statuses || []).forEach(function(s){ %>
+          <option value="<%= s %>" <%= (String(query?.status || "").toUpperCase() === s) ? "selected" : "" %>><%= s %></option>
+        <% }) %>
+      </select>
+
+      <button class="btn btn-pill" type="submit">🔎 Filter</button>
+    </form>
+  </section>
+
+  <section class="stack-md">
+    <% if (!items || items.length === 0) { %>
+      <div class="card empty">
+        <div class="muted">Result မရှိသေးပါ။ Search / Filter ပြန်စစ်ကြည့်ပါ။</div>
+      </div>
+    <% } %>
+
+    <% (items || []).forEach(function(x){ %>
+      <a class="card key-row" href="<%= x.link %>">
+        <div class="key-left">
+          <div class="key-type"><%= x.type %></div>
+
+          <div class="key-meta">
+            <span class="flag"><%= x.region_flag || "🌐" %></span>
+            <span class="region"><%= x.region_name %></span>
+          </div>
+
+          <div class="key-sub">
+            <span>GB <%= x.gb_limit || 0 %></span>
+            <span class="dot">•</span>
+            <span>Expire <%= x.expire_date || "-" %></span>
+          </div>
         </div>
+
+        <div class="key-right">
+          <span class="badge <%= (x.statusComputed || 'ACTIVE').toLowerCase() %>">
+            <%= x.statusComputed || "ACTIVE" %>
+          </span>
+          <span class="chev">Tap to open →</span>
+        </div>
+      </a>
+    <% }) %>
+  </section>
+
+  <section class="card footer-card">
+    <div class="stack-sm">
+      <div class="muted">အသုံးပြုနည်း (အတိုချုပ်)</div>
+      <div>1) Key ကို Copy နှိပ်ပါ</div>
+      <div>2) သင့် App ထဲ Import/Add → Paste</div>
+      <div>3) Connect လုပ်ပြီး သုံးပါ</div>
+
+      <div class="row">
+        <% if (panelConfig?.telegramAdminUrl && panelConfig.telegramAdminUrl !== "#") { %>
+          <a class="btn btn-soft" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">🧑‍💻 Help / Buy Key</a>
+        <% } %>
+        <% if (panelConfig?.telegramChannelUrl && panelConfig.telegramChannelUrl !== "#") { %>
+          <a class="btn btn-soft" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">📣 Updates</a>
+        <% } %>
       </div>
-
-      <form class="filters" method="GET" action="/">
-        <input class="input" name="q" placeholder="Search location... (e.g. Singapore, Japan)" value="${q || ""}" />
-
-        <select class="select" name="type">
-          <option value="">All Types</option>
-          ${types.map(t => `<option value="${t}" ${type===t ? "selected": ""}>${t}</option>`).join("")}
-        </select>
-
-        <select class="select" name="status">
-          <option value="">All Status</option>
-          ${statuses.map(s => `<option value="${s}" ${status===s ? "selected": ""}>${s}</option>`).join("")}
-        </select>
-
-        <button class="btn btn-ghost btn-pill" type="submit">🔎 Filter</button>
-      </form>
-
-      <div class="key-list">
-        ${
-          items && items.length
-            ? items.map(x => `
-              <a class="key-item" href="/k/${x.id}">
-                <div class="key-top">
-                  <div class="key-type">${x.type}</div>
-                  <div class="pill ${String(x.statusComputed).toLowerCase()==="active" ? "pill-active" : "pill-muted"}">
-                    ${x.statusComputed}
-                  </div>
-                </div>
-
-                <div class="key-region">
-                  <span class="flag">${x.region_flag || ""}</span>
-                  <span class="region-name">${x.region_name}</span>
-                </div>
-
-                <div class="key-meta">
-                  <span>${x.gb_limit ? `GB ${x.gb_limit}` : "No limit"}</span>
-                  <span class="dot">•</span>
-                  <span>${x.expire_date ? `Expire ${x.expire_date}` : "No expiry"}</span>
-                </div>
-
-                <div class="key-open">Tap to open →</div>
-              </a>
-            `).join("")
-            : `
-              <div class="empty">
-                <div class="empty-title">Key မရှိသေးပါ။</div>
-                <div class="muted">Admin ကနေ Key ထည့်ပြီး refresh ပြန်လုပ်ပါ။</div>
-              </div>
-            `
-        }
-      </div>
-    </section>
-
-    <section class="card section">
-      <div class="section-title">အသုံးပြုနည်း (အတိုချုပ်)</div>
-      <ol class="howto">
-        <li>Key ကိုဖွင့်ပြီး <b>Copy</b> နှိပ်ပါ</li>
-        <li>သင်သုံးမယ့် App ထဲမှာ <b>Import / Add → Paste</b></li>
-        <li><b>Connect</b> လုပ်ပြီး သုံးပါ</li>
-      </ol>
-
-      <div class="bottom-actions">
-        <a class="btn btn-ghost btn-pill" href="${panelConfig.telegramAdminUrl || "#"}">🧑‍💻 Help / Buy Key</a>
-        <a class="btn btn-ghost btn-pill" href="${panelConfig.updatesUrl || "#"}">📢 Updates</a>
-      </div>
-    </section>
-  `
-}) %>
+    </div>
+  </section>
+</div>
