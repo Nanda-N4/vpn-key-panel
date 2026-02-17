@@ -1,76 +1,68 @@
+.bg-aurora{
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, var(--bg1), var(--bg2));
+}
+.bg-aurora::before{
+  content:"";
+  position:absolute;
+  inset:-20%;
+  background: var(--glass);
+  filter: blur(14px);
+  opacity: .55;
+}
+.bg-aurora::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(1200px 650px at 50% -10%, rgba(255,255,255,.65), transparent 55%),
+    radial-gradient(900px 520px at 50% 110%, rgba(255,255,255,.25), transparent 60%);
+  opacity: .85;
+}
+
 .container{
-  width: min(var(--container), calc(100% - 24px));
-  margin-inline: auto;
+  width: min(980px, calc(100% - 24px));
+  margin: 0 auto;
+}
+
+.app-shell{
+  min-height: 100%;
+  padding-bottom: 26px;
 }
 
 .app-header{
   position: sticky;
-  top: 10px;
+  top: 12px;
   z-index: 50;
-  padding: 10px 0;
 }
 
 .header-inner{
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  gap: 12px;
-
-  padding: 14px 14px;
-  border-radius: var(--radius);
-  background: var(--card);
-  border: 1px solid var(--stroke);
-  box-shadow: var(--shadow-soft);
-  backdrop-filter: blur(14px);
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: var(--r-lg);
+  background: var(--glass);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
 }
 
-.brand{
-  display:flex;
-  align-items:center;
-  gap: 10px;
-  min-width: 0;
-}
-.brand-icon{
-  width: 44px;
-  height: 44px;
-  display:grid;
-  place-items:center;
-  border-radius: 16px;
-  background: rgba(14,165,233,.15);
-  border: 1px solid rgba(14,165,233,.20);
-}
-.brand-text{ min-width:0; }
-.brand-title{
-  font-weight: 800;
-  letter-spacing: .2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.brand-sub{
-  font-size: 12.5px;
-  color: var(--muted);
-  margin-top: 2px;
+.page{
+  padding-top: 16px;
 }
 
-.app-main{
-  padding: 18px 0 24px;
-}
-
-.app-footer{
-  padding: 18px 0 34px;
+.footer{
+  margin-top: 18px;
 }
 .footer-inner{
   display:flex;
+  justify-content: space-between;
+  gap: 12px;
   align-items:center;
-  justify-content:space-between;
-  gap: 10px;
+  padding: 10px 2px;
   color: var(--muted);
-  font-size: 13px;
-}
-.footer-link{
-  color: rgba(14,165,233,.95);
-}
-.footer-link:hover{
-  text-decoration: underline;
 }
