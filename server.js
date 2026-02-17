@@ -1,147 +1,369 @@
+// server.js (CommonJS)
 require("dotenv").config();
+
+const path = require("path");
+const fs = require("fs");
+const crypto = require("crypto");
 
 const express = require("express");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
-const path = require("path");
-const fs = require("fs");
-
-const { initDB } = require("./db");
+const Database = require("better-sqlite3");
 
 const app = express();
-const db = initDB("./data.sqlite");
 
+// ---------- Config ----------
+function loadConfig() {
+  const p = path.join(__dirname, "config.json");
+  const raw = fs.readFileSync(p, "utf8");
+  return JSON.parse(raw);
+}
+
+function safeStr(v) {
+  return (v ?? "").toString().trim();
+}
+
+function nowISODate() {
+  // YYYY-MM-DD
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function isExpired(expireDate) {
+  const e = safeStr(expireDate);
+  if (!e) return false;
+  // Compare as strings works for YYYY-MM-DD
+  return e < nowISODate();
+}
+
+function computeStatus(row) {
+  // row.status can be ACTIVE/INACTIVE. EXPIRED overrides.
+  if (isExpired(row.expire_date)) return "EXPIRED";
+  const s = (row.status || "ACTIVE").toUpperCase();
+  if (s !== "ACTIVE" && s !== "INACTIVE") return "ACTIVE";
+  return s;
+}
+
+// ---------- ENV ----------
 const PORT = Number(process.env.PORT || 3000);
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin";
-const COOKIE_SECRET = process.env.COOKIE_SECRET || "ChangeThisCookieSecret";
+const BASE_URL = safeStr(process.env.BASE_URL || "");
+const ADMIN_PASSWORD = safeStr(process.env.ADMIN_PASSWORD || "");
+const COOKIE_SECRET = safeStr(process.env.COOKIE_SECRET || "ChangeThisCookieSecret");
 
-const panelConfig = JSON.parse(
-  fs.readFileSync(path.join(__dirname, "config.json"), "utf8")
-);
+// ---------- DB ----------
+const dbPath = path.join(__dirname, "data.db");
+const db = new Database(dbPath);
+db.pragma("journal_mode = WAL");
 
-const ADMIN_PATH = `/${panelConfig.adminPath || "secure-admin-9283"}`;
+db.exec(`
+  CREATE TABLE IF NOT EXISTS keys (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type TEXT NOT NULL,
+    region_name TEXT NOT NULL,
+    region_flag TEXT DEFAULT '',
+    gb_limit INTEGER DEFAULT 0,
+    expire_date TEXT DEFAULT '',
+    key_string TEXT NOT NULL,
+    status TEXT DEFAULT 'ACTIVE',
+    created_at TEXT DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_keys_type ON keys(type);
+  CREATE INDEX IF NOT EXISTS idx_keys_region ON keys(region_name);
+  CREATE INDEX IF NOT EXISTS idx_keys_status ON keys(status);
+`);
 
-app.use(helmet({ contentSecurityPolicy: false }));
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(cookieParser(COOKIE_SECRET));
-app.use("/public", express.static(path.join(__dirname, "public")));
-
+// ---------- App middleware ----------
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
+app.use(helmet({
+  contentSecurityPolicy: false, // simplest for inline svg/icons & small inline script
+}));
+app.use(express.urlencoded({ extended: true, limit: "128kb" }));
+app.use(express.json({ limit: "128kb" }));
+app.use(cookieParser(COOKIE_SECRET));
+app.use("/public", express.static(path.join(__dirname, "public"), {
+  maxAge: "7d",
+}));
+
+// ---------- Auth (signed cookie) ----------
 function isAuthed(req) {
-  return req.signedCookies?.admin === "1";
-}
-function requireAuth(req, res, next) {
-  if (!isAuthed(req)) return res.redirect(`${ADMIN_PATH}/login`);
-  next();
-}
-function normalizeStatus(expire_date) {
-  const now = new Date();
-  const [y, m, d] = String(expire_date).split("-").map(Number);
-  const exp = new Date(y, m - 1, d, 23, 59, 59);
-  return exp < now ? "EXPIRED" : "ACTIVE";
+  const v = req.signedCookies && req.signedCookies.admin;
+  if (!v) return false;
+  // token format: <ts>.<sig>
+  const parts = safeStr(v).split(".");
+  if (parts.length !== 2) return false;
+  const ts = parts[0];
+  const sig = parts[1];
+
+  // 12h session
+  const tsNum = Number(ts);
+  if (!Number.isFinite(tsNum)) return false;
+  if (Date.now() - tsNum > 12 * 60 * 60 * 1000) return false;
+
+  const expected = crypto
+    .createHmac("sha256", COOKIE_SECRET)
+    .update(`${ts}|${req.headers["user-agent"] || ""}`)
+    .digest("hex")
+    .slice(0, 24);
+
+  return sig === expected;
 }
 
-const APPS = {
-  OUTLINE: {
-    windows: "https://getoutline.org/get-started/#download",
-    mac: "https://getoutline.org/get-started/#download",
-    android: "https://play.google.com/store/apps/details?id=org.outline.android.client",
-    ios: "https://apps.apple.com/app/outline-app/id1356177741",
-  },
-  V2RAY: {
-    windows: "https://github.com/2dust/v2rayN/releases",
-    android: "https://github.com/2dust/v2rayNG/releases",
-    mac: "https://github.com/yanue/V2rayU/releases",
-    ios: "https://apps.apple.com/app/shadowrocket/id932747118",
-  },
-};
+function setAuth(res, req) {
+  const ts = Date.now();
+  const sig = crypto
+    .createHmac("sha256", COOKIE_SECRET)
+    .update(`${ts}|${req.headers["user-agent"] || ""}`)
+    .digest("hex")
+    .slice(0, 24);
 
-// -------- PUBLIC --------
+  res.cookie("admin", `${ts}.${sig}`, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: false, // set true when behind HTTPS
+    maxAge: 12 * 60 * 60 * 1000,
+    signed: true,
+    path: "/",
+  });
+}
+
+function clearAuth(res) {
+  res.clearCookie("admin", { path: "/" });
+}
+
+// ---------- Queries ----------
+const qListKeys = db.prepare(`
+  SELECT * FROM keys
+  WHERE
+    (@type = '' OR type = @type)
+    AND (
+      @q = '' OR
+      lower(region_name) LIKE '%' || lower(@q) || '%' OR
+      lower(type) LIKE '%' || lower(@q) || '%'
+    )
+  ORDER BY
+    CASE status WHEN 'ACTIVE' THEN 0 WHEN 'INACTIVE' THEN 1 ELSE 2 END,
+    id DESC
+`);
+
+const qGetKey = db.prepare(`SELECT * FROM keys WHERE id = ?`);
+const qAddKey = db.prepare(`
+  INSERT INTO keys (type, region_name, region_flag, gb_limit, expire_date, key_string, status)
+  VALUES (@type, @region_name, @region_flag, @gb_limit, @expire_date, @key_string, @status)
+`);
+const qDeleteKey = db.prepare(`DELETE FROM keys WHERE id = ?`);
+const qUpdateStatus = db.prepare(`UPDATE keys SET status = @status WHERE id = @id`);
+
+// ---------- Helpers for templates ----------
+function buildPanelData(req) {
+  const cfg = loadConfig();
+  const adminPath = safeStr(cfg.adminPath || "admin");
+  const panelConfig = {
+    brandName: safeStr(cfg.brandName || "VPN KEY"),
+    announcement: safeStr(cfg.announcement || ""),
+    telegramAdminText: safeStr(cfg.telegramAdminText || "Contact Admin"),
+    telegramAdminUrl: safeStr(cfg.telegramAdminUrl || "#"),
+    telegramChannelText: safeStr(cfg.telegramChannelText || "Join Channel"),
+    telegramChannelUrl: safeStr(cfg.telegramChannelUrl || "#"),
+  };
+
+  // If BASE_URL empty, derive from request
+  const origin = BASE_URL || `${req.protocol}://${req.get("host")}`;
+  return { panelConfig, adminPath, origin };
+}
+
+// ---------- Routes (Public) ----------
 app.get("/", (req, res) => {
-  const rows = db
-    .prepare("SELECT * FROM vpn_keys ORDER BY id DESC")
-    .all()
-    .map((r) => ({ ...r, status: normalizeStatus(r.expire_date) }));
+  const { panelConfig } = buildPanelData(req);
 
-  res.render("index", { rows, panelConfig });
+  const q = safeStr(req.query.q || "");
+  const type = safeStr(req.query.type || "");
+  const status = safeStr(req.query.status || "");
+
+  const rows = qListKeys.all({ q, type, status: "" }).map(r => ({
+    ...r,
+    statusComputed: computeStatus(r),
+    isExpired: computeStatus(r) === "EXPIRED",
+    link: `/k/${r.id}`,
+  }));
+
+  // status filter must happen after computeStatus (expired override)
+  const filtered = rows.filter(r => {
+    if (!status) return true;
+    return r.statusComputed === status.toUpperCase();
+  });
+
+  // build select options
+  const types = Array.from(new Set(rows.map(r => r.type))).sort();
+  const statuses = ["ACTIVE", "INACTIVE", "EXPIRED"];
+
+  res.render("index", {
+    panelConfig,
+    items: filtered,
+    query: { q, type, status },
+    types,
+    statuses,
+  });
 });
 
 app.get("/k/:id", (req, res) => {
+  const { panelConfig } = buildPanelData(req);
   const id = Number(req.params.id);
-  const row = db.prepare("SELECT * FROM vpn_keys WHERE id = ?").get(id);
-  if (!row) return res.status(404).send("Not found");
+  const row = qGetKey.get(id);
 
-  const status = normalizeStatus(row.expire_date);
-  const apps = APPS[row.key_type];
-
-  res.render("detail", { row, status, apps, panelConfig });
-});
-
-// -------- ADMIN --------
-app.get(`${ADMIN_PATH}/login`, (req, res) => {
-  res.render("login", { error: null, panelConfig, ADMIN_PATH });
-});
-
-app.post(`${ADMIN_PATH}/login`, (req, res) => {
-  const pw = String(req.body.password || "");
-  if (pw !== ADMIN_PASSWORD) {
-    return res.render("login", {
-      error: "Password မမှန်ပါ",
+  if (!row) {
+    return res.status(404).render("detail", {
       panelConfig,
-      ADMIN_PATH,
+      item: null,
+      apps: [],
+      error: "Key မတွေ့ပါ။",
     });
   }
 
-  res.cookie("admin", "1", {
-    signed: true,
-    httpOnly: true,
-    sameSite: "lax",
-    secure: false, // if https enable => true
+  const item = {
+    ...row,
+    statusComputed: computeStatus(row),
+  };
+
+  // Simple app links (keep stable / official-ish)
+  // OUTLINE => Outline client, V2RAY => v2rayNG/Shadowrocket style note
+  const typeUpper = safeStr(item.type).toUpperCase();
+  let apps = [];
+
+  if (typeUpper.includes("OUTLINE")) {
+    apps = [
+      { name: "Windows", sub: "Outline Client", icon: "windows", url: "https://getoutline.org/" },
+      { name: "macOS", sub: "Outline Client", icon: "apple", url: "https://getoutline.org/" },
+      { name: "Android", sub: "Outline App", icon: "android", url: "https://play.google.com/store/apps/details?id=org.outline.android.client" },
+      { name: "iPhone / iPad", sub: "Outline App", icon: "apple", url: "https://apps.apple.com/app/outline-app/id1356177741" },
+    ];
+  } else {
+    // V2RAY / VLESS / SS mixed — provide common client category
+    apps = [
+      { name: "Windows", sub: "V2Ray Client", icon: "windows", url: "https://github.com/2dust/v2rayN" },
+      { name: "macOS", sub: "V2Ray Client", icon: "apple", url: "https://github.com/2dust/v2rayN" },
+      { name: "Android", sub: "v2rayNG", icon: "android", url: "https://github.com/2dust/v2rayNG" },
+      { name: "iPhone / iPad", sub: "Client (iOS)", icon: "apple", url: "https://apps.apple.com/" },
+    ];
+  }
+
+  res.render("detail", { panelConfig, item, apps, error: "" });
+});
+
+// ---------- Routes (Admin, hidden path) ----------
+app.get("/:adminPath", (req, res) => {
+  const { panelConfig, adminPath } = buildPanelData(req);
+
+  if (safeStr(req.params.adminPath) !== adminPath) return res.status(404).send("Not found");
+
+  if (!isAuthed(req)) {
+    return res.render("admin", {
+      panelConfig,
+      adminPath,
+      mode: "login",
+      error: "",
+      keys: [],
+      defaults: { type: "V2RAY", gb_limit: 2048, expire_date: nowISODate(), region_name: "", region_flag: "" },
+    });
+  }
+
+  const keys = db.prepare(`SELECT * FROM keys ORDER BY id DESC`).all().map(r => ({
+    ...r,
+    statusComputed: computeStatus(r),
+    link: `/k/${r.id}`,
+  }));
+
+  return res.render("admin", {
+    panelConfig,
+    adminPath,
+    mode: "dashboard",
+    error: "",
+    keys,
+    defaults: { type: "V2RAY", gb_limit: 2048, expire_date: nowISODate(), region_name: "", region_flag: "" },
   });
-
-  res.redirect(`${ADMIN_PATH}`);
 });
 
-app.post(`${ADMIN_PATH}/logout`, (req, res) => {
-  res.clearCookie("admin");
-  res.redirect("/");
+app.post("/:adminPath/login", (req, res) => {
+  const { adminPath } = buildPanelData(req);
+  if (safeStr(req.params.adminPath) !== adminPath) return res.status(404).send("Not found");
+
+  const pass = safeStr(req.body.password || "");
+  if (!ADMIN_PASSWORD || pass !== ADMIN_PASSWORD) {
+    const { panelConfig } = buildPanelData(req);
+    return res.status(401).render("admin", {
+      panelConfig,
+      adminPath,
+      mode: "login",
+      error: "Password မမှန်ပါ။",
+      keys: [],
+      defaults: { type: "V2RAY", gb_limit: 2048, expire_date: nowISODate(), region_name: "", region_flag: "" },
+    });
+  }
+
+  setAuth(res, req);
+  return res.redirect(`/${adminPath}`);
 });
 
-app.get(`${ADMIN_PATH}`, requireAuth, (req, res) => {
-  const rows = db
-    .prepare("SELECT * FROM vpn_keys ORDER BY id DESC")
-    .all()
-    .map((r) => ({ ...r, status: normalizeStatus(r.expire_date) }));
+app.post("/:adminPath/logout", (req, res) => {
+  const { adminPath } = buildPanelData(req);
+  if (safeStr(req.params.adminPath) !== adminPath) return res.status(404).send("Not found");
 
-  res.render("admin", { rows, panelConfig, ADMIN_PATH });
+  clearAuth(res);
+  return res.redirect(`/${adminPath}`);
 });
 
-app.post(`${ADMIN_PATH}/add`, requireAuth, (req, res) => {
-  const key_type = String(req.body.key_type || "").toUpperCase();
-  const region_name = String(req.body.region_name || "").trim();
-  const region_flag = String(req.body.region_flag || "").trim();
-  const gb_limit = Number(req.body.gb_limit || 0);
-  const expire_date = String(req.body.expire_date || "").trim();
-  const key_string = String(req.body.key_string || "").trim();
+app.post("/:adminPath/add", (req, res) => {
+  const { adminPath } = buildPanelData(req);
+  if (safeStr(req.params.adminPath) !== adminPath) return res.status(404).send("Not found");
+  if (!isAuthed(req)) return res.status(403).send("Forbidden");
 
-  if (!["OUTLINE", "V2RAY"].includes(key_type)) return res.status(400).send("Bad key_type");
-  if (!region_name || !region_flag || !expire_date || !key_string || !gb_limit)
-    return res.status(400).send("Missing fields");
+  const payload = {
+    type: safeStr(req.body.type || "V2RAY").toUpperCase(),
+    region_name: safeStr(req.body.region_name || "Unknown"),
+    region_flag: safeStr(req.body.region_flag || ""),
+    gb_limit: Number(req.body.gb_limit || 0) || 0,
+    expire_date: safeStr(req.body.expire_date || ""),
+    key_string: safeStr(req.body.key_string || ""),
+    status: safeStr(req.body.status || "ACTIVE").toUpperCase(),
+  };
 
-  db.prepare(
-    `INSERT INTO vpn_keys (key_type, region_name, region_flag, gb_limit, expire_date, key_string)
-     VALUES (?, ?, ?, ?, ?, ?)`
-  ).run(key_type, region_name, region_flag, gb_limit, expire_date, key_string);
+  if (!payload.key_string || payload.key_string.length < 8) {
+    return res.redirect(`/${adminPath}?err=KeyStringInvalid`);
+  }
 
-  res.redirect(`${ADMIN_PATH}`);
+  qAddKey.run(payload);
+  return res.redirect(`/${adminPath}`);
 });
 
-app.post(`${ADMIN_PATH}/delete/:id`, requireAuth, (req, res) => {
-  db.prepare("DELETE FROM vpn_keys WHERE id = ?").run(Number(req.params.id));
-  res.redirect(`${ADMIN_PATH}`);
+app.post("/:adminPath/delete/:id", (req, res) => {
+  const { adminPath } = buildPanelData(req);
+  if (safeStr(req.params.adminPath) !== adminPath) return res.status(404).send("Not found");
+  if (!isAuthed(req)) return res.status(403).send("Forbidden");
+
+  const id = Number(req.params.id);
+  qDeleteKey.run(id);
+  return res.redirect(`/${adminPath}`);
 });
 
-app.listen(PORT, () => console.log(`✅ running on :${PORT}`));
+app.post("/:adminPath/toggle/:id", (req, res) => {
+  const { adminPath } = buildPanelData(req);
+  if (safeStr(req.params.adminPath) !== adminPath) return res.status(404).send("Not found");
+  if (!isAuthed(req)) return res.status(403).send("Forbidden");
+
+  const id = Number(req.params.id);
+  const row = qGetKey.get(id);
+  if (!row) return res.redirect(`/${adminPath}`);
+
+  const next = (row.status || "ACTIVE").toUpperCase() === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+  qUpdateStatus.run({ id, status: next });
+  return res.redirect(`/${adminPath}`);
+});
+
+// ---------- Start ----------
+app.listen(PORT, () => {
+  console.log(`✅ running on :${PORT}`);
+});
