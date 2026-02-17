@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="color-scheme" content="light dark" />
-  <title><%= (panelConfig && panelConfig.brandName) ? panelConfig.brandName : "VPN KEY" %> - Detail</title>
+  <title><%= (panelConfig && panelConfig.brandName) ? panelConfig.brandName : "VPN KEY" %></title>
 
   <link rel="stylesheet" href="/public/00-tokens.css" />
   <link rel="stylesheet" href="/public/01-base.css" />
@@ -13,14 +13,15 @@
   <link rel="stylesheet" href="/public/04-pages.css" />
   <link rel="stylesheet" href="/public/05-utilities.css" />
 </head>
+
 <body>
   <div class="bg-aurora" aria-hidden="true"></div>
 
   <div class="app-shell">
-    <header class="app-header">
+    <header class="app-header glass">
       <div class="container header-inner">
         <div class="brand">
-          <span class="brand-icon" aria-hidden="true">⚡</span>
+          <div class="brand-icon" aria-hidden="true">⚡</div>
           <div class="brand-text">
             <div class="brand-title"><%= panelConfig.brandName || "VPN KEY" %></div>
             <div class="brand-sub">Fast • Simple • Secure</div>
@@ -29,8 +30,8 @@
 
         <div class="header-actions">
           <% if (panelConfig && panelConfig.telegramChannelUrl) { %>
-            <a class="btn btn-ghost" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
-              ✈️ <span><%= panelConfig.telegramChannelText || "Channel" %></span>
+            <a class="pill glass-btn" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
+              ✈️ <span><%= panelConfig.telegramChannelText || "Join Channel" %></span>
             </a>
           <% } %>
         </div>
@@ -38,51 +39,54 @@
     </header>
 
     <main class="container main">
-      <a class="btn btn-ghost back" href="/">← Back</a>
+      <div class="top-row">
+        <a class="pill glass-btn" href="/">← Back</a>
+      </div>
 
       <% if (error) { %>
-        <div class="card error"><%= error %></div>
+        <section class="card glass">
+          <h2 style="margin:0 0 8px 0;">Error</h2>
+          <p style="margin:0;"><%= error %></p>
+        </section>
       <% } %>
 
-      <% if (!item) { %>
-        <div class="card empty">
-          <div class="empty-title">Key မတွေ့ပါ။</div>
-          <div class="empty-sub">Back ပြန်သွားပြီး ပြန်ရွေးပါ။</div>
-        </div>
-      <% } else { %>
-        <section class="card detail">
-          <div class="detail-top">
-            <span class="pill <%= (item.statusComputed || '').toUpperCase() %>">
-              <%= (item.statusComputed || '').toUpperCase() %>
-            </span>
-            <div class="detail-type"><%= item.type %></div>
-          </div>
-
-          <div class="detail-region">
-            <span class="flag"><%= item.region_flag || "🌐" %></span>
-            <div>
-              <div class="region"><%= item.region_name %></div>
-              <div class="meta">
-                GB <b><%= item.gb_limit || 0 %></b>
-                <span class="dot">•</span>
-                Expire <b><%= item.expire_date || "-" %></b>
+      <% if (item) { %>
+        <section class="card glass detail-card">
+          <div class="detail-head">
+            <div class="detail-type">
+              <div class="status-pill <%= (item.statusComputed || '').toLowerCase() %>">
+                <%= (item.statusComputed || '').toUpperCase() %>
               </div>
+              <h2 style="margin:0;"><%= (item.type || '').toUpperCase() %></h2>
+            </div>
+
+            <div class="detail-region">
+              <span class="flag"><%= item.region_flag || "🌍" %></span>
+              <span><%= item.region_name || "Unknown" %></span>
+            </div>
+
+            <div class="key-meta">
+              <span class="dot">GB <%= item.gb_limit || 0 %></span>
+              <span class="dot">Expire <%= item.expire_date || "-" %></span>
             </div>
           </div>
 
-          <div class="detail-key-label">Key</div>
-          <div class="keybox">
-            <input id="keyString" class="input key-input" value="<%= item.key_string %>" readonly />
-            <button class="btn" id="btnCopy" type="button">📋 Copy</button>
+          <div class="key-box">
+            <div class="key-label">Key</div>
+            <div class="key-row">
+              <input id="keyInput" class="input key-input" readonly value="<%= item.key_string || '' %>" />
+              <button class="btn glass-btn" type="button" onclick="copyKey()">📋 Copy</button>
+            </div>
+            <div class="muted">
+              Copy ပြီးရင် သုံးမယ့် App ထဲ Paste → Connect လုပ်ပါ
+            </div>
           </div>
-
-          <div class="hint">Copy ပြီးရင် သင့်သုံးမယ့် App ထဲ Paste → Connect လုပ်ပါ</div>
 
           <div class="apps">
             <div class="apps-title">Download Apps</div>
             <div class="apps-grid">
-              <% (apps || []).forEach(function(a){ %>
-                <a class="app-link" href="<%= a.url %>" target="_blank" rel="noopener">
+              <% (apps || []).forEach(a => { %>
+                <a class="app-item glass" href="<%= a.url %>" target="_blank" rel="noopener">
                   <div class="app-name"><%= a.name %></div>
                   <div class="app-sub"><%= a.sub %></div>
                   <div class="app-arrow">↗</div>
@@ -91,38 +95,31 @@
             </div>
           </div>
 
-          <div class="footer-actions">
-            <a class="btn btn-soft" href="<%= panelConfig.telegramAdminUrl || '#' %>" target="_blank" rel="noopener">💬 Contact Admin</a>
-            <a class="btn btn-ghost" href="<%= panelConfig.telegramChannelUrl || '#' %>" target="_blank" rel="noopener">📣 Join Channel</a>
+          <div class="detail-actions">
+            <% if (panelConfig && panelConfig.telegramAdminUrl) { %>
+              <a class="btn glass-btn" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">💬 Contact Admin</a>
+            <% } %>
+            <% if (panelConfig && panelConfig.telegramChannelUrl) { %>
+              <a class="btn glass-btn" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">📣 Join Channel</a>
+            <% } %>
           </div>
         </section>
-      <% } %>
 
-      <p class="copyright">© <%= new Date().getFullYear() %> <%= panelConfig.brandName || "VPN KEY" %></p>
+        <footer class="footer">
+          <div>© <%= new Date().getFullYear() %> <%= (panelConfig.brandName || "FREE KEY") %></div>
+        </footer>
+      <% } %>
     </main>
   </div>
 
   <script>
-    (function(){
-      const btn = document.getElementById("btnCopy");
-      const input = document.getElementById("keyString");
-      if (!btn || !input) return;
-
-      btn.addEventListener("click", async function(){
-        try{
-          input.focus();
-          input.select();
-          input.setSelectionRange(0, 999999);
-          await navigator.clipboard.writeText(input.value);
-          btn.textContent = "✅ Copied";
-          setTimeout(()=>btn.textContent="📋 Copy", 1200);
-        }catch(e){
-          document.execCommand("copy");
-          btn.textContent = "✅ Copied";
-          setTimeout(()=>btn.textContent="📋 Copy", 1200);
-        }
-      });
-    })();
+    function copyKey() {
+      const el = document.getElementById("keyInput");
+      if (!el) return;
+      el.select();
+      el.setSelectionRange(0, 999999);
+      try { document.execCommand("copy"); } catch (e) {}
+    }
   </script>
 </body>
 </html>
