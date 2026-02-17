@@ -90,17 +90,22 @@
 }
 
 /* --- KEY CARD: iOS liquid glass --- */
-.key-card{
-  position:relative;
-  padding: 16px;
-  border-radius: var(--radius-xl);
-  background: rgba(255,255,255,.44);
-  border: 1px solid rgba(255,255,255,.40);
-  backdrop-filter: blur(var(--blur-strong));
-  -webkit-backdrop-filter: blur(var(--blur-strong));
-  box-shadow: 0 18px 50px rgba(0,0,0,.10);
-  overflow:hidden;
-  transition: transform .16s ease, box-shadow .16s ease;
+.key-card {
+  background: rgba(255,255,255,.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  border-radius: 26px;
+  padding: 18px;
+  margin-bottom: 18px;
+
+  border: 1px solid rgba(255,255,255,.6);
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.08),
+    inset 0 1px 0 rgba(255,255,255,.6);
+
+  width: 100%;
+  display: block;
 }
 .key-card:hover{
   transform: translateY(-2px);
