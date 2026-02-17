@@ -357,3 +357,48 @@
   padding:22px 0 12px 0;
   text-align:center;
 }
+/* ===== APP PLATFORM CARDS ===== */
+
+.app-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px;
+  border-radius:22px;
+  text-decoration:none;
+  color:inherit;
+  transition:all .25s ease;
+}
+
+.app-item:hover{
+  transform:translateY(-4px);
+  box-shadow:0 20px 50px rgba(0,0,0,.12);
+}
+
+.app-left{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.app-icon{
+  width:26px;
+  height:26px;
+  opacity:.9;
+}
+
+.app-platform.windows{
+  border:1px solid rgba(120,180,255,.35);
+}
+
+.app-platform.android{
+  border:1px solid rgba(120,255,160,.35);
+}
+
+.app-platform.apple{
+  border:1px solid rgba(255,255,255,.35);
+}
+
+.app-arrow{
+  opacity:.6;
+}
