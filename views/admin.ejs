@@ -24,11 +24,41 @@
         <div class="adminHead row">
           <div>
             <div class="adminTitle">Admin Dashboard</div>
-            <div class="adminSub">VPN Key တွေ ထည့်/ဖျက်/ဖွင့်ပိတ် လုပ်နိုင်ပါတယ်။</div>
+            <div class="adminSub">VPN Key တွေ ထည့်/ဖျက်/ဖွင့်ပိတ် + Announcement တင်နိုင်ပါတယ်။</div>
           </div>
 
           <form method="POST" action="/${adminPath}/logout">
             <button class="btn ghost" type="submit"><span class="btnIcon">↩</span> Logout</button>
+          </form>
+        </div>
+
+        <div class="glass adminCard">
+          <div class="cardTitle">Site Announcement (Markdown)</div>
+
+          <form class="adminForm" method="POST" action="/${adminPath}/announce">
+            <div class="field">
+              <label class="label">Enable</label>
+              <select class="select" name="announce_enabled">
+                <option value="0" ${announceEnabled ? "" : "selected"}>OFF</option>
+                <option value="1" ${announceEnabled ? "selected" : ""}>ON</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="label">Message (supports emoji, links, images)</label>
+              <textarea class="input mono" name="announce_md" rows="8" placeholder="Example:
+# 🔥 New Update
+✅ Free keys available
+👉 [Join Channel](https://t.me/xxx)
+![banner](https://i.imgur.com/xxxx.png)
+">${(announceMd || "").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</textarea>
+
+              <div class="hint">
+                Markdown support: <span class="kbd"># title</span>, <span class="kbd">**bold**</span>, <span class="kbd">[link](url)</span>, <span class="kbd">![img](https://...)</span>
+              </div>
+            </div>
+
+            <button class="btn primary" type="submit"><span class="btnIcon">💾</span> Save Announcement</button>
           </form>
         </div>
 
