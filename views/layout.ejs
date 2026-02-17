@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="light dark" />
 
-  <title><%= title ? title + " • " : "" %><%= (panelConfig && panelConfig.brandName) ? panelConfig.brandName : "FREE KEY By N4" %></title>
+  <title><%= (panelConfig && panelConfig.brandName) ? panelConfig.brandName : "VPN KEY" %></title>
 
-  <!-- CSS Architecture (must be /public/...) -->
+  <!-- CSS Architecture (IMPORTANT: must be /public/..) -->
   <link rel="stylesheet" href="/public/00-tokens.css" />
   <link rel="stylesheet" href="/public/01-base.css" />
   <link rel="stylesheet" href="/public/02-layout.css" />
@@ -16,120 +16,117 @@
   <link rel="stylesheet" href="/public/05-utilities.css" />
 </head>
 
-<body class="theme-light">
+<body>
   <div class="bg-aurora" aria-hidden="true"></div>
 
-  <!-- Sticky Header -->
-  <header class="app-header">
-    <div class="container header-inner">
-      <div class="brand">
-        <div class="brand-icon" aria-hidden="true">⚡</div>
-        <div class="brand-text">
-          <div class="brand-title"><%= (panelConfig && panelConfig.brandName) ? panelConfig.brandName : "FREE KEY By N4" %></div>
-          <div class="brand-sub">Fast • Simple • Secure</div>
+  <div class="app-shell">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="container header-inner">
+        <div class="brand">
+          <span class="brand-icon" aria-hidden="true">⚡</span>
+          <div class="brand-text">
+            <div class="brand-title"><%= panelConfig?.brandName || "VPN KEY" %></div>
+            <div class="brand-sub">Fast • Simple • Secure</div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <% if (panelConfig && panelConfig.telegramChannelUrl && panelConfig.telegramChannelUrl !== "#") { %>
+            <a class="btn btn-pill" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
+              ✈️ <span><%= panelConfig.telegramChannelText || "Channel" %></span>
+            </a>
+          <% } %>
         </div>
       </div>
+    </header>
 
-      <div class="header-actions">
-        <% if (panelConfig && panelConfig.channelUrl) { %>
-          <a class="btn btn-ghost btn-pill" href="<%= panelConfig.channelUrl %>" target="_blank" rel="noopener">
-            ✈️ <span>Channel</span>
+    <!-- Main -->
+    <main class="container page">
+      <%- body %>
+    </main>
+
+    <!-- Footer -->
+    <footer class="container footer">
+      <div class="footer-inner">
+        <span>© <%= new Date().getFullYear() %> <%= panelConfig?.brandName || "VPN KEY" %></span>
+        <% if (panelConfig && panelConfig.telegramAdminUrl && panelConfig.telegramAdminUrl !== "#") { %>
+          <a class="link" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">
+            Support: <%= panelConfig.telegramAdminText || "Contact Admin" %>
           </a>
         <% } %>
       </div>
-    </div>
-  </header>
+    </footer>
+  </div>
 
-  <main class="app-main">
-    <div class="container">
-      <%- content %>
-    </div>
-  </main>
-
-  <footer class="app-footer">
-    <div class="container footer-inner">
-      <div class="muted">
-        © <%= new Date().getFullYear() %> <%= (panelConfig && panelConfig.brandName) ? panelConfig.brandName : "FREE KEY By N4" %>
-      </div>
-
-      <% if (panelConfig && panelConfig.footerLinkText && panelConfig.footerLinkUrl) { %>
-        <a class="footer-link" href="<%= panelConfig.footerLinkUrl %>" target="_blank" rel="noopener"><%= panelConfig.footerLinkText %></a>
-      <% } %>
-    </div>
-  </footer>
-
-  <!-- Announcement Modal (User page) -->
-  <% if (panelConfig && panelConfig.announcement) { %>
-    <div class="modal" id="announceModal" aria-hidden="true">
-      <div class="modal-backdrop" data-close="1"></div>
-
-      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="announceTitle">
+  <!-- Announcement Modal (optional, safe HTML expected) -->
+  <% if (panelConfig && panelConfig.announceHtml) { %>
+    <div class="modal-backdrop" id="announceBackdrop" role="dialog" aria-modal="true" aria-label="Announcement">
+      <div class="modal">
         <div class="modal-head">
-          <div class="modal-title" id="announceTitle">📣 Announcement</div>
-          <button class="icon-btn" type="button" data-close="1" aria-label="Close">✕</button>
+          <div class="modal-title">📣 Announcement</div>
+          <button class="btn btn-ghost" id="announceClose" type="button">Close</button>
         </div>
-
-        <div class="modal-body rich">
-          <!-- Admin က HTML/emoji/photo/link တွေထည့်ချင်လို့ raw HTML ထုတ်ပြထားတယ် -->
-          <%- panelConfig.announcement %>
-        </div>
-
-        <div class="modal-foot">
-          <button class="btn btn-primary btn-pill" type="button" data-close="1">Close</button>
+        <div class="modal-body">
+          <%- panelConfig.announceHtml %>
         </div>
       </div>
     </div>
+
+    <script>
+      (function () {
+        var version = "<%= panelConfig.announceVersion || "" %>";
+        var key = "announce_seen_" + version;
+        var backdrop = document.getElementById("announceBackdrop");
+        var closeBtn = document.getElementById("announceClose");
+
+        function hide() {
+          if (backdrop) backdrop.style.display = "none";
+          try { localStorage.setItem(key, "1"); } catch(e) {}
+        }
+
+        function showIfNeeded() {
+          var seen = "0";
+          try { seen = localStorage.getItem(key) || "0"; } catch(e) {}
+          if (seen === "1") {
+            if (backdrop) backdrop.style.display = "none";
+          } else {
+            if (backdrop) backdrop.style.display = "flex";
+          }
+        }
+
+        if (closeBtn) closeBtn.addEventListener("click", hide);
+        if (backdrop) backdrop.addEventListener("click", function (e) {
+          if (e.target === backdrop) hide();
+        });
+
+        showIfNeeded();
+      })();
+    </script>
   <% } %>
 
+  <!-- Clipboard helper -->
   <script>
-    (function () {
-      // Announcement show once per content (hash)
-      const modal = document.getElementById("announceModal");
-      if (!modal) return;
-
-      const raw = <%- JSON.stringify(String(panelConfig.announcement || "")) %>;
-      const key = "n4_announcement_hash";
-      const shownKey = "n4_announcement_dismissed";
-
-      function hashStr(str) {
-        // lightweight hash
-        let h = 0, i = 0;
-        while (i < str.length) { h = (h << 5) - h + str.charCodeAt(i++) | 0; }
-        return String(h);
+    window.copyText = async function (txt) {
+      try {
+        await navigator.clipboard.writeText(txt);
+        return true;
+      } catch (e) {
+        try {
+          var ta = document.createElement("textarea");
+          ta.value = txt;
+          ta.style.position = "fixed";
+          ta.style.left = "-9999px";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+          return true;
+        } catch (e2) {
+          return false;
+        }
       }
-
-      const currentHash = hashStr(raw);
-      const lastHash = localStorage.getItem(key);
-      const dismissed = localStorage.getItem(shownKey);
-
-      function open() {
-        modal.classList.add("is-open");
-        modal.setAttribute("aria-hidden", "false");
-        document.documentElement.classList.add("modal-open");
-      }
-      function close() {
-        modal.classList.remove("is-open");
-        modal.setAttribute("aria-hidden", "true");
-        document.documentElement.classList.remove("modal-open");
-        localStorage.setItem(key, currentHash);
-        localStorage.setItem(shownKey, "1");
-      }
-
-      // only show when announcement changed OR not dismissed before
-      const shouldShow = (lastHash !== currentHash) || (dismissed !== "1");
-      if (shouldShow && raw.trim().length) {
-        open();
-      }
-
-      modal.addEventListener("click", (e) => {
-        const t = e.target;
-        if (t && t.getAttribute && t.getAttribute("data-close") === "1") close();
-      });
-
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && modal.classList.contains("is-open")) close();
-      });
-    })();
+    };
   </script>
 </body>
 </html>
