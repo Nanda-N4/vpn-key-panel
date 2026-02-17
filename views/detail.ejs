@@ -1,93 +1,90 @@
 <%- include("layout", {
   title: item ? (item.type + " • " + item.region_name) : "Key",
   panelConfig,
-  body: `
-  <section class="section">
-    ${
-      error ? `
-        <div class="glass empty">
-          <div class="emptyTitle">${error}</div>
-          <a class="btn" href="/"><span class="btnIcon">←</span> Back</a>
-        </div>
-      ` : `
-        <div class="glass detailCard">
-          <div class="detailTop">
-            <a class="btn small ghost" href="/"><span class="btnIcon">←</span> Back</a>
-            <div class="badge ${item.statusComputed === "ACTIVE" ? "ok" : (item.statusComputed === "EXPIRED" ? "bad" : "muted")}">
-              ${item.statusComputed}
+  content: `
+    <section class="card section">
+      ${
+        error
+          ? `
+            <div class="alert alert-danger">${error}</div>
+            <a class="btn btn-ghost btn-pill" href="/">← Back</a>
+          `
+          : `
+            <div class="detail-head">
+              <a class="btn btn-ghost btn-pill" href="/">← Back</a>
+              <div class="pill ${String(item.statusComputed).toLowerCase()==="active" ? "pill-active" : "pill-muted"}">
+                ${item.statusComputed}
+              </div>
             </div>
-          </div>
 
-          <div class="detailTitle">
-            <div class="detailType">${item.type}</div>
-            <div class="detailRegion"><span class="flag">${item.region_flag || "🌐"}</span> ${item.region_name}</div>
-          </div>
-
-          <div class="detailMeta">
-            <span>${item.gb_limit ? `GB ${item.gb_limit}` : "No limit"}</span>
-            <span class="dot">•</span>
-            <span>${item.expire_date ? `Expire ${item.expire_date}` : "No expiry"}</span>
-          </div>
-
-          <div class="keyBox">
-            <div class="keyLabel">Key</div>
-            <div class="keyRow">
-              <input id="keyText" class="input mono" value="${item.key_string.replace(/"/g, "&quot;")}" readonly />
-              <button class="btn primary" id="copyBtn" type="button">
-                <span class="btnIcon">📋</span> Copy
-              </button>
+            <div class="detail-title">${item.type}</div>
+            <div class="detail-region">
+              <span class="flag">${item.region_flag || ""}</span>
+              <span>${item.region_name}</span>
             </div>
-            <div class="keyNote">Copy ပြီးရင် သင်သုံးမယ့် App ထဲ Paste → Connect လုပ်ပါ</div>
-          </div>
-        </div>
+            <div class="muted">
+              ${item.gb_limit ? `GB ${item.gb_limit}` : "No limit"} •
+              ${item.expire_date ? `Expire ${item.expire_date}` : "No expiry"}
+            </div>
 
-        <div class="glass appsCard">
-          <div class="appsTitle">Download Apps</div>
-          <div class="appsGrid">
-            ${apps.map(a => `
-              <a class="appTile" href="${a.url}" target="_blank" rel="noopener">
-                <div class="appIcon ${a.icon}"></div>
-                <div class="appText">
-                  <div class="appName">${a.name}</div>
-                  <div class="appSub">${a.sub}</div>
-                </div>
-                <div class="appGo">↗</div>
-              </a>
-            `).join("")}
-          </div>
-        </div>
+            <div class="card-soft keybox">
+              <div class="keybox-label">Key</div>
+              <div class="keybox-row">
+                <input class="input key-input" id="keyInput" readonly value="${item.key_string || ""}" />
+                <button class="btn btn-primary btn-pill" type="button" id="copyBtn">📋 Copy</button>
+              </div>
+              <div class="muted">Copy ပြီးရင် သင်သုံးမယ့် App ထဲ Paste → Connect လုပ်ပါ</div>
+            </div>
 
-        <div class="glass helpCard compact">
-          <div class="helpTitle">Need help / Buy key?</div>
-          <div class="helpActions">
-            <a class="btn" href="${panelConfig.telegramAdminUrl || "#"}" target="_blank" rel="noopener">
-              <span class="btnIcon">💬</span> Contact Admin
-            </a>
-            <a class="btn ghost" href="${panelConfig.telegramChannelUrl || "#"}" target="_blank" rel="noopener">
-              <span class="btnIcon">📢</span> Join Channel
-            </a>
-          </div>
-        </div>
+            <div class="card-soft">
+              <div class="section-title">Download Apps</div>
+              <div class="apps">
+                ${apps.map(a => `
+                  <a class="app-link" href="${a.url}" target="_blank" rel="noopener">
+                    <div class="app-name">${a.name}</div>
+                    <div class="muted">${a.sub}</div>
+                    <div class="app-arrow">↗</div>
+                  </a>
+                `).join("")}
+              </div>
+            </div>
 
-        <script>
-          const btn = document.getElementById("copyBtn");
-          const input = document.getElementById("keyText");
+            <div class="card-soft">
+              <div class="section-title">Need help / Buy key?</div>
+              <div class="bottom-actions">
+                <a class="btn btn-ghost btn-pill" href="${panelConfig.telegramAdminUrl || "#"}">💬 Contact Admin</a>
+                <a class="btn btn-ghost btn-pill" href="${panelConfig.channelUrl || "#"}" target="_blank" rel="noopener">📢 Join Channel</a>
+              </div>
+            </div>
 
-          btn?.addEventListener("click", async () => {
-            try {
-              input.select();
-              input.setSelectionRange(0, 999999);
-              await navigator.clipboard.writeText(input.value);
-              window.__toast && window.__toast("Copied ✅");
-            } catch (e) {
-              // fallback
-              document.execCommand("copy");
-              window.__toast && window.__toast("Copied ✅");
-            }
-          });
-        </script>
-      `
-    }
-  </section>
+            <script>
+              (function () {
+                const input = document.getElementById("keyInput");
+                const btn = document.getElementById("copyBtn");
+                if (!input || !btn) return;
+
+                async function doCopy() {
+                  try {
+                    input.select();
+                    input.setSelectionRange(0, 99999);
+                    if (navigator.clipboard && window.isSecureContext) {
+                      await navigator.clipboard.writeText(input.value);
+                    } else {
+                      document.execCommand("copy");
+                    }
+                    btn.textContent = "✅ Copied";
+                    setTimeout(() => (btn.textContent = "📋 Copy"), 1200);
+                  } catch (e) {
+                    btn.textContent = "❌ Failed";
+                    setTimeout(() => (btn.textContent = "📋 Copy"), 1200);
+                  }
+                }
+
+                btn.addEventListener("click", doCopy);
+              })();
+            </script>
+          `
+      }
+    </section>
   `
 }) %>
