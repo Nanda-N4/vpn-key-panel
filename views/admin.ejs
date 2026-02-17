@@ -43,7 +43,9 @@
       <% if (mode === "login") { %>
         <section class="card glass">
           <h2 style="margin:0 0 10px 0;">Admin Login</h2>
-          <% if (error) { %><div class="toast glass"><strong>⚠</strong> <span><%= error %></span></div><% } %>
+          <% if (error) { %>
+            <div class="toast glass"><strong>⚠</strong> <span><%= error %></span></div>
+          <% } %>
 
           <form method="POST" action="/<%= adminPath %>/login" class="form-grid">
             <label class="field">
@@ -104,23 +106,21 @@
           </div>
         </section>
 
-        <!-- UI TEXT EDITOR (NEW) -->
+        <!-- UI TEXT EDITOR -->
         <section class="card glass">
           <h2 style="margin:0 0 12px 0;">UI Text (User Page Labels)</h2>
 
-          <div class="muted" style="margin:0 0 12px 0;">
-            ဒီနေရာက စာတွေက User Page (Key list / Detail) မှာ ပေါ်မယ့် စာတွေပါ။<br/>
+          <div class="muted" style="margin:0 0 12px 0; line-height:1.55;">
+            ဒီနေရာက စာတွေက User Page (Key list / Detail) မှာ ပေါ်မယ့် စာတွေပါ။<br/>
             Template တွေမှာ <code>{gb}</code> နဲ့ <code>{date}</code> ကို အသုံးပြုနိုင်ပါတယ်။
           </div>
 
           <form method="POST" action="/<%= adminPath %>/ui-text" class="form-grid">
-            <!-- top -->
             <label class="field" style="grid-column: 1 / -1;">
               <span class="field-label">Back button text</span>
               <input class="input" name="ui_backText" value="<%= panelConfig?.uiText?.backText || '← Back' %>" />
             </label>
 
-            <!-- labels -->
             <label class="field">
               <span class="field-label">Label: GB (short)</span>
               <input class="input" name="ui_label_gbShort" value="<%= panelConfig?.uiText?.labels?.gbShort || 'GB' %>" />
@@ -146,7 +146,6 @@
               <input class="input" name="ui_label_downloadTitle" value="<%= panelConfig?.uiText?.labels?.downloadTitle || 'Download Apps' %>" />
             </label>
 
-            <!-- templates -->
             <label class="field" style="grid-column: 1 / -1;">
               <span class="field-label">Template: GB info (use {gb})</span>
               <input class="input" name="ui_tpl_gbInfo" value="<%= panelConfig?.uiText?.templates?.gbInfo || 'ဒီ Key က {gb} GB သုံးနိုင်ပါတယ်။' %>" />
@@ -160,7 +159,7 @@
             <div style="display:flex; gap:10px; flex-wrap:wrap; grid-column: 1 / -1;">
               <button class="btn glass-btn" type="submit">Save UI Text</button>
 
-              <button class="btn glass-btn danger" type="submit" name="ui_reset" value="1"
+              <button class="btn danger" type="submit" name="ui_reset" value="1"
                 onclick="return confirm('UI Text ကို Default ပြန်ထားမလား?')">
                 Reset to Default
               </button>
