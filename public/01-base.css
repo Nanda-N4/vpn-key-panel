@@ -4,15 +4,18 @@ body{
   margin:0;
   font-family:var(--font);
   color:var(--text);
-  background: #ffffff;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background:var(--bg1);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
 }
 
-a{ color: inherit; text-decoration: none; }
-a:hover{ text-decoration: underline; }
+a{ color:inherit; text-decoration:none; }
+a:hover{ text-decoration:underline; }
 
 img{ max-width:100%; display:block; }
-button, input, select, textarea{ font: inherit; color: inherit; }
 
-::selection{ background: rgba(0,190,255,.22); }
+button,input,select,textarea{
+  font:inherit;
+  color:inherit;
+}
+::selection{ background: rgba(0,160,255,.22); }
