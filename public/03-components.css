@@ -1,194 +1,160 @@
-/* Glass surfaces */
+/* ==========================================================================
+   03 — COMPONENTS (glass cards, buttons, inputs, badges, list items)
+   ========================================================================== */
+
 .glass{
-  background: var(--glass);
-  backdrop-filter: blur(var(--blur));
-  -webkit-backdrop-filter: blur(var(--blur));
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-card);
-  border-radius: var(--radius-xl);
+  border-radius: var(--r-xl);
+  border: var(--b-1);
+  background: linear-gradient(180deg, var(--glass), var(--glass-2));
+  backdrop-filter: var(--blur-2);
+  -webkit-backdrop-filter: var(--blur-2);
+  box-shadow: var(--sh-2), var(--sh-in);
 }
 
-.glass--strong{
-  background: var(--glass-strong);
-  backdrop-filter: blur(var(--blur-strong));
-  -webkit-backdrop-filter: blur(var(--blur-strong));
+.card{
+  border-radius: var(--r-xl);
+  border: var(--b-1);
+  background: linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.40));
+  backdrop-filter: var(--blur-2);
+  -webkit-backdrop-filter: var(--blur-2);
+  box-shadow: var(--sh-2), var(--sh-in);
+  padding: 18px;
 }
 
-/* Header */
-.app-header{
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  padding: 14px 0 10px;
+@media (prefers-color-scheme: dark){
+  .card{
+    background: linear-gradient(180deg, rgba(25,30,40,.62), rgba(25,30,40,.40));
+  }
 }
 
-.header-bar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: var(--radius-xl);
+.card-title{
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0 0 6px;
 }
 
-.brand{
-  display:flex;
-  align-items:center;
-  gap: 10px;
-  min-width: 0;
-}
-.brand .logo{
-  width: 38px;
-  height: 38px;
-  border-radius: 14px;
-  display:grid;
-  place-items:center;
-  background: linear-gradient(135deg, rgba(0,190,255,.30), rgba(170,120,255,.22));
-  border: 1px solid var(--glass-border-2);
-  box-shadow: 0 10px 24px rgba(0,0,0,.14);
-}
-.brand .title{
-  font-family: var(--font-display);
-  font-weight: 760;
-  letter-spacing: .2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.brand .sub{
-  font-size: 12px;
-  color: hsl(var(--muted));
-  margin-top: 2px;
+.card-subtitle{
+  margin: 0;
+  color: var(--text-2);
+  line-height: 1.45;
 }
 
 /* Buttons */
 .btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
+  height: var(--control-h);
+  padding: 0 18px;
+  border-radius: var(--r-pill);
+  border: var(--b-1);
+  background: linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.45));
+  backdrop-filter: var(--blur-1);
+  -webkit-backdrop-filter: var(--blur-1);
+  box-shadow: var(--sh-1), var(--sh-in);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   gap: 10px;
-  padding: 10px 14px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--glass-border);
-  background: rgba(255,255,255,.30);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 10px 22px rgba(0,0,0,.12);
-  cursor:pointer;
-  user-select:none;
+  font-weight: 700;
+  user-select: none;
   transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
 }
-.btn:hover{ transform: translateY(-1px); }
+
+.btn:hover{ transform: translateY(-1px); box-shadow: var(--sh-2), var(--sh-in); }
 .btn:active{ transform: translateY(0px) scale(.99); }
-.btn.primary{
-  border-color: rgba(0,190,255,.28);
-  background: linear-gradient(135deg, rgba(0,190,255,.26), rgba(170,120,255,.18));
+.btn:focus{ outline: none; box-shadow: var(--sh-2), var(--sh-in), var(--ring); }
+
+.btn-primary{
+  border: 1px solid rgba(0, 170, 255, .24);
+  background:
+    radial-gradient(circle at 20% 10%, rgba(255,255,255,.70), transparent 55%),
+    linear-gradient(135deg, rgba(0, 170, 255, .42), rgba(190, 120, 255, .28));
 }
-.btn .icon{
-  width: 22px;
-  height: 22px;
-  display:grid;
-  place-items:center;
-  border-radius: 10px;
-  background: rgba(255,255,255,.22);
-  border: 1px solid var(--glass-border-2);
+
+.btn-soft{
+  background: linear-gradient(180deg, rgba(255,255,255,.62), rgba(255,255,255,.38));
 }
 
 /* Inputs */
-.input, select{
+.field{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label{
+  font-size: 12px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.input, .select, .textarea{
+  height: var(--control-h);
   width: 100%;
-  padding: 12px 14px;
-  border-radius: 16px;
-  border: 1px solid var(--glass-border);
-  background: rgba(255,255,255,.28);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  border-radius: var(--r-lg);
+  border: var(--b-1);
+  background: rgba(255,255,255,.58);
+  backdrop-filter: var(--blur-1);
+  -webkit-backdrop-filter: var(--blur-1);
+  box-shadow: var(--sh-1), var(--sh-in);
+  padding: 0 14px;
   outline: none;
   transition: box-shadow .12s ease, border-color .12s ease;
 }
-.input:focus, select:focus{
-  box-shadow: var(--ring);
-  border-color: rgba(0,190,255,.40);
+
+.textarea{
+  height: auto;
+  min-height: 108px;
+  padding: 12px 14px;
+  resize: vertical;
 }
 
-/* Cards */
-.card{
-  padding: 16px;
-  border-radius: var(--radius-xl);
-}
-.card-title{
-  font-weight: 760;
-  letter-spacing: .2px;
-  margin: 0 0 8px;
-}
-.card-muted{
-  color: hsl(var(--muted));
-  font-size: 13px;
+.select{ appearance: none; background-image:
+  linear-gradient(45deg, transparent 50%, rgba(0,0,0,.45) 50%),
+  linear-gradient(135deg, rgba(0,0,0,.45) 50%, transparent 50%);
+  background-position:
+    calc(100% - 22px) 22px,
+    calc(100% - 16px) 22px;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
 }
 
-/* Server list item (tap surface) */
-.server{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 14px;
-  padding: 16px;
-  border-radius: var(--radius-xl);
-  background: rgba(255,255,255,.30);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 12px 26px rgba(0,0,0,.12);
-  transition: transform .12s ease;
-}
-.server:hover{ transform: translateY(-1px); }
-
-.server .left{
-  min-width:0;
-}
-.server .type{
-  font-size: 12px;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: hsl(var(--muted));
-}
-.server .name{
-  font-size: 20px;
-  font-weight: 780;
-  margin-top: 6px;
-  display:flex;
-  align-items:center;
-  gap: 10px;
-}
-.server .meta{
-  margin-top: 8px;
-  color: hsl(var(--muted));
-  font-size: 13px;
+@media (prefers-color-scheme: dark){
+  .input, .select, .textarea{ background: rgba(25,30,40,.58); }
+  .select{ background-image:
+    linear-gradient(45deg, transparent 50%, rgba(255,255,255,.55) 50%),
+    linear-gradient(135deg, rgba(255,255,255,.55) 50%, transparent 50%);
+  }
 }
 
+.input:focus, .select:focus, .textarea:focus{
+  box-shadow: var(--sh-2), var(--sh-in), var(--ring);
+}
+
+/* Badges */
 .badge{
-  padding: 7px 12px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--glass-border);
-  background: rgba(255,255,255,.26);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding: 8px 14px;
+  border-radius: var(--r-pill);
+  border: var(--b-2);
+  background: rgba(255,255,255,.45);
+  backdrop-filter: var(--blur-1);
+  -webkit-backdrop-filter: var(--blur-1);
+  font-weight: 900;
   font-size: 12px;
-  font-weight: 700;
-}
-.badge.ok{
-  border-color: rgba(46, 204, 113, .28);
-  color: hsl(var(--ok));
-  background: rgba(46, 204, 113, .10);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text);
 }
 
-.tap{
-  margin-top: 12px;
-  font-size: 13px;
-  color: rgba(0,190,255,.95);
-  font-weight: 700;
+.badge-active{
+  border: 1px solid rgba(0, 220, 170, .35);
+  background: linear-gradient(135deg, rgba(0, 220, 170, .22), rgba(0, 170, 255, .18));
+  color: hsl(155 60% 22%);
 }
 
-/* Footer */
-.footer{
-  margin-top: 18px;
-  padding: 14px 0 0;
-  color: hsl(var(--mut
+@media (prefers-color-scheme: dark){
+  .badge-active{ color
