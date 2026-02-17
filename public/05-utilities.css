@@ -1,33 +1,3 @@
-/* ==========================================================================
-   05 — UTILITIES (helpers)
-   ========================================================================== */
-
-.mt-1{ margin-top: var(--s-1); }
-.mt-2{ margin-top: var(--s-2); }
-.mt-3{ margin-top: var(--s-3); }
-.mt-4{ margin-top: var(--s-4); }
-
-.mb-1{ margin-bottom: var(--s-1); }
-.mb-2{ margin-bottom: var(--s-2); }
-.mb-3{ margin-bottom: var(--s-3); }
-.mb-4{ margin-bottom: var(--s-4); }
-
-.p-1{ padding: var(--s-1); }
-.p-2{ padding: var(--s-2); }
-.p-3{ padding: var(--s-3); }
-.p-4{ padding: var(--s-4); }
-
-.center{ text-align:center; }
-.muted{ color: var(--muted); }
-.text2{ color: var(--text-2); }
-
-.row{
-  display:flex;
-  align-items:center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.wrap{ flex-wrap: wrap; }
-
-.hidden{ display:none !important; }
+.u-hidden{ display:none !important; }
+.u-center{ text-align:center; }
+.u-mt{ margin-top: 12px; }
