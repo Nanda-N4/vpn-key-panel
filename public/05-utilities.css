@@ -1,1 +1,6 @@
-
+.mt-8{ margin-top:8px; }
+.mt-12{ margin-top:12px; }
+.mt-16{ margin-top:16px; }
+.center{ display:flex; align-items:center; justify-content:center; }
+.row{ display:flex; gap: 10px; align-items:center; flex-wrap:wrap; }
+.hidden{ display:none !important; }
