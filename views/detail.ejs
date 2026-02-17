@@ -1,90 +1,94 @@
-<%- include("layout", {
-  title: item ? (item.type + " • " + item.region_name) : "Key",
-  panelConfig,
-  content: `
-    <section class="card section">
-      ${
-        error
-          ? `
-            <div class="alert alert-danger">${error}</div>
-            <a class="btn btn-ghost btn-pill" href="/">← Back</a>
-          `
-          : `
-            <div class="detail-head">
-              <a class="btn btn-ghost btn-pill" href="/">← Back</a>
-              <div class="pill ${String(item.statusComputed).toLowerCase()==="active" ? "pill-active" : "pill-muted"}">
-                ${item.statusComputed}
-              </div>
-            </div>
+<% if (error) { %>
+  <div class="card">
+    <div class="title">Error</div>
+    <div class="muted"><%= error %></div>
+    <div class="spacer"></div>
+    <a class="btn btn-pill" href="/">← Back</a>
+  </div>
+<% } else if (!item) { %>
+  <div class="card">
+    <div class="muted">Key မတွေ့ပါ။</div>
+    <div class="spacer"></div>
+    <a class="btn btn-pill" href="/">← Back</a>
+  </div>
+<% } else { %>
 
-            <div class="detail-title">${item.type}</div>
-            <div class="detail-region">
-              <span class="flag">${item.region_flag || ""}</span>
-              <span>${item.region_name}</span>
-            </div>
-            <div class="muted">
-              ${item.gb_limit ? `GB ${item.gb_limit}` : "No limit"} •
-              ${item.expire_date ? `Expire ${item.expire_date}` : "No expiry"}
-            </div>
+<div class="stack-lg">
+  <section class="card">
+    <div class="row between">
+      <a class="btn btn-soft" href="/">← Back</a>
+      <span class="badge <%= (item.statusComputed || 'ACTIVE').toLowerCase() %>">
+        <%= item.statusComputed || "ACTIVE" %>
+      </span>
+    </div>
 
-            <div class="card-soft keybox">
-              <div class="keybox-label">Key</div>
-              <div class="keybox-row">
-                <input class="input key-input" id="keyInput" readonly value="${item.key_string || ""}" />
-                <button class="btn btn-primary btn-pill" type="button" id="copyBtn">📋 Copy</button>
-              </div>
-              <div class="muted">Copy ပြီးရင် သင်သုံးမယ့် App ထဲ Paste → Connect လုပ်ပါ</div>
-            </div>
+    <div class="stack-sm">
+      <div class="key-type big"><%= item.type %></div>
 
-            <div class="card-soft">
-              <div class="section-title">Download Apps</div>
-              <div class="apps">
-                ${apps.map(a => `
-                  <a class="app-link" href="${a.url}" target="_blank" rel="noopener">
-                    <div class="app-name">${a.name}</div>
-                    <div class="muted">${a.sub}</div>
-                    <div class="app-arrow">↗</div>
-                  </a>
-                `).join("")}
-              </div>
-            </div>
+      <div class="key-meta">
+        <span class="flag"><%= item.region_flag || "🌐" %></span>
+        <span class="region"><%= item.region_name %></span>
+      </div>
 
-            <div class="card-soft">
-              <div class="section-title">Need help / Buy key?</div>
-              <div class="bottom-actions">
-                <a class="btn btn-ghost btn-pill" href="${panelConfig.telegramAdminUrl || "#"}">💬 Contact Admin</a>
-                <a class="btn btn-ghost btn-pill" href="${panelConfig.channelUrl || "#"}" target="_blank" rel="noopener">📢 Join Channel</a>
-              </div>
-            </div>
+      <div class="key-sub">
+        <span>GB <%= item.gb_limit || 0 %></span>
+        <span class="dot">•</span>
+        <span>Expire <%= item.expire_date || "-" %></span>
+      </div>
+    </div>
 
-            <script>
-              (function () {
-                const input = document.getElementById("keyInput");
-                const btn = document.getElementById("copyBtn");
-                if (!input || !btn) return;
+    <div class="spacer"></div>
 
-                async function doCopy() {
-                  try {
-                    input.select();
-                    input.setSelectionRange(0, 99999);
-                    if (navigator.clipboard && window.isSecureContext) {
-                      await navigator.clipboard.writeText(input.value);
-                    } else {
-                      document.execCommand("copy");
-                    }
-                    btn.textContent = "✅ Copied";
-                    setTimeout(() => (btn.textContent = "📋 Copy"), 1200);
-                  } catch (e) {
-                    btn.textContent = "❌ Failed";
-                    setTimeout(() => (btn.textContent = "📋 Copy"), 1200);
-                  }
-                }
+    <div class="field">
+      <div class="label">Key</div>
+      <div class="copybox">
+        <div class="copytext" id="keyText"><%= item.key_string %></div>
+        <button class="btn btn-pill" type="button" id="copyBtn">📋 Copy</button>
+      </div>
+      <div class="muted">Copy ပြီးရင် သင့် App ထဲ Paste → Connect လုပ်ပါ</div>
+    </div>
+  </section>
 
-                btn.addEventListener("click", doCopy);
-              })();
-            </script>
-          `
-      }
-    </section>
-  `
-}) %>
+  <section class="card">
+    <div class="title">Download Apps</div>
+
+    <div class="apps">
+      <% (apps || []).forEach(function(a){ %>
+        <a class="app" href="<%= a.url %>" target="_blank" rel="noopener">
+          <div class="app-left">
+            <div class="app-name"><%= a.name %></div>
+            <div class="muted"><%= a.sub %></div>
+          </div>
+          <div class="app-right">↗</div>
+        </a>
+      <% }) %>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="row">
+      <% if (panelConfig?.telegramAdminUrl && panelConfig.telegramAdminUrl !== "#") { %>
+        <a class="btn btn-soft" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">💬 Contact Admin</a>
+      <% } %>
+      <% if (panelConfig?.telegramChannelUrl && panelConfig.telegramChannelUrl !== "#") { %>
+        <a class="btn btn-soft" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">📣 Join Channel</a>
+      <% } %>
+    </div>
+  </section>
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById("copyBtn");
+    var t = document.getElementById("keyText");
+    if (!btn || !t) return;
+
+    btn.addEventListener("click", async function () {
+      var ok = await window.copyText(t.textContent || "");
+      btn.textContent = ok ? "✅ Copied" : "❌ Failed";
+      setTimeout(function () { btn.textContent = "📋 Copy"; }, 1200);
+    });
+  })();
+</script>
+
+<% } %>
