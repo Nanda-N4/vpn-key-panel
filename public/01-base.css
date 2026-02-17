@@ -2,20 +2,45 @@
 html,body{ height:100%; }
 body{
   margin:0;
-  font-family:var(--font);
-  color:var(--text);
-  background:var(--bg1);
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
+  font-family: var(--font-sans);
+  color: var(--text);
+  background: linear-gradient(180deg, var(--bg1), var(--bg2));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-[hidden]{ display:none !important; }
-a{ color:inherit; text-decoration:none; }
-a:hover{ text-decoration:underline; }
+
+/* iOS-like aurora / bloom layer */
+.bg-aurora{
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: linear-gradient(140deg, rgba(0,160,255,.20), rgba(160,120,255,.18));
+}
+.bg-aurora::before{
+  content:"";
+  position:absolute;
+  inset:-20%;
+  background:
+    radial-gradient(900px 520px at 12% 10%, rgba(255,255,255,.75), transparent 55%),
+    radial-gradient(900px 520px at 88% 20%, rgba(200,220,255,.55), transparent 60%),
+    radial-gradient(1000px 700px at 50% 110%, rgba(180,130,255,.38), transparent 62%);
+  filter: blur(18px);
+  opacity: .95;
+}
+.bg-aurora::after{
+  /* subtle noise for liquid-glass */
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.18'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  opacity: .18;
+  pointer-events:none;
+}
+
+a{ color: inherit; text-decoration: none; }
+a:hover{ text-decoration: underline; }
 
 img{ max-width:100%; display:block; }
-
-button,input,select,textarea{
-  font:inherit;
-  color:inherit;
-}
-::selection{ background: rgba(0,160,255,.22); }
+button, input, select, textarea{ font: inherit; color: inherit; }
