@@ -1,12 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" data-theme="glass-bright">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="light dark" />
-  <title><%= (panelConfig && panelConfig.brandName) ? panelConfig.brandName : "VPN Key Panel" %></title>
 
-  <!-- CSS Architecture (IMPORTANT: must be /public/...) -->
+  <title><%= (panelConfig && panelConfig.brandName) ? panelConfig.brandName : "VPN Key Portal" %></title>
+
+  <!-- CSS Architecture (must be /public/...) -->
   <link rel="stylesheet" href="/public/00-tokens.css" />
   <link rel="stylesheet" href="/public/01-base.css" />
   <link rel="stylesheet" href="/public/02-layout.css" />
@@ -16,21 +17,29 @@
 </head>
 
 <body>
+  <!-- Background -->
+  <div class="bg-aurora" aria-hidden="true"></div>
+
   <div class="app-shell">
     <!-- Header -->
-    <header class="app-header">
-      <div class="container header-inner">
+    <header class="app-header" role="banner">
+      <div class="container header-inner glass glass--strong">
         <div class="brand">
-          <span class="brand-icon" aria-hidden="true">⚡</span>
+          <div class="brand-icon" aria-hidden="true">⚡</div>
+
           <div class="brand-text">
-            <div class="brand-title"><%= (panelConfig && panelConfig.brandName) ? panelConfig.brandName : "FREE KEY By N4" %></div>
-            <div class="brand-sub">Fast • Simple • Secure</div>
+            <div class="brand-title">
+              <%= (panelConfig && panelConfig.brandName) ? panelConfig.brandName : "FREE KEY By N4" %>
+            </div>
+            <div class="brand-sub">
+              <%= (panelConfig && panelConfig.brandTagline) ? panelConfig.brandTagline : "Fast • Simple • Secure" %>
+            </div>
           </div>
         </div>
 
         <div class="header-actions">
           <% if (panelConfig && panelConfig.channelUrl) { %>
-            <a class="btn btn--pill btn--ghost" href="<%= panelConfig.channelUrl %>" target="_blank" rel="noopener">
+            <a class="btn btn--pill btn--glass" href="<%= panelConfig.channelUrl %>" target="_blank" rel="noopener">
               ✈️ <span>Channel</span>
             </a>
           <% } %>
@@ -39,38 +48,32 @@
     </header>
 
     <!-- Main -->
-    <main class="container app-main">
-      <%- body %>
+    <main class="app-main" role="main">
+      <div class="container">
+        <%- body %>
+      </div>
     </main>
 
     <!-- Footer -->
     <footer class="app-footer">
       <div class="container footer-inner">
-        <div class="muted">© <%= new Date().getFullYear() %> <%= (panelConfig && panelConfig.brandName) ? panelConfig.brandName : "FREE KEY By N4" %></div>
+        <div class="footer-text">
+          © <%= new Date().getFullYear() %> <%= (panelConfig && panelConfig.brandName) ? panelConfig.brandName : "FREE KEY By N4" %>
+        </div>
+
         <% if (panelConfig && panelConfig.footerLinkText && panelConfig.footerLinkUrl) { %>
-          <a class="link" href="<%= panelConfig.footerLinkUrl %>" target="_blank" rel="noopener"><%= panelConfig.footerLinkText %></a>
+          <a class="footer-link" href="<%= panelConfig.footerLinkUrl %>" target="_blank" rel="noopener">
+            <%= panelConfig.footerLinkText %>
+          </a>
         <% } %>
       </div>
     </footer>
   </div>
 
-  <!-- Basic JS helpers (optional) -->
+  <!-- Small UX helpers (safe) -->
   <script>
-    // Prevent accidental text selection on double tap
-    document.addEventListener("touchstart", () => {}, { passive: true });
-
-    // Example: copy buttons (if you use data-copy)
-    document.addEventListener("click", (e) => {
-      const btn = e.target.closest("[data-copy]");
-      if (!btn) return;
-      const text = btn.getAttribute("data-copy") || "";
-      if (!text) return;
-
-      navigator.clipboard.writeText(text).then(() => {
-        btn.classList.add("is-copied");
-        setTimeout(() => btn.classList.remove("is-copied"), 900);
-      }).catch(() => {});
-    });
+    // Prevent "tap highlight" weirdness on some Android browsers
+    document.documentElement.style.webkitTapHighlightColor = "transparent";
   </script>
 </body>
 </html>
