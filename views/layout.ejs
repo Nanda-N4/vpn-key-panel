@@ -97,3 +97,16 @@
   <script defer src="/public/06-app.js"></script>
 </body>
 </html>
+<script>
+  async function copyKey(btn){
+    const text = btn.getAttribute('data-copy') || '';
+    try{
+      await navigator.clipboard.writeText(text);
+      const old = btn.innerHTML;
+      btn.innerHTML = '✅ Copied';
+      setTimeout(()=> btn.innerHTML = old, 900);
+    }catch(e){
+      alert('Copy failed. Please tap open then copy.');
+    }
+  }
+</script>
