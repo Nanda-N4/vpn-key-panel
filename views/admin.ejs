@@ -1,101 +1,129 @@
-<% if (mode === "login") { %>
-  <div class="card auth">
-    <div class="title">Admin Login</div>
-    <% if (error) { %><div class="alert"><%= error %></div><% } %>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title><%= panelConfig.brandName || "VPN KEY" %> - Admin</title>
 
-    <form method="POST" action="/<%= adminPath %>/login" class="stack-md">
-      <input class="input" type="password" name="password" placeholder="Admin password" required />
-      <button class="btn btn-pill" type="submit">Login</button>
-    </form>
+  <link rel="stylesheet" href="/public/00-tokens.css" />
+  <link rel="stylesheet" href="/public/01-base.css" />
+  <link rel="stylesheet" href="/public/02-layout.css" />
+  <link rel="stylesheet" href="/public/03-components.css" />
+  <link rel="stylesheet" href="/public/04-pages.css" />
+  <link rel="stylesheet" href="/public/05-utilities.css" />
+</head>
+<body>
+  <div class="bg-aurora" aria-hidden="true"></div>
 
-    <div class="spacer"></div>
-    <a class="link" href="/">← Back to user page</a>
-  </div>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="container header-inner">
+        <div class="brand">
+          <span class="brand-icon" aria-hidden="true">⚡</span>
+          <div class="brand-text">
+            <div class="brand-title"><%= panelConfig.brandName || "VPN KEY" %></div>
+            <div class="brand-sub">Admin Panel</div>
+          </div>
+        </div>
 
-<% } else { %>
+        <div class="header-actions">
+          <a class="btn btn-ghost" href="/" target="_self">🏠 Home</a>
+          <% if (mode === "dashboard") { %>
+            <form method="POST" action="/<%= adminPath %>/logout">
+              <button class="btn btn-soft" type="submit">Logout</button>
+            </form>
+          <% } %>
+        </div>
+      </div>
+    </header>
 
-  <div class="stack-lg">
-    <div class="row between">
-      <div class="title">Admin Dashboard</div>
-      <form method="POST" action="/<%= adminPath %>/logout">
-        <button class="btn btn-soft" type="submit">Logout</button>
-      </form>
-    </div>
+    <main class="container main">
+      <% if (mode === "login") { %>
+        <section class="card admin">
+          <h2 class="section-title">Admin Login</h2>
+          <% if (error) { %><div class="card error"><%= error %></div><% } %>
 
-    <% if (error) { %>
-      <div class="card"><div class="alert">Error: <%= error %></div></div>
-    <% } %>
+          <form method="POST" action="/<%= adminPath %>/login" class="form">
+            <label class="label">Password</label>
+            <input class="input" type="password" name="password" placeholder="Enter admin password" required />
+            <button class="btn" type="submit">Login</button>
+          </form>
+        </section>
+      <% } else { %>
 
-    <div class="card">
-      <div class="title">Add Key</div>
+        <% if (error) { %>
+          <div class="card error">Error: <%= error %></div>
+        <% } %>
 
-      <form method="POST" action="/<%= adminPath %>/add" class="grid2">
-        <input class="input" name="type" placeholder="Type (V2RAY/OUTLINE)" value="<%= defaults?.type || "V2RAY" %>" required />
-        <input class="input" name="region_name" placeholder="Region name" value="<%= defaults?.region_name || "" %>" required />
+        <section class="card admin">
+          <h2 class="section-title">Add Key</h2>
 
-        <input class="input" name="region_flag" placeholder="Flag emoji (e.g. 🇦🇺)" value="<%= defaults?.region_flag || "" %>" />
-        <input class="input" name="gb_limit" placeholder="GB limit" value="<%= defaults?.gb_limit || 0 %>" />
+          <form method="POST" action="/<%= adminPath %>/add" class="grid">
+            <input class="input" name="type" value="<%= (defaults && defaults.type) ? defaults.type : "V2RAY" %>" placeholder="V2RAY / OUTLINE" required />
+            <input class="input" name="region_name" value="<%= (defaults && defaults.region_name) ? defaults.region_name : "" %>" placeholder="Region name" required />
+            <input class="input" name="region_flag" value="<%= (defaults && defaults.region_flag) ? defaults.region_flag : "" %>" placeholder="Flag emoji (🇸🇬)" />
+            <input class="input" name="gb_limit" type="number" value="<%= (defaults && defaults.gb_limit!=null) ? defaults.gb_limit : 0 %>" placeholder="GB limit" />
+            <input class="input" name="expire_date" value="<%= (defaults && defaults.expire_date) ? defaults.expire_date : "" %>" placeholder="YYYY-MM-DD" />
+            <select class="select" name="status">
+              <option value="ACTIVE" selected>ACTIVE</option>
+              <option value="INACTIVE">INACTIVE</option>
+            </select>
 
-        <input class="input" name="expire_date" placeholder="Expire date (YYYY-MM-DD)" value="<%= defaults?.expire_date || "" %>" />
-        <select class="select" name="status">
-          <option value="ACTIVE">ACTIVE</option>
-          <option value="INACTIVE">INACTIVE</option>
-        </select>
+            <textarea class="textarea" name="key_string" placeholder="Key string (vless://... or ss://... or outline://...)" required></textarea>
 
-        <textarea class="textarea col2" name="key_string" placeholder="Key string (vless://...)" required></textarea>
+            <button class="btn" type="submit">Add</button>
+          </form>
+        </section>
 
-        <button class="btn btn-pill col2" type="submit">Add</button>
-      </form>
-    </div>
+        <section class="card admin">
+          <h2 class="section-title">Announcement (Popup)</h2>
+          <p class="muted">
+            Note: Markdown ကို server.js မှာ sanitize လုပ်ထားပါတယ်။
+          </p>
 
-    <div class="card">
-      <div class="title">Announcement (Popup)</div>
+          <form method="POST" action="/<%= adminPath %>/announce" class="form">
+            <label class="checkbox">
+              <input type="checkbox" name="announce_enabled" value="1" <%= announceEnabled ? "checked" : "" %> />
+              Enable popup announcement
+            </label>
 
-      <form method="POST" action="/<%= adminPath %>/announce" class="stack-md">
-        <label class="check">
-          <input type="checkbox" name="announce_enabled" value="1" <%= announceEnabled ? "checked" : "" %> />
-          Enable popup announcement
-        </label>
+            <textarea class="textarea" name="announce_md" placeholder="# 🔥 New Update&#10;✅ Australia key..."><%= announceMd || "" %></textarea>
 
-        <textarea class="textarea" name="announce_md" placeholder="Markdown supported..."><%= announceMd || "" %></textarea>
+            <button class="btn" type="submit">Save Announcement</button>
+          </form>
+        </section>
 
-        <button class="btn btn-pill" type="submit">Save</button>
-      </form>
+        <section class="card admin">
+          <h2 class="section-title">Keys</h2>
 
-      <div class="muted">Note: Markdown ကို server.js ထဲမှာ sanitize လုပ်ထားလို့ safe ဖြစ်ပါတယ်။</div>
-    </div>
+          <% (keys || []).forEach(function(k){ %>
+            <div class="key-admin">
+              <div class="key-admin-row">
+                <div class="key-admin-main">
+                  <div class="key-admin-type"><%= k.type %></div>
+                  <div class="key-admin-region"><%= k.region_flag || "🌐" %> <%= k.region_name %> • GB <%= k.gb_limit || 0 %> • Exp <%= k.expire_date || "-" %></div>
+                  <div class="key-admin-meta">ID: <%= k.id %> • <b><%= (k.statusComputed || '').toUpperCase() %></b></div>
+                  <a href="<%= k.link %>" target="_blank" rel="noopener">Open</a>
+                </div>
 
-    <div class="card">
-      <div class="title">Keys</div>
+                <div class="key-admin-actions">
+                  <form method="POST" action="/<%= adminPath %>/toggle/<%= k.id %>">
+                    <button class="btn btn-soft" type="submit">Toggle</button>
+                  </form>
+                  <form method="POST" action="/<%= adminPath %>/delete/<%= k.id %>" onsubmit="return confirm('Delete this key?');">
+                    <button class="btn btn-ghost" type="submit">Delete</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </section>
 
-      <% if (!keys || keys.length === 0) { %>
-        <div class="muted">No keys yet.</div>
       <% } %>
 
-      <div class="table">
-        <% (keys || []).forEach(function(k){ %>
-          <div class="trow">
-            <div class="tmain">
-              <div class="key-type"><%= k.type %></div>
-              <div class="muted"><%= k.region_flag || "🌐" %> <%= k.region_name %> • GB <%= k.gb_limit || 0 %> • Exp <%= k.expire_date || "-" %></div>
-              <div class="muted">ID: <%= k.id %> • <%= k.statusComputed %></div>
-            </div>
-
-            <div class="tactions">
-              <a class="btn btn-soft" href="<%= k.link %>" target="_blank" rel="noopener">Open</a>
-
-              <form method="POST" action="/<%= adminPath %>/toggle/<%= k.id %>">
-                <button class="btn btn-soft" type="submit">Toggle</button>
-              </form>
-
-              <form method="POST" action="/<%= adminPath %>/delete/<%= k.id %>" onsubmit="return confirm('Delete this key?');">
-                <button class="btn btn-danger" type="submit">Delete</button>
-              </form>
-            </div>
-          </div>
-        <% }) %>
-      </div>
-    </div>
+      <p class="copyright">© <%= new Date().getFullYear() %> <%= panelConfig.brandName || "VPN KEY" %></p>
+    </main>
   </div>
-
-<% } %>
+</body>
+</html>
