@@ -1,13 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="light dark" />
+  <title><%= panelConfig?.brandName || "VPN KEY" %></title>
 
-  <title><%= (panelConfig && panelConfig.brandName) ? panelConfig.brandName : "VPN KEY" %></title>
-
-  <!-- CSS Architecture (IMPORTANT: must be /public/..) -->
+  <!-- CSS Architecture -->
   <link rel="stylesheet" href="/public/00-tokens.css" />
   <link rel="stylesheet" href="/public/01-base.css" />
   <link rel="stylesheet" href="/public/02-layout.css" />
@@ -34,7 +33,7 @@
         <div class="header-actions">
           <% if (panelConfig && panelConfig.telegramChannelUrl && panelConfig.telegramChannelUrl !== "#") { %>
             <a class="btn btn-pill" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
-              ✈️ <span><%= panelConfig.telegramChannelText || "Channel" %></span>
+              ✈️ <%= panelConfig.telegramChannelText || "Channel" %>
             </a>
           <% } %>
         </div>
@@ -42,16 +41,17 @@
     </header>
 
     <!-- Main -->
-    <main class="container page">
+    <main class="container page-main">
       <%- body %>
     </main>
 
     <!-- Footer -->
-    <footer class="container footer">
-      <div class="footer-inner">
-        <span>© <%= new Date().getFullYear() %> <%= panelConfig?.brandName || "VPN KEY" %></span>
+    <footer class="container app-footer">
+      <div class="footer-row">
+        <div>© <%= new Date().getFullYear() %> <%= panelConfig?.brandName || "VPN KEY" %></div>
+
         <% if (panelConfig && panelConfig.telegramAdminUrl && panelConfig.telegramAdminUrl !== "#") { %>
-          <a class="link" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">
+          <a class="footer-link" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">
             Support: <%= panelConfig.telegramAdminText || "Contact Admin" %>
           </a>
         <% } %>
@@ -59,74 +59,41 @@
     </footer>
   </div>
 
-  <!-- Announcement Modal (optional, safe HTML expected) -->
+  <!-- Announcement Modal -->
   <% if (panelConfig && panelConfig.announceHtml) { %>
-    <div class="modal-backdrop" id="announceBackdrop" role="dialog" aria-modal="true" aria-label="Announcement">
-      <div class="modal">
+    <div
+      id="announceModal"
+      class="modal-overlay is-hidden"
+      data-version="<%= panelConfig.announceVersion || '' %>"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="announceTitle"
+    >
+      <div class="modal-card">
         <div class="modal-head">
-          <div class="modal-title">📣 Announcement</div>
-          <button class="btn btn-ghost" id="announceClose" type="button">Close</button>
+          <div class="modal-head-left">
+            <span class="badge">📣 Announcement</span>
+          </div>
+
+          <!-- X close -->
+          <button type="button" class="icon-btn" data-close-modal aria-label="Close">✕</button>
         </div>
+
         <div class="modal-body">
-          <%- panelConfig.announceHtml %>
+          <div id="announceTitle" class="modal-title">Update</div>
+          <div class="modal-content">
+            <%- panelConfig.announceHtml %>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <!-- OK close -->
+          <button type="button" class="btn btn-primary" data-close-modal>OK</button>
         </div>
       </div>
     </div>
-
-    <script>
-      (function () {
-        var version = "<%= panelConfig.announceVersion || "" %>";
-        var key = "announce_seen_" + version;
-        var backdrop = document.getElementById("announceBackdrop");
-        var closeBtn = document.getElementById("announceClose");
-
-        function hide() {
-          if (backdrop) backdrop.style.display = "none";
-          try { localStorage.setItem(key, "1"); } catch(e) {}
-        }
-
-        function showIfNeeded() {
-          var seen = "0";
-          try { seen = localStorage.getItem(key) || "0"; } catch(e) {}
-          if (seen === "1") {
-            if (backdrop) backdrop.style.display = "none";
-          } else {
-            if (backdrop) backdrop.style.display = "flex";
-          }
-        }
-
-        if (closeBtn) closeBtn.addEventListener("click", hide);
-        if (backdrop) backdrop.addEventListener("click", function (e) {
-          if (e.target === backdrop) hide();
-        });
-
-        showIfNeeded();
-      })();
-    </script>
   <% } %>
 
-  <!-- Clipboard helper -->
-  <script>
-    window.copyText = async function (txt) {
-      try {
-        await navigator.clipboard.writeText(txt);
-        return true;
-      } catch (e) {
-        try {
-          var ta = document.createElement("textarea");
-          ta.value = txt;
-          ta.style.position = "fixed";
-          ta.style.left = "-9999px";
-          document.body.appendChild(ta);
-          ta.select();
-          document.execCommand("copy");
-          document.body.removeChild(ta);
-          return true;
-        } catch (e2) {
-          return false;
-        }
-      }
-    };
-  </script>
+  <script defer src="/public/06-app.js"></script>
 </body>
 </html>
