@@ -1,115 +1,76 @@
-/* ==========================================================================
-   02 — LAYOUT (shell, header, container, spacing)
-   ========================================================================== */
-
-.app-shell{
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
 .container{
   width: min(var(--container), calc(100% - 24px));
   margin-inline: auto;
 }
 
-/* Header (sticky, no overlap) */
 .app-header{
   position: sticky;
-  top: 0;
+  top: 10px;
   z-index: 50;
-  padding: 12px 0;
+  padding: 10px 0;
 }
 
 .header-inner{
-  height: var(--header-h);
-  border-radius: var(--r-xl);
-  border: var(--b-1);
-  background: linear-gradient(180deg, var(--glass), var(--glass-2));
-  backdrop-filter: var(--blur-2);
-  -webkit-backdrop-filter: var(--blur-2);
-  box-shadow: var(--sh-2), var(--sh-in);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px;
-  gap: 14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+
+  padding: 14px 14px;
+  border-radius: var(--radius);
+  background: var(--card);
+  border: 1px solid var(--stroke);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(14px);
 }
 
-/* Brand area */
 .brand{
   display:flex;
   align-items:center;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
 }
-
 .brand-icon{
   width: 44px;
   height: 44px;
-  border-radius: 16px;
   display:grid;
   place-items:center;
-  border: var(--b-2);
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.85), rgba(255,255,255,.28));
-  box-shadow: var(--sh-1), var(--sh-in);
+  border-radius: 16px;
+  background: rgba(14,165,233,.15);
+  border: 1px solid rgba(14,165,233,.20);
 }
-
-.brand-text{
-  min-width: 0;
-}
-
+.brand-text{ min-width:0; }
 .brand-title{
   font-weight: 800;
   letter-spacing: .2px;
-  line-height: 1.1;
-  font-size: 18px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .brand-sub{
-  margin-top: 2px;
+  font-size: 12.5px;
   color: var(--muted);
-  font-size: 13px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  margin-top: 2px;
 }
 
-.header-actions{
+.app-main{
+  padding: 18px 0 24px;
+}
+
+.app-footer{
+  padding: 18px 0 34px;
+}
+.footer-inner{
   display:flex;
   align-items:center;
+  justify-content:space-between;
   gap: 10px;
-  flex-shrink: 0;
-}
-
-/* Main content spacing (prevents header overlap) */
-main.container{
-  padding-top: 14px;
-  padding-bottom: 40px;
-}
-
-/* Cards stack */
-.stack{
-  display:flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-/* Footer */
-.footer{
-  padding: 22px 0 40px;
   color: var(--muted);
-  text-align:center;
   font-size: 13px;
 }
-
-/* Mobile tweaks */
-@media (max-width: 420px){
-  :root{ --header-h: 78px; }
-  .brand-title{ font-size: 16px; }
-  .brand-icon{ width: 40px; height: 40px; border-radius: 14px; }
-  .header-inner{ padding: 12px 14px; }
+.footer-link{
+  color: rgba(14,165,233,.95);
+}
+.footer-link:hover{
+  text-decoration: underline;
 }
