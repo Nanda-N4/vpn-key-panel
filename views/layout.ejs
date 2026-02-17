@@ -46,17 +46,26 @@
     </div>
   </footer>
 
-  <!-- Announcement Modal -->
+  <!-- Announcement (Bottom Sheet / Modal) -->
   <% if (panelConfig.announceHtml && panelConfig.announceVersion) { %>
-    <div id="annBackdrop" class="annBackdrop hidden"></div>
-    <div id="annModal" class="annModal hidden" role="dialog" aria-modal="true">
-      <div class="annCard glass">
-        <div class="annHead">
-          <div class="annTitle">📣 Announcement</div>
-          <button id="annClose" class="btn tiny ghost" type="button">Close</button>
+    <div id="annBackdrop" class="annBackdrop" hidden></div>
+
+    <div id="annWrap" class="annWrap" hidden aria-hidden="true">
+      <div class="annSheet glass" role="dialog" aria-modal="true" aria-label="Announcement">
+        <div class="annTop">
+          <div class="annTopLeft">
+            <div class="annPill">📣 Announcement</div>
+            <div class="annSmall">Latest updates from Admin</div>
+          </div>
+          <button id="annClose" class="annX" type="button" aria-label="Close announcement">✕</button>
         </div>
+
         <div class="annBody">
           <%- panelConfig.announceHtml %>
+        </div>
+
+        <div class="annBottom">
+          <button id="annClose2" class="btn primary" type="button">Close</button>
         </div>
       </div>
     </div>
@@ -64,38 +73,55 @@
     <script>
       (function(){
         const ver = "<%= panelConfig.announceVersion %>";
-        const key = "announceSeen:" + ver;
+        const storeKey = "announceSeen:" + ver;
 
         const backdrop = document.getElementById("annBackdrop");
-        const modal = document.getElementById("annModal");
-        const closeBtn = document.getElementById("annClose");
+        const wrap = document.getElementById("annWrap");
+        const close1 = document.getElementById("annClose");
+        const close2 = document.getElementById("annClose2");
 
-        function open(){
-          backdrop.classList.remove("hidden");
-          modal.classList.remove("hidden");
-          requestAnimationFrame(()=>{
+        function show(){
+          // show elements
+          backdrop.hidden = false;
+          wrap.hidden = false;
+          wrap.setAttribute("aria-hidden","false");
+
+          // animate
+          requestAnimationFrame(() => {
             backdrop.classList.add("show");
-            modal.classList.add("show");
+            wrap.classList.add("show");
           });
         }
-        function close(){
-          try{ localStorage.setItem(key, "1"); }catch(e){}
+
+        function hide(){
+          // mark seen (even if localStorage fails, still close visually)
+          try { localStorage.setItem(storeKey, "1"); } catch(e) {}
+
           backdrop.classList.remove("show");
-          modal.classList.remove("show");
-          setTimeout(()=>{
-            backdrop.classList.add("hidden");
-            modal.classList.add("hidden");
-          }, 140);
+          wrap.classList.remove("show");
+          wrap.setAttribute("aria-hidden","true");
+
+          // hard hide after animation
+          setTimeout(() => {
+            backdrop.hidden = true;
+            wrap.hidden = true;
+          }, 180);
         }
 
-        const seen = (function(){
-          try{ return localStorage.getItem(key) === "1"; }catch(e){ return false; }
-        })();
+        function seenAlready(){
+          try { return localStorage.getItem(storeKey) === "1"; } catch(e) { return false; }
+        }
 
-        if(!seen) open();
+        // attach events (robust)
+        backdrop.addEventListener("click", hide);
+        close1.addEventListener("click", hide);
+        close2.addEventListener("click", hide);
 
-        closeBtn && closeBtn.addEventListener("click", close);
-        backdrop && backdrop.addEventListener("click", close);
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && !wrap.hidden) hide();
+        });
+
+        if (!seenAlready()) show();
       })();
     </script>
   <% } %>
