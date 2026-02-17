@@ -153,3 +153,62 @@
   border: 1px solid rgba(255,255,255,.44);
   box-shadow: 0 10px 22px rgba(0,0,0,.08);
 }
+/* =========================
+   FIX: Android select dropdown overlays the page (ACTIVE/INACTIVE big)
+   ========================= */
+
+/* Make each card a proper stacking context so browser UI doesn't paint weirdly */
+.card, .key-card, .header-inner{
+  position: relative;
+  isolation: isolate;
+}
+
+/* Ensure selects don't create weird overlay inside glass layers */
+select.select, .select, select{
+  -webkit-appearance: none;
+  appearance: none;
+
+  /* keep it "solid-ish" so native dropdown doesn't blend with blur layers */
+  background: rgba(255,255,255,.78) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  /* stable border + text */
+  border: 1px solid rgba(255,255,255,.60) !important;
+}
+
+/* give selects a small chevron */
+select.select, .select{
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(0,0,0,.55) 50%),
+    linear-gradient(135deg, rgba(0,0,0,.55) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) calc(50% - 2px),
+    calc(100% - 12px) calc(50% - 2px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 40px;
+}
+
+/* On mobile, don't let filter panel float above keys unexpectedly */
+.filter-panel{
+  position: relative;
+  z-index: 5;
+}
+
+/* Keys list below filter panel */
+.keys{
+  position: relative;
+  z-index: 1;
+}
+
+/* Prevent header blur from interfering with dropdown painting */
+.app-header{
+  isolation: isolate;
+}
+
+/* When dropdown is focused, keep it above glass */
+select:focus{
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(0,120,255,.12);
+}
