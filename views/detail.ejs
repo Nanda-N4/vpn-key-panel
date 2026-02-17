@@ -20,6 +20,18 @@
 <%
   function safeStr(v){ return (v ?? "").toString().trim(); }
 
+  // UI text (from server.js -> panelConfig.uiText)
+  const ui = panelConfig?.uiText || {};
+  const uiLabels = ui.labels || {};
+  const uiTpl = ui.templates || {};
+
+  const labelGb = safeStr(uiLabels.gbShort) || "GB";
+  const labelExpire = safeStr(uiLabels.expireShort) || "Expire";
+  const labelKey = safeStr(uiLabels.keyLabel) || "Key";
+  const labelCopy = safeStr(uiLabels.copyBtn) || "Copy";
+  const labelDownload = safeStr(uiLabels.downloadTitle) || "Download Apps";
+  const backText = safeStr(ui.backText) || "← Back";
+
   function formatExpire(dateStr){
     const s = safeStr(dateStr);
     if(!s) return { iso: "-", human: "-", mm: "-" };
@@ -41,8 +53,25 @@
     return { iso: s, human, mm: mmText };
   }
 
+  function applyTpl(tpl, vars){
+    const t = safeStr(tpl);
+    if(!t) return "";
+    return t
+      .replaceAll("{gb}", safeStr(vars.gb))
+      .replaceAll("{date}", safeStr(vars.date));
+  }
+
   const gb = Number(item?.gb_limit || 0) || 0;
   const exp = formatExpire(item?.expire_date || "");
+
+  // Templates (fallback to good defaults if empty)
+  const gbLine =
+    applyTpl(uiTpl.gbInfo, { gb, date: exp.mm }) ||
+    `ဒီ Key က ${gb} GB အထိ သုံးနိုင်ပါတယ်။`;
+
+  const expLine =
+    applyTpl(uiTpl.expireInfo, { gb, date: exp.mm }) ||
+    `သက်တမ်းကုန်ဆုံးရက် — ${exp.mm}`;
 %>
 
 <div class="app-shell">
@@ -61,7 +90,7 @@
            href="<%= panelConfig.telegramChannelUrl %>"
            target="_blank"
            rel="noopener">
-           📢 Join Channel
+           <%= panelConfig.telegramChannelText || "Join Channel" %>
         </a>
       <% } %>
 
@@ -71,7 +100,7 @@
   <main class="container main">
 
     <div class="top-row">
-      <a class="pill glass-btn" href="/">← Back</a>
+      <a class="pill glass-btn" href="/"><%= backText %></a>
     </div>
 
     <% if (error) { %>
@@ -109,27 +138,27 @@
           <!-- Info pills -->
           <div class="key-meta" style="margin-top:4px;">
             <span class="dot">
-              <span style="font-weight:900;">GB</span>
+              <span style="font-weight:900;"><%= labelGb %></span>
               <span style="font-weight:900; margin-left:6px;"><%= gb %></span>
             </span>
             <span class="dot">
-              <span style="font-weight:900;">Expire</span>
+              <span style="font-weight:900;"><%= labelExpire %></span>
               <span style="font-weight:900; margin-left:6px;"><%= exp.human %></span>
             </span>
           </div>
 
-          <!-- Info text (clean + clear) -->
+          <!-- Info text (admin templates) -->
           <div class="muted" style="margin-top:6px; line-height:1.55;">
-            ဒီ Key က <span style="font-weight:900; opacity:1;"><%= gb %> GB</span> အထိ သုံးနိုင်ပါတယ်။
+            <%= gbLine %>
             <br/>
-            သက်တမ်းကုန်ဆုံးရက် — <span style="font-weight:900; opacity:1;"><%= exp.mm %></span>
+            <%= expLine %>
           </div>
 
         </div>
 
-        <!-- KEY (make it visible & clean) -->
+        <!-- KEY (visible & clean) -->
         <div class="key-box" style="margin-top:16px;">
-          <div class="key-label" style="font-weight:900; letter-spacing:.2px;">Key</div>
+          <div class="key-label" style="font-weight:900; letter-spacing:.2px;"><%= labelKey %></div>
 
           <div class="key-row" style="margin-top:10px; align-items:stretch;">
             <input
@@ -140,7 +169,7 @@
               style="font-weight:800; letter-spacing:.2px;"
             />
             <button class="btn glass-btn" type="button" onclick="copyKey()" style="white-space:nowrap;">
-              📋 Copy
+              📋 <%= labelCopy %>
             </button>
           </div>
 
@@ -151,7 +180,7 @@
 
         <!-- DOWNLOAD APPS -->
         <div class="apps" style="margin-top:18px;">
-          <div class="apps-title" style="font-weight:900;">Download Apps</div>
+          <div class="apps-title" style="font-weight:900;"><%= labelDownload %></div>
 
           <div class="apps-grid apps-grid-cards" style="margin-top:10px;">
             <% (apps || []).forEach(a => { %>
@@ -198,13 +227,13 @@
           </div>
         </div>
 
-        <!-- ACTIONS (not sticking) -->
+        <!-- ACTIONS -->
         <div class="detail-actions" style="margin-top:16px; gap:12px;">
           <% if (panelConfig?.telegramAdminUrl) { %>
             <a class="pill glass-btn"
                href="<%= panelConfig.telegramAdminUrl %>"
                target="_blank" rel="noopener">
-              💬 Contact Admin
+              <%= panelConfig.telegramAdminText || "Contact Admin" %>
             </a>
           <% } %>
 
@@ -212,7 +241,7 @@
             <a class="pill glass-btn"
                href="<%= panelConfig.telegramChannelUrl %>"
                target="_blank" rel="noopener">
-              📢 Join Channel
+              <%= panelConfig.telegramChannelText || "Join Channel" %>
             </a>
           <% } %>
         </div>
@@ -233,8 +262,9 @@ function copyKey(){
   const el = document.getElementById("keyInput");
   if(!el) return;
 
-  // Modern copy when available
   const v = el.value || "";
+
+  // Modern copy when available
   if (navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(v).catch(()=>{});
     return;
