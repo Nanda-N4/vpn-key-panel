@@ -1,108 +1,182 @@
-<div class="stack-lg">
-  <section class="card hero">
-    <div class="stack-md">
-      <div class="kicker">VPN Key Portal</div>
-      <h1 class="title">Key ကို ရွေး → Copy → Paste → Connect</h1>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title><%= (panelConfig && panelConfig.brandName) ? panelConfig.brandName : "VPN KEY" %></title>
 
-      <p class="muted">
-        ဤ Website မှာ All SIM WIFI အတွက် VPN Key တွေကို လွယ်လွယ်ကူကူ ရွေးပြီး Copy → သင့် App ထဲ Paste → Connect လုပ်နိုင်ပါတယ်။
-      </p>
+  <link rel="stylesheet" href="/public/00-tokens.css" />
+  <link rel="stylesheet" href="/public/01-base.css" />
+  <link rel="stylesheet" href="/public/02-layout.css" />
+  <link rel="stylesheet" href="/public/03-components.css" />
+  <link rel="stylesheet" href="/public/04-pages.css" />
+  <link rel="stylesheet" href="/public/05-utilities.css" />
+</head>
+<body>
+  <div class="bg-aurora" aria-hidden="true"></div>
 
-      <div class="hero-actions">
-        <% if (panelConfig?.telegramAdminUrl && panelConfig.telegramAdminUrl !== "#") { %>
-          <a class="btn btn-soft" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">
-            💬 <span><%= panelConfig.telegramAdminText || "Contact Admin" %></span>
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="container header-inner">
+        <div class="brand">
+          <span class="brand-icon" aria-hidden="true">⚡</span>
+          <div class="brand-text">
+            <div class="brand-title"><%= panelConfig.brandName || "VPN KEY" %></div>
+            <div class="brand-sub">Fast • Simple • Secure</div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <% if (panelConfig && panelConfig.telegramChannelUrl) { %>
+            <a class="btn btn-ghost" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
+              ✈️ <span><%= panelConfig.telegramChannelText || "Channel" %></span>
+            </a>
+          <% } %>
+        </div>
+      </div>
+    </header>
+
+    <main class="container main">
+      <section class="card hero">
+        <div class="hero-kicker">VPN Key Portal</div>
+        <h1 class="hero-title">Key ကို ရွေး → Copy → Paste → Connect</h1>
+        <p class="hero-desc">
+          ဒီ Website မှာ All SIM / WIFI အတွက် VPN Key တွေကို လွယ်လွယ်ကူကူ ရယူနိုင်ပါတယ်။
+          Key ကို Copy → သင့်သုံးမယ့် App ထဲ Paste → Connect လုပ်ပြီးသုံးနိုင်ပါတယ်။
+        </p>
+
+        <div class="hero-actions">
+          <% if (panelConfig && panelConfig.telegramAdminUrl) { %>
+            <a class="btn btn-soft" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">
+              💬 <span><%= panelConfig.telegramAdminText || "Contact Admin" %></span>
+            </a>
+          <% } %>
+        </div>
+
+        <div class="steps">
+          <div>1) Key ရွေး</div>
+          <div>2) Copy</div>
+          <div>3) App ထဲ Paste</div>
+          <div>4) Connect</div>
+        </div>
+      </section>
+
+      <section class="card filters">
+        <form method="GET" action="/" class="filter-row">
+          <input
+            class="input"
+            type="search"
+            name="q"
+            value="<%= (query && query.q) ? query.q : "" %>"
+            placeholder="Search location... (e.g. Singapore, Japan)"
+          />
+
+          <select class="select" name="type">
+            <option value="">All Types</option>
+            <% (types || []).forEach(function(t){ %>
+              <option value="<%= t %>" <%= (query && query.type===t) ? "selected" : "" %>><%= t %></option>
+            <% }) %>
+          </select>
+
+          <select class="select" name="status">
+            <option value="">All Status</option>
+            <% (statuses || []).forEach(function(s){ %>
+              <option value="<%= s %>" <%= (query && query.status===s) ? "selected" : "" %>><%= s %></option>
+            <% }) %>
+          </select>
+
+          <button class="btn" type="submit">🔎 Filter</button>
+        </form>
+      </section>
+
+      <section class="list">
+        <% if (!items || items.length === 0) { %>
+          <div class="card empty">
+            <div class="empty-title">No keys found</div>
+            <div class="empty-sub">Filter ကိုပြောင်းပြီး ပြန်ရှာကြည့်ပါ။</div>
+          </div>
+        <% } %>
+
+        <% (items || []).forEach(function(it){ %>
+          <a class="card key-card" href="<%= it.link %>">
+            <div class="key-top">
+              <div class="key-type"><%= it.type %></div>
+              <span class="pill <%= (it.statusComputed || '').toUpperCase() %>">
+                <%= (it.statusComputed || '').toUpperCase() %>
+              </span>
+            </div>
+
+            <div class="key-region">
+              <span class="flag"><%= it.region_flag || "🌐" %></span>
+              <span class="region"><%= it.region_name %></span>
+            </div>
+
+            <div class="key-meta">
+              <span>GB <b><%= it.gb_limit || 0 %></b></span>
+              <span class="dot">•</span>
+              <span>Expire <b><%= it.expire_date || "-" %></b></span>
+            </div>
+
+            <div class="key-open">Tap to open →</div>
           </a>
-        <% } %>
-      </div>
+        <% }) %>
+      </section>
 
-      <div class="steps card-soft">
-        <div>1) Key ရွေး</div>
-        <div>2) Copy</div>
-        <div>3) App ထဲ Paste</div>
-        <div>4) Connect</div>
+      <section class="card footer-note">
+        <div class="note-title">အသုံးပြုနည်း (အတိုချုပ်)</div>
+        <ol class="note-list">
+          <li>Key ကို Copy လုပ်ပါ</li>
+          <li>သင့်သုံးမယ့် App ထဲ Import / Add → Paste</li>
+          <li>Connect လုပ်ပြီး သုံးပါ</li>
+        </ol>
+
+        <div class="footer-actions">
+          <a class="btn btn-soft" href="<%= panelConfig.telegramAdminUrl || '#' %>" target="_blank" rel="noopener">🧑‍💻 Help / Buy Key</a>
+          <button class="btn btn-ghost" type="button" id="btnUpdates">📣 Updates</button>
+        </div>
+      </section>
+
+      <p class="copyright">© <%= new Date().getFullYear() %> <%= panelConfig.brandName || "VPN KEY" %></p>
+    </main>
+  </div>
+
+  <% if (panelConfig && panelConfig.announceHtml && panelConfig.announceVersion) { %>
+    <div class="modal" id="announceModal" hidden>
+      <div class="modal-backdrop"></div>
+      <div class="modal-card" role="dialog" aria-modal="true">
+        <div class="modal-head">
+          <div class="modal-title">📣 Announcement</div>
+          <button class="btn btn-ghost" id="announceClose" type="button">✖</button>
+        </div>
+        <div class="modal-body">
+          <%- panelConfig.announceHtml %>
+        </div>
+        <div class="modal-foot">
+          <button class="btn" id="announceOk" type="button">OK</button>
+        </div>
       </div>
     </div>
-  </section>
 
-  <section class="card">
-    <form class="filter" method="GET" action="/">
-      <input
-        class="input"
-        type="text"
-        name="q"
-        value="<%= query?.q || "" %>"
-        placeholder="Search location... (e.g. Singapore, Japan)"
-        autocomplete="off"
-      />
+    <script>
+      (function(){
+        const ver = "<%= panelConfig.announceVersion %>";
+        const key = "announce_seen_" + ver;
+        const modal = document.getElementById("announceModal");
+        const close = () => { modal.hidden = true; localStorage.setItem(key, "1"); };
+        if (!localStorage.getItem(key)) modal.hidden = false;
+        document.getElementById("announceClose").addEventListener("click", close);
+        document.getElementById("announceOk").addEventListener("click", close);
+        modal.querySelector(".modal-backdrop").addEventListener("click", close);
+      })();
+    </script>
+  <% } %>
 
-      <select class="select" name="type">
-        <option value="">All Types</option>
-        <% (types || []).forEach(function(t){ %>
-          <option value="<%= t %>" <%= (query?.type === t) ? "selected" : "" %>><%= t %></option>
-        <% }) %>
-      </select>
-
-      <select class="select" name="status">
-        <option value="">All Status</option>
-        <% (statuses || []).forEach(function(s){ %>
-          <option value="<%= s %>" <%= (String(query?.status || "").toUpperCase() === s) ? "selected" : "" %>><%= s %></option>
-        <% }) %>
-      </select>
-
-      <button class="btn btn-pill" type="submit">🔎 Filter</button>
-    </form>
-  </section>
-
-  <section class="stack-md">
-    <% if (!items || items.length === 0) { %>
-      <div class="card empty">
-        <div class="muted">Result မရှိသေးပါ။ Search / Filter ပြန်စစ်ကြည့်ပါ။</div>
-      </div>
-    <% } %>
-
-    <% (items || []).forEach(function(x){ %>
-      <a class="card key-row" href="<%= x.link %>">
-        <div class="key-left">
-          <div class="key-type"><%= x.type %></div>
-
-          <div class="key-meta">
-            <span class="flag"><%= x.region_flag || "🌐" %></span>
-            <span class="region"><%= x.region_name %></span>
-          </div>
-
-          <div class="key-sub">
-            <span>GB <%= x.gb_limit || 0 %></span>
-            <span class="dot">•</span>
-            <span>Expire <%= x.expire_date || "-" %></span>
-          </div>
-        </div>
-
-        <div class="key-right">
-          <span class="badge <%= (x.statusComputed || 'ACTIVE').toLowerCase() %>">
-            <%= x.statusComputed || "ACTIVE" %>
-          </span>
-          <span class="chev">Tap to open →</span>
-        </div>
-      </a>
-    <% }) %>
-  </section>
-
-  <section class="card footer-card">
-    <div class="stack-sm">
-      <div class="muted">အသုံးပြုနည်း (အတိုချုပ်)</div>
-      <div>1) Key ကို Copy နှိပ်ပါ</div>
-      <div>2) သင့် App ထဲ Import/Add → Paste</div>
-      <div>3) Connect လုပ်ပြီး သုံးပါ</div>
-
-      <div class="row">
-        <% if (panelConfig?.telegramAdminUrl && panelConfig.telegramAdminUrl !== "#") { %>
-          <a class="btn btn-soft" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">🧑‍💻 Help / Buy Key</a>
-        <% } %>
-        <% if (panelConfig?.telegramChannelUrl && panelConfig.telegramChannelUrl !== "#") { %>
-          <a class="btn btn-soft" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">📣 Updates</a>
-        <% } %>
-      </div>
-    </div>
-  </section>
-</div>
+  <script>
+    document.getElementById("btnUpdates")?.addEventListener("click", function(){
+      const url = "<%= (panelConfig && panelConfig.telegramChannelUrl) ? panelConfig.telegramChannelUrl : "#" %>";
+      if (url && url !== "#") window.open(url, "_blank");
+    });
+  </script>
+</body>
+</html>
