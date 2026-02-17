@@ -241,3 +241,81 @@
   flex-wrap: wrap;
   align-items:center;
 }
+/* ========== TABS ========== */
+
+.tabs-header {
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  margin-bottom: 18px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  font-size: 14px;
+  color: rgba(0,0,0,0.7);
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  background: rgba(255,255,255,0.7);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  color: #000;
+}
+
+.tab-btn:hover {
+  opacity: 0.8;
+}
+
+/* tab content */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* ========== KEY OPEN BUTTON ========== */
+
+.key-open {
+  margin-top: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.25s ease;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.key-open:hover {
+  background: rgba(255,255,255,0.45);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+.key-card:hover .key-open {
+  background: rgba(255,255,255,0.55);
+  }
