@@ -157,4 +157,131 @@
 }
 
 @media (prefers-color-scheme: dark){
-  .badge-active{ color
+  .badge-active{ color: hsl(150 85% 85%); }
+}
+
+/* List card (key items) */
+.key-card{
+  display:flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.key-top{
+  display:flex;
+  align-items:flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.key-type{
+  font-weight: 900;
+  letter-spacing: .18em;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.key-title{
+  font-size: 26px;
+  font-weight: 900;
+  margin: 4px 0 0;
+  line-height: 1.08;
+}
+
+.key-meta{
+  color: var(--text-2);
+  margin: 4px 0 0;
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.key-link{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  font-weight: 800;
+  color: hsl(var(--accent-h) var(--accent-s) 40%);
+}
+
+@media (prefers-color-scheme: dark){
+  .key-link{ color: hsl(var(--accent-h) var(--accent-s) 70%); }
+}
+
+/* Announcement modal */
+.modal{
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 14px;
+}
+
+.modal.is-open{ display:flex; }
+
+.modal-backdrop{
+  position:absolute;
+  inset:0;
+  background: rgba(0,0,0,.22);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.modal-panel{
+  position: relative;
+  width: min(720px, 100%);
+  border-radius: var(--r-xl);
+  border: var(--b-1);
+  background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.48));
+  backdrop-filter: var(--blur-2);
+  -webkit-backdrop-filter: var(--blur-2);
+  box-shadow: var(--sh-2), var(--sh-in);
+  padding: 16px;
+  max-height: min(72vh, 640px);
+  overflow: auto;
+}
+
+@media (prefers-color-scheme: dark){
+  .modal-panel{
+    background: linear-gradient(180deg, rgba(25,30,40,.78), rgba(25,30,40,.48));
+  }
+}
+
+.modal-head{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.modal-title{
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.modal-close{
+  height: 44px;
+  padding: 0 14px;
+  border-radius: var(--r-pill);
+}
+
+.modal-body{
+  color: var(--text-2);
+  line-height: 1.55;
+}
+
+.modal-body img{
+  border-radius: var(--r-lg);
+  border: var(--b-2);
+  box-shadow: var(--sh-1);
+}
+
+.modal-body a{
+  text-decoration: underline;
+}
