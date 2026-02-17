@@ -3,9 +3,33 @@
   margin: 0 auto;
 }
 
-.app-shell{
-  min-height: 100vh;
-  padding: 18px 0 34px;
+/* FIX glass stretch bug */
+.app-shell,
+.container,
+.main,
+.keys,
+.key-card {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Remove accidental 100vw usage */
+.key-card,
+.card {
+  width: 100%;
+}
+
+/* Prevent half glass rendering bug */
+.key-card {
+  position: relative;
+  transform: none !important;
+  will-change: auto !important;
+}
+
+/* IMPORTANT: prevent weird layer clipping */
+body,
+.app-shell {
+  overflow-x: hidden;
 }
 
 /* Sticky safe space */
