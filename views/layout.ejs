@@ -1,145 +1,45 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#0b1020" />
-  <title><%= title ? title + " • " : "" %><%= panelConfig.brandName %></title>
-  <link rel="stylesheet" href="/public/style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= panelConfig?.brandName || "VPN Key Portal" %></title>
+
+    <!-- CSS Architecture -->
+    <link rel="stylesheet" href="/00-tokens.css">
+    <link rel="stylesheet" href="/01-base.css">
+    <link rel="stylesheet" href="/02-layout.css">
+    <link rel="stylesheet" href="/03-components.css">
+    <link rel="stylesheet" href="/04-pages.css">
+    <link rel="stylesheet" href="/05-utilities.css">
 </head>
 <body>
-  <div class="bgGlow" aria-hidden="true"></div>
 
-  <header class="topbar">
-    <div class="topbarInner">
-      <div class="brand">
-        <div class="brandIcon" aria-hidden="true">⚡</div>
-        <div class="brandText">
-          <div class="brandName"><%= panelConfig.brandName %></div>
-          <div class="brandSub">Fast • Simple • Secure</div>
-        </div>
-      </div>
+    <div class="app-shell">
+        <header class="app-header">
+            <div class="brand">
+                <span class="brand-icon">⚡</span>
+                <div class="brand-text">
+                    <h1><%= panelConfig?.brandName %></h1>
+                    <span class="brand-sub">Fast • Simple • Secure</span>
+                </div>
+            </div>
 
-      <div class="topActions">
-        <% if (panelConfig.telegramChannelUrl) { %>
-          <a class="pill" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
-            <span class="pillIcon" aria-hidden="true">✈️</span>
-            <span class="pillText">Channel</span>
-          </a>
-        <% } %>
-      </div>
-    </div>
-  </header>
+            <a href="<%= panelConfig?.telegramChannelUrl %>" 
+               target="_blank" 
+               class="btn btn-glass">
+               ✈ Channel
+            </a>
+        </header>
 
-  <main class="container">
-    <%- body %>
-  </main>
+        <main class="app-content">
+            <%- body %>
+        </main>
 
-  <footer class="footer">
-    <div class="footerInner">
-      <span>© <%= new Date().getFullYear() %> <%= panelConfig.brandName %></span>
-      <% if (panelConfig.telegramChannelUrl) { %>
-        <a class="footerLink" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
-          <%= panelConfig.telegramChannelText || "Free VPN Channel" %>
-        </a>
-      <% } %>
-    </div>
-  </footer>
-
-  <!-- Announcement (Bottom Sheet / Modal) -->
-  <% if (panelConfig.announceHtml && panelConfig.announceVersion) { %>
-    <div id="annBackdrop" class="annBackdrop" hidden></div>
-
-    <div id="annWrap" class="annWrap" hidden aria-hidden="true">
-      <div class="annSheet glass" role="dialog" aria-modal="true" aria-label="Announcement">
-        <div class="annTop">
-          <div class="annTopLeft">
-            <div class="annPill">📣 Announcement</div>
-            <div class="annSmall">Latest updates from Admin</div>
-          </div>
-          <button id="annClose" class="annX" type="button" aria-label="Close announcement">✕</button>
-        </div>
-
-        <div class="annBody">
-          <%- panelConfig.announceHtml %>
-        </div>
-
-        <div class="annBottom">
-          <button id="annClose2" class="btn primary" type="button">Close</button>
-        </div>
-      </div>
+        <footer class="app-footer">
+            © <%= new Date().getFullYear() %> <%= panelConfig?.brandName %>
+        </footer>
     </div>
 
-    <script>
-      (function(){
-        const ver = "<%= panelConfig.announceVersion %>";
-        const storeKey = "announceSeen:" + ver;
-
-        const backdrop = document.getElementById("annBackdrop");
-        const wrap = document.getElementById("annWrap");
-        const close1 = document.getElementById("annClose");
-        const close2 = document.getElementById("annClose2");
-
-        function show(){
-          // show elements
-          backdrop.hidden = false;
-          wrap.hidden = false;
-          wrap.setAttribute("aria-hidden","false");
-
-          // animate
-          requestAnimationFrame(() => {
-            backdrop.classList.add("show");
-            wrap.classList.add("show");
-          });
-        }
-
-        function hide(){
-          // mark seen (even if localStorage fails, still close visually)
-          try { localStorage.setItem(storeKey, "1"); } catch(e) {}
-
-          backdrop.classList.remove("show");
-          wrap.classList.remove("show");
-          wrap.setAttribute("aria-hidden","true");
-
-          // hard hide after animation
-          setTimeout(() => {
-            backdrop.hidden = true;
-            wrap.hidden = true;
-          }, 180);
-        }
-
-        function seenAlready(){
-          try { return localStorage.getItem(storeKey) === "1"; } catch(e) { return false; }
-        }
-
-        // attach events (robust)
-        backdrop.addEventListener("click", hide);
-        close1.addEventListener("click", hide);
-        close2.addEventListener("click", hide);
-
-        document.addEventListener("keydown", (e) => {
-          if (e.key === "Escape" && !wrap.hidden) hide();
-        });
-
-        if (!seenAlready()) show();
-      })();
-    </script>
-  <% } %>
-
-  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
-  <script>
-    window.__toast = (msg) => {
-      const el = document.getElementById('toast');
-      if (!el) return;
-      el.textContent = msg;
-      el.classList.remove('hidden');
-      el.classList.add('show');
-      clearTimeout(window.__toastT);
-      window.__toastT = setTimeout(() => {
-        el.classList.remove('show');
-        el.classList.add('hidden');
-      }, 2200);
-    }
-  </script>
 </body>
 </html>
