@@ -1,61 +1,42 @@
-/* ==========================================================================
-   01 — BASE (reset, html/body, base elements)
-   ========================================================================== */
-
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
-html{ -webkit-text-size-adjust: 100%; }
-
 body{
   margin:0;
   font-family: var(--font-sans);
   color: var(--text);
-  background: var(--bg-0);
+  background: var(--bg2);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Aurora background (liquid glass feel) */
-.bg-aurora{
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(1200px 700px at 16% 14%, rgba(255,255,255,.75), transparent 58%),
-    radial-gradient(900px 600px at 86% 10%, rgba(255,255,255,.55), transparent 60%),
-    radial-gradient(900px 700px at 50% 110%, rgba(255,255,255,.45), transparent 62%),
-    radial-gradient(900px 700px at 10% 70%, var(--bg-1), transparent 60%),
-    radial-gradient(900px 700px at 90% 60%, var(--bg-2), transparent 60%),
-    radial-gradient(900px 700px at 50% 80%, var(--bg-3), transparent 60%),
-    linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,.18));
-  filter: blur(0px);
-}
-
 a{ color: inherit; text-decoration: none; }
-a:hover{ text-decoration: underline; }
+a:hover{ text-decoration: none; }
 
 img{ max-width:100%; display:block; }
 
-button, input, select, textarea{
-  font: inherit;
-  color: inherit;
-}
+::selection{ background: rgba(14,165,233,.25); }
 
-::selection{
-  background: rgba(0, 170, 255, .18);
+/* Background aurora */
+.bg-aurora{
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: linear-gradient(180deg, var(--bg1), var(--bg2));
 }
-
-hr{
-  border:0;
-  height:1px;
-  background: rgba(0,0,0,.08);
+.bg-aurora::before{
+  content:"";
+  position:absolute;
+  inset:-20%;
+  background: radial-gradient(900px 480px at 18% 10%, var(--g1), transparent 60%),
+              radial-gradient(760px 420px at 85% 18%, var(--g2), transparent 62%),
+              radial-gradient(820px 520px at 50% 92%, rgba(34,197,94,.20), transparent 65%);
+  filter: blur(12px);
+  opacity: .95;
 }
-
-@media (prefers-color-scheme: dark){
-  hr{ background: rgba(255,255,255,.12); }
-}
-
-/* Reduce motion */
-@media (prefers-reduced-motion: reduce){
-  *{ scroll-behavior:auto !important; transition:none !important; animation:none !important; }
+.bg-aurora::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: linear-gradient(180deg, rgba(255,255,255,.35), transparent 40%, rgba(255,255,255,.25));
+  opacity:.8;
 }
