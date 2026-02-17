@@ -1,30 +1,38 @@
 :root{
-  --bg1: #dff1ff;
-  --bg2: #f3e7ff;
-  --glass: rgba(255,255,255,.70);
-  --glass2: rgba(255,255,255,.55);
-  --border: rgba(15,23,42,.10);
-  --text: #0f172a;
-  --muted: rgba(15,23,42,.65);
-  --shadow: 0 18px 55px rgba(2,6,23,.12);
+  --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans Myanmar", sans-serif;
 
-  --r-lg: 26px;
-  --r-md: 18px;
+  --text: hsl(220 20% 18%);
+  --muted: hsl(220 10% 45%);
 
-  --pad-lg: 18px;
-  --pad-md: 14px;
+  --bg1: hsl(210 60% 96%);
+  --bg2: hsl(260 60% 96%);
 
-  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
+  --card: rgba(255,255,255,.72);
+  --card-strong: rgba(255,255,255,.88);
+
+  --stroke: rgba(30, 40, 60, .12);
+  --stroke-strong: rgba(30, 40, 60, .20);
+
+  --focus: rgba(0, 160, 255, .35);
+
+  --radius: 18px;
+  --container: 980px;
+
+  --shadow: 0 16px 40px rgba(0,0,0,.10);
+  --shadow-soft: 0 10px 25px rgba(0,0,0,.08);
 }
 @media (prefers-color-scheme: dark){
   :root{
-    --bg1:#0b1324;
-    --bg2:#1b1030;
-    --glass: rgba(15,23,42,.65);
-    --glass2: rgba(15,23,42,.45);
-    --border: rgba(255,255,255,.10);
-    --text: rgba(255,255,255,.92);
-    --muted: rgba(255,255,255,.65);
-    --shadow: 0 18px 55px rgba(0,0,0,.45);
+    --text: hsl(220 18% 92%);
+    --muted: hsl(220 10% 70%);
+    --bg1: hsl(220 30% 12%);
+    --bg2: hsl(265 30% 12%);
+    --card: rgba(20,25,35,.55);
+    --card-strong: rgba(20,25,35,.75);
+    --stroke: rgba(255,255,255,.10);
+    --stroke-strong: rgba(255,255,255,.18);
+    --focus: rgba(0, 160, 255, .45);
+    --shadow: 0 18px 50px rgba(0,0,0,.45);
+    --shadow-soft: 0 12px 30px rgba(0,0,0,.35);
   }
 }
