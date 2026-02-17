@@ -46,8 +46,61 @@
     </div>
   </footer>
 
-  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+  <!-- Announcement Modal -->
+  <% if (panelConfig.announceHtml && panelConfig.announceVersion) { %>
+    <div id="annBackdrop" class="annBackdrop hidden"></div>
+    <div id="annModal" class="annModal hidden" role="dialog" aria-modal="true">
+      <div class="annCard glass">
+        <div class="annHead">
+          <div class="annTitle">📣 Announcement</div>
+          <button id="annClose" class="btn tiny ghost" type="button">Close</button>
+        </div>
+        <div class="annBody">
+          <%- panelConfig.announceHtml %>
+        </div>
+      </div>
+    </div>
 
+    <script>
+      (function(){
+        const ver = "<%= panelConfig.announceVersion %>";
+        const key = "announceSeen:" + ver;
+
+        const backdrop = document.getElementById("annBackdrop");
+        const modal = document.getElementById("annModal");
+        const closeBtn = document.getElementById("annClose");
+
+        function open(){
+          backdrop.classList.remove("hidden");
+          modal.classList.remove("hidden");
+          requestAnimationFrame(()=>{
+            backdrop.classList.add("show");
+            modal.classList.add("show");
+          });
+        }
+        function close(){
+          try{ localStorage.setItem(key, "1"); }catch(e){}
+          backdrop.classList.remove("show");
+          modal.classList.remove("show");
+          setTimeout(()=>{
+            backdrop.classList.add("hidden");
+            modal.classList.add("hidden");
+          }, 140);
+        }
+
+        const seen = (function(){
+          try{ return localStorage.getItem(key) === "1"; }catch(e){ return false; }
+        })();
+
+        if(!seen) open();
+
+        closeBtn && closeBtn.addEventListener("click", close);
+        backdrop && backdrop.addEventListener("click", close);
+      })();
+    </script>
+  <% } %>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
   <script>
     window.__toast = (msg) => {
       const el = document.getElementById('toast');
