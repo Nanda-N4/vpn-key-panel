@@ -33,7 +33,7 @@
            href="<%= panelConfig.telegramChannelUrl %>"
            target="_blank"
            rel="noopener">
-           📢 Join Channel
+          <%= panelConfig.telegramChannelText || "Join Channel" %>
         </a>
       <% } %>
 
@@ -47,20 +47,20 @@
     <section class="card hero glass">
 
       <h1 class="hero-title">
-        Free Key By N4 VPN
+        <%= panelConfig?.brandName || "Free Key" %>
       </h1>
 
       <div class="hero-sub">
-       ⚡ Fast • Secure • Simple ⚡
+        Fast • Secure • Simple
       </div>
 
       <!-- Tabs -->
       <div class="tabs-header">
         <button class="tab-btn active" onclick="switchTab('list', event)">
-         📃 Key List 
+          Key List
         </button>
         <button class="tab-btn" onclick="switchTab('guide', event)">
-         📝 Key ရယူနည်း
+          Key ရယူနည်း
         </button>
       </div>
 
@@ -73,7 +73,7 @@
       <section class="card glass filters">
         <details <%= (query.q || query.type || query.status) ? "open" : "" %>>
           <summary class="glass-btn filter-summary">
-            🔎 Filter
+            Filter
             <span>
               <%= (query.q || query.type || query.status) ? "Active" : "Tap to expand" %>
             </span>
@@ -144,8 +144,12 @@
             </div>
 
             <div class="key-meta">
-              <span class="dot">GB <%= item.gb_limit || 0 %></span>
-              <span class="dot">Expire <%= item.expire_date || "-" %></span>
+              <span class="dot">
+                <%= (panelConfig?.uiText?.labels?.gbShort || "GB") %> <%= item.gb_limit || 0 %>
+              </span>
+              <span class="dot">
+                <%= (panelConfig?.uiText?.labels?.expireShort || "Expire") %> <%= item.expire_date || "-" %>
+              </span>
             </div>
 
             <a href="/k/<%= item.id %>" class="key-open">
@@ -178,7 +182,7 @@
                href="<%= panelConfig.telegramAdminUrl %>"
                target="_blank"
                rel="noopener">
-               💬 Contact Admin
+              <%= panelConfig.telegramAdminText || "Contact Admin" %>
             </a>
           <% } %>
 
@@ -187,7 +191,7 @@
                href="<%= panelConfig.telegramChannelUrl %>"
                target="_blank"
                rel="noopener">
-               📢 Join Channel
+              <%= panelConfig.telegramChannelText || "Join Channel" %>
             </a>
           <% } %>
 
