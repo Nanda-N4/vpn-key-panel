@@ -33,7 +33,7 @@
            href="<%= panelConfig.telegramChannelUrl %>"
            target="_blank"
            rel="noopener">
-           🛬 Telegram Channel
+           📢 Join Channel
         </a>
       <% } %>
 
@@ -54,8 +54,31 @@
        ⚡ Fast • Secure • Simple ⚡
       </div>
 
+      <!-- Hero Action Buttons -->
+      <div class="hero-actions" style="margin-top:18px;">
+
+        <% if (panelConfig?.telegramAdminUrl) { %>
+          <a class="pill glass-btn"
+             href="<%= panelConfig.telegramAdminUrl %>"
+             target="_blank"
+             rel="noopener">
+             💬 Contact Admin
+          </a>
+        <% } %>
+
+        <% if (panelConfig?.telegramChannelUrl) { %>
+          <a class="pill glass-btn"
+             href="<%= panelConfig.telegramChannelUrl %>"
+             target="_blank"
+             rel="noopener">
+             📢 Join Channel
+          </a>
+        <% } %>
+
+      </div>
+
       <!-- Tabs -->
-      <div class="tabs-header">
+      <div class="tabs-header" style="margin-top:22px;">
         <button class="tab-btn active" onclick="switchTab('list', event)">
          📃 Key List 
         </button>
@@ -152,7 +175,7 @@
             </div>
 
             <a href="/k/<%= item.id %>" class="key-open glass-btn modern">
-              Open Key →
+              Tap to open →
             </a>
 
           </article>
@@ -167,17 +190,16 @@
     <div id="tab-guide" class="tab-content">
       <div class="card glass" style="padding:20px;">
         <ol>
-          <li> အသုံးပြုလိုသည့် Key ကို နှိပ်ပြီး Copy ယူပါ</li>
-          <li> မိမိဖုန်းနဲ့ အဆင်ပြေရာ App ထဲ Import ထည့်သွင်းအသုံးပြုပါ။ </li>
-          <li>သိလိုရာများရှိရင် Admin အကောင့်မှာ မေးမြန်းနိုင်ပါတယ်</li>
+          <li>အသုံးပြုလိုသည့် Key ကို ရွေးပြီး Copy ယူပါ</li>
+          <li>မိမိအသုံးပြုမည့် App ထဲ Import ထည့်သွင်းအသုံးပြုပါ</li>
+          <li>မဖြစ်ပါက Admin ကို ဆက်သွယ်နိုင်ပါတယ်</li>
         </ol>
       </div>
     </div>
 
 
     <footer class="footer">
-      © <%= new Date().getFullYear() %>
-      N4 VPN
+      © <%= new Date().getFullYear() %> N4 VPN
     </footer>
 
   </main>
