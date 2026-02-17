@@ -1,84 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= panelConfig?.brandName || "VPN Key Portal" %></title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <title><%= (panelConfig && panelConfig.brandName) ? panelConfig.brandName : "VPN Key Panel" %></title>
 
-    <!-- CSS Architecture -->
-    <link rel="stylesheet" href="/public/00-tokens.css">
-<link rel="stylesheet" href="/public/01-base.css">
-<link rel="stylesheet" href="/public/02-layout.css">
-<link rel="stylesheet" href="/public/03-components.css">
-<link rel="stylesheet" href="/public/04-pages.css">
-<link rel="stylesheet" href="/public/05-utilities.css">
+  <!-- CSS Architecture (IMPORTANT: must be /public/...) -->
+  <link rel="stylesheet" href="/public/00-tokens.css" />
+  <link rel="stylesheet" href="/public/01-base.css" />
+  <link rel="stylesheet" href="/public/02-layout.css" />
+  <link rel="stylesheet" href="/public/03-components.css" />
+  <link rel="stylesheet" href="/public/04-pages.css" />
+  <link rel="stylesheet" href="/public/05-utilities.css" />
 </head>
+
 <body>
-  <div class="bg-aurora"></div>
-
   <div class="app-shell">
+    <!-- Header -->
     <header class="app-header">
-      <div class="container">
-        <div class="header-bar glass glass--strong">
-          <div class="brand">
-            <div class="logo">⚡</div>
-            <div style="min-width:0">
-              <div class="title"><%= panelConfig?.brandName || "FREE KEY By N4" %></div>
-              <div class="sub"><%= panelConfig?.tagline || "Fast • Simple • Secure" %></div>
-            </div>
+      <div class="container header-inner">
+        <div class="brand">
+          <span class="brand-icon" aria-hidden="true">⚡</span>
+          <div class="brand-text">
+            <div class="brand-title"><%= (panelConfig && panelConfig.brandName) ? panelConfig.brandName : "FREE KEY By N4" %></div>
+            <div class="brand-sub">Fast • Simple • Secure</div>
           </div>
-/* Sticky header safe spacing */
-.app-header{
-  position: sticky;
-  top: 12px;
-  z-index: 50;
-  padding: 12px 0;
-}
+        </div>
 
-.app-shell main.container{
-  padding-top: 18px;
-}
-          <a class="btn" href="<%= panelConfig?.telegramChannelUrl || "#" %>" target="_blank" rel="noopener">
-            <span class="icon">✈️</span>
-            Channel
-          </a>
+        <div class="header-actions">
+          <% if (panelConfig && panelConfig.channelUrl) { %>
+            <a class="btn btn--pill btn--ghost" href="<%= panelConfig.channelUrl %>" target="_blank" rel="noopener">
+              ✈️ <span>Channel</span>
+            </a>
+          <% } %>
         </div>
       </div>
     </header>
 
-    <main class="container">
+    <!-- Main -->
+    <main class="container app-main">
       <%- body %>
-      <div class="footer">© <%= new Date().getFullYear() %> <%= panelConfig?.brandName || "FREE KEY By N4" %></div>
     </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="container footer-inner">
+        <div class="muted">© <%= new Date().getFullYear() %> <%= (panelConfig && panelConfig.brandName) ? panelConfig.brandName : "FREE KEY By N4" %></div>
+        <% if (panelConfig && panelConfig.footerLinkText && panelConfig.footerLinkUrl) { %>
+          <a class="link" href="<%= panelConfig.footerLinkUrl %>" target="_blank" rel="noopener"><%= panelConfig.footerLinkText %></a>
+        <% } %>
+      </div>
+    </footer>
   </div>
-</body>
-<body>
 
-    <div class="app-shell">
-        <header class="app-header">
-            <div class="brand">
-                <span class="brand-icon">⚡</span>
-                <div class="brand-text">
-                    <h1><%= panelConfig?.brandName %></h1>
-                    <span class="brand-sub">Fast • Simple • Secure</span>
-                </div>
-            </div>
+  <!-- Basic JS helpers (optional) -->
+  <script>
+    // Prevent accidental text selection on double tap
+    document.addEventListener("touchstart", () => {}, { passive: true });
 
-            <a href="<%= panelConfig?.telegramChannelUrl %>" 
-               target="_blank" 
-               class="btn btn-glass">
-               ✈ Channel
-            </a>
-        </header>
+    // Example: copy buttons (if you use data-copy)
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-copy]");
+      if (!btn) return;
+      const text = btn.getAttribute("data-copy") || "";
+      if (!text) return;
 
-        <main class="app-content">
-            <%- body %>
-        </main>
-
-        <footer class="app-footer">
-            © <%= new Date().getFullYear() %> <%= panelConfig?.brandName %>
-        </footer>
-    </div>
-
+      navigator.clipboard.writeText(text).then(() => {
+        btn.classList.add("is-copied");
+        setTimeout(() => btn.classList.remove("is-copied"), 900);
+      }).catch(() => {});
+    });
+  </script>
 </body>
 </html>
