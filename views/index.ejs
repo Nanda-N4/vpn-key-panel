@@ -22,12 +22,10 @@
   <!-- HEADER -->
   <header class="app-header glass">
     <div class="container header-inner">
+
       <div class="brand">
-        <div class="brand-icon">⚡</div>
-        <div>
-          <div class="brand-title"><%= panelConfig?.brandName || "VPN KEY" %></div>
-          <div class="brand-sub">Fast • Simple • Secure</div>
-        </div>
+        <img src="/public/images/n4-logo.png" alt="N4 Logo" class="logo-img">
+        <div class="brand-title">N4 VPN</div>
       </div>
 
       <% if (panelConfig?.telegramChannelUrl) { %>
@@ -35,175 +33,163 @@
            href="<%= panelConfig.telegramChannelUrl %>"
            target="_blank"
            rel="noopener">
-           ✈️ Telegram Channel Join ရန်
+           ✈️ Telegram Join
         </a>
       <% } %>
+
     </div>
   </header>
 
 
   <main class="container main">
 
-    <!-- PANEL NAME -->
-    <section class="card glass panel-name">
-      <h2><%= panelConfig?.brandName || "VPN KEY PANEL" %></h2>
-    </section>
+    <!-- HERO -->
+    <section class="card hero glass">
 
+      <h1 class="hero-title">
+        FREE KEY By N4
+      </h1>
 
-    <!-- TABS -->
-    <section class="tabs-wrap">
+      <div class="hero-sub">
+        Fast • Secure • Simple
+      </div>
 
+      <!-- Tabs -->
       <div class="tabs-header">
-        <button class="tab-btn active" onclick="switchTab('keys')">Key List</button>
-        <button class="tab-btn" onclick="switchTab('guide')">Key ရယူနည်း</button>
-      </div>
-
-
-      <!-- TAB 1: KEY LIST -->
-      <div id="tab-keys" class="tab-content active">
-
-        <!-- FILTER -->
-        <section class="card glass filters">
-          <details <%= (query.q || query.type || query.status) ? "open" : "" %>>
-            <summary class="glass-btn filter-summary">
-              🔎 Filter
-              <span>
-                <%= (query.q || query.type || query.status) ? "Active" : "Tap to expand" %>
-              </span>
-            </summary>
-
-            <form method="GET" action="/" class="filters-grid compact">
-
-              <input type="text"
-                     class="input"
-                     name="q"
-                     placeholder="Search location..."
-                     value="<%= query.q || '' %>" />
-
-              <select class="select" name="type">
-                <option value="">All Types</option>
-                <% (types || []).forEach(t => { %>
-                  <option value="<%= t %>" <%= query.type === t ? "selected" : "" %>>
-                    <%= t %>
-                  </option>
-                <% }) %>
-              </select>
-
-              <select class="select" name="status">
-                <option value="">All Status</option>
-                <% (statuses || []).forEach(s => { %>
-                  <option value="<%= s %>" <%= query.status === s ? "selected" : "" %>>
-                    <%= s %>
-                  </option>
-                <% }) %>
-              </select>
-
-              <div class="filter-actions">
-                <button class="btn glass-btn" type="submit">Apply</button>
-                <a class="btn glass-btn" href="/">Reset</a>
-              </div>
-            </form>
-          </details>
-        </section>
-
-
-        <!-- KEYS GRID -->
-        <section class="keys-grid">
-
-          <% if (!items || items.length === 0) { %>
-            <div class="card glass empty">
-              No keys found.
-            </div>
-          <% } %>
-
-          <% (items || []).forEach(item => { %>
-
-            <article class="key-card glass">
-
-              <div class="key-card-top">
-                <div class="key-type">
-                  <%= (item.type || "").toUpperCase() %>
-                </div>
-
-                <div class="status-pill <%= (item.statusComputed || '').toLowerCase() %>">
-                  <%= (item.statusComputed || "").toUpperCase() %>
-                </div>
-              </div>
-
-              <div class="key-region">
-                <span class="flag">
-                  <%= item.region_flag || "🌍" %>
-                </span>
-                <span class="region">
-                  <%= item.region_name || "Unknown" %>
-                </span>
-              </div>
-
-              <div class="key-meta">
-                <span class="dot">GB <%= item.gb_limit || 0 %></span>
-                <span class="dot">Expire <%= item.expire_date || "-" %></span>
-              </div>
-
-              <a href="/k/<%= item.id %>" class="key-open glass-btn">
-                Tap to open →
-              </a>
-
-            </article>
-
-          <% }) %>
-
-        </section>
-      </div>
-
-
-      <!-- TAB 2: GUIDE -->
-      <div id="tab-guide" class="tab-content">
-
-        <section class="card glass guide-card">
-          <h3>VPN Key အသုံးပြုနည်း</h3>
-          <ol>
-            <li>Key ကို Copy လုပ်ပါ</li>
-            <li>App ထဲ Import / Add → Paste</li>
-            <li>Connect လုပ်ပြီး အသုံးပြုပါ</li>
-          </ol>
-
-          <% if (panelConfig?.telegramAdminUrl) { %>
-            <a class="pill glass-btn"
-               href="<%= panelConfig.telegramAdminUrl %>"
-               target="_blank"
-               rel="noopener">
-               💬 Admin ဆက်သွယ်ရန်
-            </a>
-          <% } %>
-        </section>
-
+        <button class="tab-btn active" onclick="switchTab('list', event)">
+          Key List
+        </button>
+        <button class="tab-btn" onclick="switchTab('guide', event)">
+          Key ရယူနည်း
+        </button>
       </div>
 
     </section>
+
+
+    <!-- TAB: KEY LIST -->
+    <div id="tab-list" class="tab-content active">
+
+      <!-- FILTER -->
+      <section class="card glass filters">
+        <details <%= (query.q || query.type || query.status) ? "open" : "" %>>
+          <summary class="glass-btn filter-summary">
+            🔎 Filter
+            <span>
+              <%= (query.q || query.type || query.status) ? "Active" : "Tap to expand" %>
+            </span>
+          </summary>
+
+          <form method="GET" action="/" class="filters-grid compact">
+            <input type="text"
+                   class="input"
+                   name="q"
+                   placeholder="Search location..."
+                   value="<%= query.q || '' %>" />
+
+            <select class="select" name="type">
+              <option value="">All Types</option>
+              <% (types || []).forEach(t => { %>
+                <option value="<%= t %>" <%= query.type === t ? "selected" : "" %>>
+                  <%= t %>
+                </option>
+              <% }) %>
+            </select>
+
+            <select class="select" name="status">
+              <option value="">All Status</option>
+              <% (statuses || []).forEach(s => { %>
+                <option value="<%= s %>" <%= query.status === s ? "selected" : "" %>>
+                  <%= s %>
+                </option>
+              <% }) %>
+            </select>
+
+            <div class="filter-actions">
+              <button class="btn glass-btn" type="submit">Apply</button>
+              <a class="btn glass-btn" href="/">Reset</a>
+            </div>
+          </form>
+        </details>
+      </section>
+
+
+      <!-- KEYS -->
+      <section class="keys-grid">
+
+        <% if (!items || items.length === 0) { %>
+          <div class="card glass empty">
+            No keys found.
+          </div>
+        <% } %>
+
+        <% (items || []).forEach(item => { %>
+
+          <article class="key-card glass">
+
+            <div class="key-card-top">
+              <div class="key-type">
+                <%= (item.type || "").toUpperCase() %>
+              </div>
+
+              <div class="status-pill <%= (item.statusComputed || '').toLowerCase() %>">
+                <%= (item.statusComputed || "").toUpperCase() %>
+              </div>
+            </div>
+
+            <div class="key-region">
+              <span class="flag">
+                <%= item.region_flag || "🌍" %>
+              </span>
+              <span class="region">
+                <%= item.region_name || "Unknown" %>
+              </span>
+            </div>
+
+            <div class="key-meta">
+              <span class="dot">GB <%= item.gb_limit || 0 %></span>
+              <span class="dot">Expire <%= item.expire_date || "-" %></span>
+            </div>
+
+            <a href="/k/<%= item.id %>" class="key-open glass-btn modern">
+              Open Key →
+            </a>
+
+          </article>
+
+        <% }) %>
+
+      </section>
+    </div>
+
+
+    <!-- TAB: GUIDE -->
+    <div id="tab-guide" class="tab-content">
+      <div class="card glass" style="padding:20px;">
+        <ol>
+          <li>Key ကို Copy လုပ်ပါ</li>
+          <li>App ထဲ Import / Add → Paste</li>
+          <li>Connect လုပ်ပါ</li>
+        </ol>
+      </div>
+    </div>
 
 
     <footer class="footer">
       © <%= new Date().getFullYear() %>
-      <%= panelConfig?.brandName || "FREE KEY" %>
+      N4 VPN
     </footer>
 
   </main>
 </div>
 
-
-<!-- TAB SCRIPT -->
 <script>
-function switchTab(name) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+function switchTab(name, event){
+  document.querySelectorAll('.tab-btn').forEach(btn=>btn.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
 
-  if (name === 'keys') {
-    document.querySelectorAll('.tab-btn')[0].classList.add('active');
-    document.getElementById('tab-keys').classList.add('active');
-  } else {
-    document.querySelectorAll('.tab-btn')[1].classList.add('active');
-    document.getElementById('tab-guide').classList.add('active');
-  }
+  event.target.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
 }
 </script>
 
