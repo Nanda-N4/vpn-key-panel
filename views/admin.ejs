@@ -1,167 +1,101 @@
-<%- include("layout", {
-  title: "Admin",
-  panelConfig,
-  body: `
-  <section class="section">
-    <div class="glass adminWrap">
+<% if (mode === "login") { %>
+  <div class="card auth">
+    <div class="title">Admin Login</div>
+    <% if (error) { %><div class="alert"><%= error %></div><% } %>
 
-      ${mode === "login" ? `
-        <div class="adminHead">
-          <div class="adminTitle">Admin Login</div>
-          <div class="adminSub">Hidden path ကို သိတဲ့သူပဲ ဝင်နိုင်ပါတယ်။</div>
-        </div>
+    <form method="POST" action="/<%= adminPath %>/login" class="stack-md">
+      <input class="input" type="password" name="password" placeholder="Admin password" required />
+      <button class="btn btn-pill" type="submit">Login</button>
+    </form>
 
-        ${error ? `<div class="alert bad">${error}</div>` : ""}
+    <div class="spacer"></div>
+    <a class="link" href="/">← Back to user page</a>
+  </div>
 
-        <form class="adminLogin" method="POST" action="/${adminPath}/login">
-          <div class="field">
-            <label class="label">Password</label>
-            <input class="input" type="password" name="password" placeholder="Enter admin password" required />
-          </div>
-          <button class="btn primary" type="submit"><span class="btnIcon">🔐</span> Login</button>
-        </form>
-      ` : `
-        <div class="adminHead row">
-          <div>
-            <div class="adminTitle">Admin Dashboard</div>
-            <div class="adminSub">VPN Key တွေ ထည့်/ဖျက်/ဖွင့်ပိတ် + Announcement တင်နိုင်ပါတယ်။</div>
-          </div>
+<% } else { %>
 
-          <form method="POST" action="/${adminPath}/logout">
-            <button class="btn ghost" type="submit"><span class="btnIcon">↩</span> Logout</button>
-          </form>
-        </div>
-
-        <div class="glass adminCard">
-          <div class="cardTitle">Site Announcement (Markdown)</div>
-
-          <form class="adminForm" method="POST" action="/${adminPath}/announce">
-            <div class="field">
-              <label class="label">Enable</label>
-              <select class="select" name="announce_enabled">
-                <option value="0" ${announceEnabled ? "" : "selected"}>OFF</option>
-                <option value="1" ${announceEnabled ? "selected" : ""}>ON</option>
-              </select>
-            </div>
-
-            <div class="field">
-              <label class="label">Message (supports emoji, links, images)</label>
-              <textarea class="input mono" name="announce_md" rows="8" placeholder="Example:
-# 🔥 New Update
-✅ Free keys available
-👉 [Join Channel](https://t.me/xxx)
-![banner](https://i.imgur.com/xxxx.png)
-">${(announceMd || "").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</textarea>
-
-              <div class="hint">
-                Markdown support: <span class="kbd"># title</span>, <span class="kbd">**bold**</span>, <span class="kbd">[link](url)</span>, <span class="kbd">![img](https://...)</span>
-              </div>
-            </div>
-
-            <button class="btn primary" type="submit"><span class="btnIcon">💾</span> Save Announcement</button>
-          </form>
-        </div>
-
-        <div class="glass adminCard">
-          <div class="cardTitle">Add VPN Key</div>
-
-          <form class="adminForm" method="POST" action="/${adminPath}/add">
-            <div class="formGrid">
-              <div class="field">
-                <label class="label">Key Type</label>
-                <select class="select" name="type">
-                  <option value="V2RAY">V2RAY</option>
-                  <option value="OUTLINE">OUTLINE</option>
-                  <option value="SS">SS</option>
-                  <option value="VLESS">VLESS</option>
-                </select>
-              </div>
-
-              <div class="field">
-                <label class="label">Status</label>
-                <select class="select" name="status">
-                  <option value="ACTIVE">ACTIVE</option>
-                  <option value="INACTIVE">INACTIVE</option>
-                </select>
-              </div>
-
-              <div class="field">
-                <label class="label">GB Limit</label>
-                <input class="input" name="gb_limit" inputmode="numeric" value="${defaults.gb_limit}" />
-              </div>
-
-              <div class="field">
-                <label class="label">Expire Date</label>
-                <input class="input" name="expire_date" placeholder="YYYY-MM-DD" value="${defaults.expire_date}" />
-              </div>
-
-              <div class="field">
-                <label class="label">Region Name</label>
-                <input class="input" name="region_name" placeholder="Singapore" value="${defaults.region_name}" required />
-              </div>
-
-              <div class="field">
-                <label class="label">Region Flag (emoji)</label>
-                <input class="input" name="region_flag" placeholder="🇸🇬" value="${defaults.region_flag}" />
-              </div>
-
-              <div class="field full">
-                <label class="label">Key String</label>
-                <textarea class="input mono" name="key_string" rows="3" placeholder="ss://...  or  vless://...  or  vmess://..." required></textarea>
-              </div>
-            </div>
-
-            <button class="btn primary" type="submit"><span class="btnIcon">➕</span> Add Key</button>
-          </form>
-        </div>
-
-        <div class="glass adminCard">
-          <div class="cardTitle">Keys</div>
-
-          <div class="tableWrap">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Type</th>
-                  <th>Region</th>
-                  <th>GB</th>
-                  <th>Expire</th>
-                  <th>Status</th>
-                  <th>Link</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${keys.map(k => `
-                  <tr>
-                    <td>${k.id}</td>
-                    <td>${k.type}</td>
-                    <td><span class="flag">${k.region_flag || "🌐"}</span> ${k.region_name}</td>
-                    <td>${k.gb_limit || ""}</td>
-                    <td>${k.expire_date || ""}</td>
-                    <td>
-                      <span class="badge ${k.statusComputed === "ACTIVE" ? "ok" : (k.statusComputed === "EXPIRED" ? "bad" : "muted")}">
-                        ${k.statusComputed}
-                      </span>
-                    </td>
-                    <td><a class="link" href="${k.link}" target="_blank" rel="noopener">/k/${k.id}</a></td>
-                    <td class="actions">
-                      <form method="POST" action="/${adminPath}/toggle/${k.id}">
-                        <button class="btn tiny" type="submit">${(k.status || "ACTIVE").toUpperCase() === "ACTIVE" ? "Disable" : "Enable"}</button>
-                      </form>
-                      <form method="POST" action="/${adminPath}/delete/${k.id}" onsubmit="return confirm('Delete this key?')">
-                        <button class="btn tiny danger" type="submit">Delete</button>
-                      </form>
-                    </td>
-                  </tr>
-                `).join("")}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      `}
+  <div class="stack-lg">
+    <div class="row between">
+      <div class="title">Admin Dashboard</div>
+      <form method="POST" action="/<%= adminPath %>/logout">
+        <button class="btn btn-soft" type="submit">Logout</button>
+      </form>
     </div>
-  </section>
-  `
-}) %>
+
+    <% if (error) { %>
+      <div class="card"><div class="alert">Error: <%= error %></div></div>
+    <% } %>
+
+    <div class="card">
+      <div class="title">Add Key</div>
+
+      <form method="POST" action="/<%= adminPath %>/add" class="grid2">
+        <input class="input" name="type" placeholder="Type (V2RAY/OUTLINE)" value="<%= defaults?.type || "V2RAY" %>" required />
+        <input class="input" name="region_name" placeholder="Region name" value="<%= defaults?.region_name || "" %>" required />
+
+        <input class="input" name="region_flag" placeholder="Flag emoji (e.g. 🇦🇺)" value="<%= defaults?.region_flag || "" %>" />
+        <input class="input" name="gb_limit" placeholder="GB limit" value="<%= defaults?.gb_limit || 0 %>" />
+
+        <input class="input" name="expire_date" placeholder="Expire date (YYYY-MM-DD)" value="<%= defaults?.expire_date || "" %>" />
+        <select class="select" name="status">
+          <option value="ACTIVE">ACTIVE</option>
+          <option value="INACTIVE">INACTIVE</option>
+        </select>
+
+        <textarea class="textarea col2" name="key_string" placeholder="Key string (vless://...)" required></textarea>
+
+        <button class="btn btn-pill col2" type="submit">Add</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="title">Announcement (Popup)</div>
+
+      <form method="POST" action="/<%= adminPath %>/announce" class="stack-md">
+        <label class="check">
+          <input type="checkbox" name="announce_enabled" value="1" <%= announceEnabled ? "checked" : "" %> />
+          Enable popup announcement
+        </label>
+
+        <textarea class="textarea" name="announce_md" placeholder="Markdown supported..."><%= announceMd || "" %></textarea>
+
+        <button class="btn btn-pill" type="submit">Save</button>
+      </form>
+
+      <div class="muted">Note: Markdown ကို server.js ထဲမှာ sanitize လုပ်ထားလို့ safe ဖြစ်ပါတယ်။</div>
+    </div>
+
+    <div class="card">
+      <div class="title">Keys</div>
+
+      <% if (!keys || keys.length === 0) { %>
+        <div class="muted">No keys yet.</div>
+      <% } %>
+
+      <div class="table">
+        <% (keys || []).forEach(function(k){ %>
+          <div class="trow">
+            <div class="tmain">
+              <div class="key-type"><%= k.type %></div>
+              <div class="muted"><%= k.region_flag || "🌐" %> <%= k.region_name %> • GB <%= k.gb_limit || 0 %> • Exp <%= k.expire_date || "-" %></div>
+              <div class="muted">ID: <%= k.id %> • <%= k.statusComputed %></div>
+            </div>
+
+            <div class="tactions">
+              <a class="btn btn-soft" href="<%= k.link %>" target="_blank" rel="noopener">Open</a>
+
+              <form method="POST" action="/<%= adminPath %>/toggle/<%= k.id %>">
+                <button class="btn btn-soft" type="submit">Toggle</button>
+              </form>
+
+              <form method="POST" action="/<%= adminPath %>/delete/<%= k.id %>" onsubmit="return confirm('Delete this key?');">
+                <button class="btn btn-danger" type="submit">Delete</button>
+              </form>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+
+<% } %>
