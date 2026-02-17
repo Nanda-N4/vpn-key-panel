@@ -1,32 +1,115 @@
+/* ==========================================================================
+   02 — LAYOUT (shell, header, container, spacing)
+   ========================================================================== */
+
 .app-shell{
   min-height: 100%;
-  display:flex;
-  flex-direction:column;
+  display: flex;
+  flex-direction: column;
 }
 
 .container{
-  width: min(980px, 92vw);
-  margin: 0 auto;
-  padding: 16px 0 44px;
+  width: min(var(--container), calc(100% - 24px));
+  margin-inline: auto;
 }
 
-.section{
-  margin-top: 16px;
+/* Header (sticky, no overlap) */
+.app-header{
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 12px 0;
 }
 
-.grid-2{
-  display:grid;
-  grid-template-columns: 1fr;
+.header-inner{
+  height: var(--header-h);
+  border-radius: var(--r-xl);
+  border: var(--b-1);
+  background: linear-gradient(180deg, var(--glass), var(--glass-2));
+  backdrop-filter: var(--blur-2);
+  -webkit-backdrop-filter: var(--blur-2);
+  box-shadow: var(--sh-2), var(--sh-in);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  gap: 14px;
+}
+
+/* Brand area */
+.brand{
+  display:flex;
+  align-items:center;
   gap: 12px;
-}
-@media (min-width: 720px){
-  .grid-2{
-    grid-template-columns: 1fr 1fr;
-  }
+  min-width: 0;
 }
 
+.brand-icon{
+  width: 44px;
+  height: 44px;
+  border-radius: 16px;
+  display:grid;
+  place-items:center;
+  border: var(--b-2);
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.85), rgba(255,255,255,.28));
+  box-shadow: var(--sh-1), var(--sh-in);
+}
+
+.brand-text{
+  min-width: 0;
+}
+
+.brand-title{
+  font-weight: 800;
+  letter-spacing: .2px;
+  line-height: 1.1;
+  font-size: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.brand-sub{
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.header-actions{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Main content spacing (prevents header overlap) */
+main.container{
+  padding-top: 14px;
+  padding-bottom: 40px;
+}
+
+/* Cards stack */
 .stack{
   display:flex;
-  flex-direction:column;
-  gap: 12px;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Footer */
+.footer{
+  padding: 22px 0 40px;
+  color: var(--muted);
+  text-align:center;
+  font-size: 13px;
+}
+
+/* Mobile tweaks */
+@media (max-width: 420px){
+  :root{ --header-h: 78px; }
+  .brand-title{ font-size: 16px; }
+  .brand-icon{ width: 40px; height: 40px; border-radius: 14px; }
+  .header-inner{ padding: 12px 14px; }
 }
