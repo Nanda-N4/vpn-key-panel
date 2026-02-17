@@ -1,3 +1,9 @@
-.u-hidden{ display:none !important; }
-.u-center{ text-align:center; }
-.u-mt{ margin-top: 12px; }
+.muted{ color:var(--muted); }
+.label{ font-weight:800; }
+.checkbox{ display:flex; gap:10px; align-items:center; color:var(--muted); }
+.copyright{
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+  margin:18px 0 0;
+}
