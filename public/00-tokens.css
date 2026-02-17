@@ -1,1 +1,62 @@
+/* ===============================
+   DESIGN TOKENS
+   Calm White Pro Theme
+================================= */
 
+:root {
+
+  /* ===== COLORS ===== */
+
+  --color-bg: #f4f7fb;
+  --color-surface: rgba(255, 255, 255, 0.65);
+  --color-surface-strong: rgba(255, 255, 255, 0.85);
+
+  --color-border: rgba(255, 255, 255, 0.5);
+
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94a3b8;
+
+  --color-accent: #4f8cff;
+  --color-accent-soft: rgba(79, 140, 255, 0.15);
+
+  --color-success: #22c55e;
+  --color-danger: #ef4444;
+
+  /* ===== GLASS ===== */
+
+  --glass-blur: 18px;
+  --glass-radius: 22px;
+
+  --glass-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  /* ===== SPACING ===== */
+
+  --space-xs: 6px;
+  --space-sm: 10px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+
+  /* ===== FONT ===== */
+
+  --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+               "Segoe UI", Roboto, sans-serif;
+
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 28px;
+
+}
+
+/* Background Gradient Layer */
+body {
+  background:
+    radial-gradient(circle at 10% 20%, #dbeafe 0%, transparent 40%),
+    radial-gradient(circle at 90% 30%, #e0f2fe 0%, transparent 40%),
+    radial-gradient(circle at 50% 80%, #ede9fe 0%, transparent 40%),
+    var(--color-bg);
+}
