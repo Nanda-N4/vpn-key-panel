@@ -1,33 +1,30 @@
 :root{
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Myanmar", Arial, sans-serif;
-
-  /* Bright + clean palette */
-  --bg1: #d9f2ff;
-  --bg2: #f3f7ff;
-  --g1: rgba(120, 205, 255, .55);
-  --g2: rgba(160, 140, 255, .35);
-
-  --card: rgba(255,255,255,.72);
-  --card-strong: rgba(255,255,255,.86);
-  --stroke: rgba(15, 23, 42, .10);
-  --stroke-strong: rgba(15, 23, 42, .14);
-
+  --bg1: #dff1ff;
+  --bg2: #f3e7ff;
+  --glass: rgba(255,255,255,.70);
+  --glass2: rgba(255,255,255,.55);
+  --border: rgba(15,23,42,.10);
   --text: #0f172a;
-  --muted: rgba(15, 23, 42, .62);
+  --muted: rgba(15,23,42,.65);
+  --shadow: 0 18px 55px rgba(2,6,23,.12);
 
-  --primary: #0ea5e9;
-  --primary-2: #22c55e;
+  --r-lg: 26px;
+  --r-md: 18px;
 
-  --danger: #ef4444;
+  --pad-lg: 18px;
+  --pad-md: 14px;
 
-  --radius: 22px;
-  --radius-sm: 16px;
-
-  --shadow: 0 18px 55px rgba(2, 6, 23, .12);
-  --shadow-soft: 0 10px 28px rgba(2, 6, 23, .10);
-
-  --container: 860px;
-  --space: 14px;
-
-  --focus: rgba(14, 165, 233, .35);
+  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg1:#0b1324;
+    --bg2:#1b1030;
+    --glass: rgba(15,23,42,.65);
+    --glass2: rgba(15,23,42,.45);
+    --border: rgba(255,255,255,.10);
+    --text: rgba(255,255,255,.92);
+    --muted: rgba(255,255,255,.65);
+    --shadow: 0 18px 55px rgba(0,0,0,.45);
+  }
 }
