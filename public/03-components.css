@@ -498,3 +498,58 @@
   padding:22px 0 12px 0;
   text-align:center;
 }
+/* ===== Announcement Modal ===== */
+.modal-overlay{
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(0,0,0,.22);
+  z-index: 2000;
+}
+
+.modal{
+  width: min(520px, 100%);
+  border-radius: 26px;
+  padding: 14px;
+  box-shadow: 0 26px 80px rgba(0,0,0,.20);
+}
+
+.modal-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  padding: 6px 6px 10px 6px;
+}
+
+.modal-title{
+  font-weight: 900;
+  letter-spacing: .2px;
+}
+
+.modal-close{
+  border-radius: 999px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.modal-body{
+  padding: 6px;
+  line-height: 1.55;
+}
+
+.modal-body img{
+  max-width: 100%;
+  height: auto;
+  border-radius: 16px;
+  display:block;
+  margin-top: 10px;
+}
+
+.modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  padding: 10px 6px 6px 6px;
+}
