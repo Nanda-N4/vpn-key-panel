@@ -14,6 +14,35 @@
 <link rel="stylesheet" href="/public/05-utilities.css">
 </head>
 <body>
+  <div class="bg-aurora"></div>
+
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="container">
+        <div class="header-bar glass glass--strong">
+          <div class="brand">
+            <div class="logo">⚡</div>
+            <div style="min-width:0">
+              <div class="title"><%= panelConfig?.brandName || "FREE KEY By N4" %></div>
+              <div class="sub"><%= panelConfig?.tagline || "Fast • Simple • Secure" %></div>
+            </div>
+          </div>
+
+          <a class="btn" href="<%= panelConfig?.telegramChannelUrl || "#" %>" target="_blank" rel="noopener">
+            <span class="icon">✈️</span>
+            Channel
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <%- body %>
+      <div class="footer">© <%= new Date().getFullYear() %> <%= panelConfig?.brandName || "FREE KEY By N4" %></div>
+    </main>
+  </div>
+</body>
+<body>
 
     <div class="app-shell">
         <header class="app-header">
