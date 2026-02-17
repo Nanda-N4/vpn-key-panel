@@ -214,3 +214,30 @@
   padding: 18px 0 8px 0;
   text-align: center;
   }
+/* Compact collapsible filter */
+.filter-wrap { display:block; }
+.filter-summary{
+  list-style: none;
+  cursor: pointer;
+  border-radius: 18px;
+  padding: 12px 12px;
+  font-weight: 800;
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.filter-summary::-webkit-details-marker{ display:none; }
+.filter-hint{ font-size: 12px; opacity: .7; font-weight: 700; }
+
+.filters-grid.compact{
+  margin-top: 12px;
+  grid-template-columns: 1fr;
+}
+
+.filter-actions{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items:center;
+}
