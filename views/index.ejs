@@ -112,7 +112,11 @@
             No keys found.
           </div>
         <% } %>
-
+        <button class="btn glass-btn mini"
+  data-copy="<%= k.key %>"
+  onclick="copyKey(this)">
+  📋 Copy
+</button>
         <% (items || []).forEach(item => { %>
           <article class="key-card glass">
             <div class="key-card-top">
