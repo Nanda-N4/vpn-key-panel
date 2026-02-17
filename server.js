@@ -217,6 +217,7 @@ const qDeleteKey = db.prepare(`DELETE FROM keys WHERE id = ?`);
 const qUpdateStatus = db.prepare(`UPDATE keys SET status = @status WHERE id = @id`);
 
 // ---------- Template data ----------
+// ---------- Template data ----------
 function buildPanelData(req) {
   const cfg = loadConfig();
   const adminPath = safeStr(cfg.adminPath || "admin");
@@ -229,7 +230,8 @@ function buildPanelData(req) {
 
   const panelConfig = {
     brandName: safeStr(cfg.brandName || "VPN KEY"),
-    // keep config.json announcement as hero text (optional)
+
+    // optional config.json hero announcement (if you use it)
     announcement: safeStr(cfg.announcement || ""),
 
     telegramAdminText: safeStr(cfg.telegramAdminText || "Contact Admin"),
@@ -237,9 +239,9 @@ function buildPanelData(req) {
     telegramChannelText: safeStr(cfg.telegramChannelText || "Join Channel"),
     telegramChannelUrl: safeStr(cfg.telegramChannelUrl || "#"),
 
-    // NEW:
+    // ✅ IMPORTANT: add these two lines
     announceHtml,
-    announceVersion
+    announceVersion,
   };
 
   const origin = BASE_URL || `${req.protocol}://${req.get("host")}`;
