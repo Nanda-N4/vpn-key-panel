@@ -4,9 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="color-scheme" content="light dark" />
-  <title><%= (panelConfig && panelConfig.brandName) ? panelConfig.brandName : "VPN KEY" %></title>
+  <title><%= panelConfig?.brandName || "VPN KEY" %></title>
 
-  <!-- CSS Architecture (IMPORTANT: must be /public/..) -->
   <link rel="stylesheet" href="/public/00-tokens.css" />
   <link rel="stylesheet" href="/public/01-base.css" />
   <link rel="stylesheet" href="/public/02-layout.css" />
@@ -16,137 +15,164 @@
 </head>
 
 <body>
-  <div class="bg-aurora" aria-hidden="true"></div>
+<div class="bg-aurora"></div>
 
-  <div class="app-shell">
-    <!-- Header -->
-    <header class="app-header glass">
-      <div class="container header-inner">
-        <div class="brand">
-          <div class="brand-icon" aria-hidden="true">⚡</div>
-          <div class="brand-text">
-            <div class="brand-title"><%= panelConfig.brandName || "VPN KEY" %></div>
-            <div class="brand-sub">Fast • Simple • Secure</div>
-          </div>
-        </div>
+<div class="app-shell">
 
-        <div class="header-actions">
-          <% if (panelConfig && panelConfig.telegramChannelUrl) { %>
-            <a class="pill glass-btn" href="<%= panelConfig.telegramChannelUrl %>" target="_blank" rel="noopener">
-              ✈️ <span><%= panelConfig.telegramChannelText || "Join Channel" %></span>
-            </a>
-          <% } %>
+  <!-- HEADER -->
+  <header class="app-header glass">
+    <div class="container header-inner">
+      <div class="brand">
+        <div class="brand-icon">⚡</div>
+        <div>
+          <div class="brand-title"><%= panelConfig?.brandName || "VPN KEY" %></div>
+          <div class="brand-sub">Fast • Simple • Secure</div>
         </div>
       </div>
-    </header>
 
-    <main class="container main">
-      <!-- Hero -->
-      <section class="card hero glass">
-        <div class="hero-kicker">VPN Key Portal</div>
-        <h1 class="hero-title">Key ကို ရွေး → Copy → Paste → Connect</h1>
-        <p class="hero-desc"><%= panelConfig.announcement || "" %></p>
+      <% if (panelConfig?.telegramChannelUrl) { %>
+        <a class="pill glass-btn"
+           href="<%= panelConfig.telegramChannelUrl %>"
+           target="_blank"
+           rel="noopener">
+           ✈️ <%= panelConfig.telegramChannelText || "Join Channel" %>
+        </a>
+      <% } %>
+    </div>
+  </header>
 
-        <div class="hero-actions">
-          <% if (panelConfig && panelConfig.telegramAdminUrl) { %>
-            <a class="pill glass-btn" href="<%= panelConfig.telegramAdminUrl %>" target="_blank" rel="noopener">
-              💬 <span><%= panelConfig.telegramAdminText || "Contact Admin" %></span>
-            </a>
-          <% } %>
-        </div>
 
-        <ol class="hero-steps">
-          <li>Key ကို Copy လုပ်ပါ</li>
-          <li>သုံးမယ့် App ထဲ Import / Add → Paste</li>
-          <li>Connect လုပ်ပြီး သုံးပါ</li>
-        </ol>
-      </section>
+  <main class="container main">
 
-<section class="card glass filters">
-  <details class="filter-wrap" <%= (query.q || query.type || query.status) ? "open" : "" %>>
-    <summary class="filter-summary glass-btn">
-      🔎 Filter
-      <span class="filter-hint">
-        <%= (query.q || query.type || query.status) ? "Active" : "Tap to expand" %>
-      </span>
-    </summary>
+    <!-- HERO -->
+    <section class="card hero glass">
+      <div class="hero-kicker">VPN Key Portal</div>
 
-    <form method="GET" action="/" class="filters-grid compact">
-      <label class="field" style="grid-column: 1 / -1;">
-        <span class="field-label">Search location...</span>
-        <input class="input" type="text" name="q" value="<%= query.q || '' %>" placeholder="e.g. Singapore, Japan" />
-      </label>
+      <h1 class="hero-title">
+        Key ကို ရွေး → Copy → Paste → Connect
+      </h1>
 
-      <label class="field">
-        <span class="field-label">Type</span>
-        <select class="select" name="type">
-          <option value="">All Types</option>
-          <% (types || []).forEach(t => { %>
-            <option value="<%= t %>" <%= (query.type === t) ? "selected" : "" %>><%= t %></option>
-          <% }) %>
-        </select>
-      </label>
+      <% if (panelConfig?.announcement) { %>
+        <p class="hero-desc"><%= panelConfig.announcement %></p>
+      <% } %>
 
-      <label class="field">
-        <span class="field-label">Status</span>
-        <select class="select" name="status">
-          <option value="">All Status</option>
-          <% (statuses || []).forEach(s => { %>
-            <option value="<%= s %>" <%= (query.status === s) ? "selected" : "" %>><%= s %></option>
-          <% }) %>
-        </select>
-      </label>
+      <% if (panelConfig?.telegramAdminUrl) { %>
+        <a class="pill glass-btn"
+           href="<%= panelConfig.telegramAdminUrl %>"
+           target="_blank"
+           rel="noopener">
+           💬 <%= panelConfig.telegramAdminText || "Contact Admin" %>
+        </a>
+      <% } %>
 
-      <div class="filter-actions">
-        <button class="btn glass-btn" type="submit">Apply</button>
-        <a class="btn glass-btn" href="/">Reset</a>
-      </div>
-    </form>
-  </details>
-</section>
+      <ol class="hero-steps">
+        <li>Key ကို Copy လုပ်ပါ</li>
+        <li>App ထဲ Import / Add → Paste</li>
+        <li>Connect လုပ်ပါ</li>
+      </ol>
+    </section>
 
-      <!-- Keys -->
-      <section class="keys-grid">
-        <% if (!items || items.length === 0) { %>
-          <div class="card glass empty">
-            No keys found.
+
+    <!-- FILTER -->
+    <section class="card glass filters">
+      <details <%= (query.q || query.type || query.status) ? "open" : "" %>>
+        <summary class="glass-btn filter-summary">
+          🔎 Filter
+          <span>
+            <%= (query.q || query.type || query.status) ? "Active" : "Tap to expand" %>
+          </span>
+        </summary>
+
+        <form method="GET" action="/" class="filters-grid compact">
+
+          <input type="text"
+                 class="input"
+                 name="q"
+                 placeholder="Search location..."
+                 value="<%= query.q || '' %>" />
+
+          <select class="select" name="type">
+            <option value="">All Types</option>
+            <% (types || []).forEach(t => { %>
+              <option value="<%= t %>" <%= query.type === t ? "selected" : "" %>>
+                <%= t %>
+              </option>
+            <% }) %>
+          </select>
+
+          <select class="select" name="status">
+            <option value="">All Status</option>
+            <% (statuses || []).forEach(s => { %>
+              <option value="<%= s %>" <%= query.status === s ? "selected" : "" %>>
+                <%= s %>
+              </option>
+            <% }) %>
+          </select>
+
+          <div class="filter-actions">
+            <button class="btn glass-btn" type="submit">Apply</button>
+            <a class="btn glass-btn" href="/">Reset</a>
           </div>
-        <% } %>
-        <button class="btn glass-btn mini"
-  data-copy="<%= k.key %>"
-  onclick="copyKey(this)">
-  📋 Copy
-</button>
-        <% (items || []).forEach(item => { %>
-          <article class="key-card glass">
-            <div class="key-card-top">
-              <div class="key-type"><%= (item.type || "").toUpperCase() %></div>
-              <div class="status-pill <%= (item.statusComputed || '').toLowerCase() %>">
-                <%= (item.statusComputed || "").toUpperCase() %>
-              </div>
+        </form>
+      </details>
+    </section>
+
+
+    <!-- KEYS GRID -->
+    <section class="keys-grid">
+
+      <% if (!items || items.length === 0) { %>
+        <div class="card glass empty">
+          No keys found.
+        </div>
+      <% } %>
+
+      <% (items || []).forEach(item => { %>
+
+        <article class="key-card glass">
+
+          <div class="key-card-top">
+            <div class="key-type">
+              <%= (item.type || "").toUpperCase() %>
             </div>
 
-            <div class="key-region">
-              <span class="flag"><%= item.region_flag || "🌍" %></span>
-              <span class="region"><%= item.region_name || "Unknown" %></span>
+            <div class="status-pill <%= (item.statusComputed || '').toLowerCase() %>">
+              <%= (item.statusComputed || "").toUpperCase() %>
             </div>
+          </div>
 
-            <div class="key-meta">
-              <span class="dot">GB <%= item.gb_limit || 0 %></span>
-              <span class="dot">Expire <%= item.expire_date || "-" %></span>
-            </div>
+          <div class="key-region">
+            <span class="flag">
+              <%= item.region_flag || "🌍" %>
+            </span>
+            <span class="region">
+              <%= item.region_name || "Unknown" %>
+            </span>
+          </div>
 
-            <a class="key-open glass-btn" href="/k/<%= item.id %>">
-              Tap to open →
-            </a>
-          </article>
-        <% }) %>
-      </section>
+          <div class="key-meta">
+            <span class="dot">GB <%= item.gb_limit || 0 %></span>
+            <span class="dot">Expire <%= item.expire_date || "-" %></span>
+          </div>
 
-      <footer class="footer">
-        <div>© <%= new Date().getFullYear() %> <%= (panelConfig.brandName || "FREE KEY") %></div>
-      </footer>
-    </main>
-  </div>
+          <a href="/k/<%= item.id %>" class="key-open glass-btn">
+            Tap to open →
+          </a>
+
+        </article>
+
+      <% }) %>
+
+    </section>
+
+
+    <footer class="footer">
+      © <%= new Date().getFullYear() %>
+      <%= panelConfig?.brandName || "FREE KEY" %>
+    </footer>
+
+  </main>
+</div>
+
 </body>
 </html>
