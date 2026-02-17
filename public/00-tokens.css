@@ -1,98 +1,33 @@
-/* ==========================================================================
-   00 — TOKENS (Design system variables)
-   ========================================================================== */
-
 :root{
-  /* Typography */
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
-               Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Myanmar", Arial, sans-serif;
 
-  /* Radii */
-  --r-xs: 12px;
-  --r-sm: 16px;
-  --r-md: 20px;
-  --r-lg: 26px;
-  --r-xl: 32px;
-  --r-pill: 999px;
+  /* Bright + clean palette */
+  --bg1: #d9f2ff;
+  --bg2: #f3f7ff;
+  --g1: rgba(120, 205, 255, .55);
+  --g2: rgba(160, 140, 255, .35);
 
-  /* Spacing */
-  --s-1: 6px;
-  --s-2: 10px;
-  --s-3: 14px;
-  --s-4: 18px;
-  --s-5: 24px;
-  --s-6: 30px;
+  --card: rgba(255,255,255,.72);
+  --card-strong: rgba(255,255,255,.86);
+  --stroke: rgba(15, 23, 42, .10);
+  --stroke-strong: rgba(15, 23, 42, .14);
 
-  /* Shadows (soft, glass-like) */
-  --sh-1: 0 10px 30px rgba(0,0,0,.10);
-  --sh-2: 0 18px 55px rgba(0,0,0,.14);
-  --sh-in: inset 0 1px 0 rgba(255,255,255,.55);
+  --text: #0f172a;
+  --muted: rgba(15, 23, 42, .62);
 
-  /* Blur */
-  --blur-1: blur(14px);
-  --blur-2: blur(22px);
+  --primary: #0ea5e9;
+  --primary-2: #22c55e;
 
-  /* Borders */
-  --b-1: 1px solid rgba(255,255,255,.55);
-  --b-2: 1px solid rgba(255,255,255,.38);
+  --danger: #ef4444;
 
-  /* Brand / Accent */
-  --accent-h: 200; /* cyan/sky */
-  --accent-s: 95%;
-  --accent-l: 58%;
+  --radius: 22px;
+  --radius-sm: 16px;
 
-  --accent: hsl(var(--accent-h) var(--accent-s) var(--accent-l));
-  --accent-2: hsl(285 90% 66%); /* purple sparkle */
-  --accent-3: hsl(150 85% 52%); /* mint */
+  --shadow: 0 18px 55px rgba(2, 6, 23, .12);
+  --shadow-soft: 0 10px 28px rgba(2, 6, 23, .10);
 
-  /* Neutral text */
-  --text: hsl(222 22% 18%);
-  --text-2: hsl(224 14% 34%);
-  --muted: hsl(225 12% 56%);
+  --container: 860px;
+  --space: 14px;
 
-  /* Surface (glass) */
-  --glass: rgba(255,255,255,.55);
-  --glass-2: rgba(255,255,255,.42);
-  --glass-3: rgba(255,255,255,.30);
-
-  /* Background aurora */
-  --bg-0: hsl(210 60% 96%);
-  --bg-1: rgba(120, 190, 255, .38);
-  --bg-2: rgba(190, 120, 255, .26);
-  --bg-3: rgba(120, 255, 220, .22);
-
-  /* Layout */
-  --container: 980px;
-  --header-h: 84px;
-
-  /* Controls */
-  --control-h: 52px;
-  --ring: 0 0 0 3px rgba(0, 170, 255, .18);
-}
-
-/* Dark mode (optional) */
-@media (prefers-color-scheme: dark){
-  :root{
-    --text: hsl(0 0% 97%);
-    --text-2: hsl(0 0% 86%);
-    --muted: hsl(0 0% 72%);
-
-    --glass: rgba(25, 30, 40, .55);
-    --glass-2: rgba(25, 30, 40, .42);
-    --glass-3: rgba(25, 30, 40, .30);
-
-    --bg-0: hsl(230 30% 10%);
-    --bg-1: rgba(70, 140, 255, .26);
-    --bg-2: rgba(190, 90, 255, .18);
-    --bg-3: rgba(80, 255, 220, .14);
-
-    --b-1: 1px solid rgba(255,255,255,.18);
-    --b-2: 1px solid rgba(255,255,255,.12);
-
-    --sh-1: 0 12px 34px rgba(0,0,0,.32);
-    --sh-2: 0 22px 70px rgba(0,0,0,.40);
-    --sh-in: inset 0 1px 0 rgba(255,255,255,.12);
-    --ring: 0 0 0 3px rgba(0, 170, 255, .22);
-  }
+  --focus: rgba(14, 165, 233, .35);
 }
