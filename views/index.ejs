@@ -40,11 +40,11 @@
     </div>
   </header>
 <% if (panelConfig?.announceHtml) { %>
-  <div id="announceModal" class="a-overlay" hidden>
+  <div id="announceModal" class="a-overlay" onclick="announceOverlayClose(event)">
     <div class="a-modal glass" role="dialog" aria-modal="true" aria-label="Announcement">
       <div class="a-head">
         <div class="a-title">Announcement</div>
-        <button id="aCloseBtn" class="a-close glass-btn" type="button" aria-label="Close">✕</button>
+        <button class="a-close glass-btn" type="button" onclick="announceClose()">✕</button>
       </div>
 
       <div class="a-body">
@@ -52,44 +52,39 @@
       </div>
 
       <div class="a-actions">
-        <button id="aOkBtn" class="pill glass-btn small" type="button">OK</button>
+        <button class="pill glass-btn small" type="button" onclick="announceClose()">OK</button>
       </div>
     </div>
   </div>
 
   <script>
     (function(){
-      const v = "<%= panelConfig.announceVersion || '' %>";
+      var v = "<%= panelConfig.announceVersion || '' %>";
       if(!v) return;
-
-      const key = "announce_dismissed_" + v;
-      if (localStorage.getItem(key) === "1") return;
-
-      const overlay = document.getElementById("announceModal");
-      const closeBtn = document.getElementById("aCloseBtn");
-      const okBtn = document.getElementById("aOkBtn");
-      if(!overlay || !closeBtn || !okBtn) return;
-
-      function close(){
-        localStorage.setItem(key, "1");
-        overlay.hidden = true;
+      var key = "announce_dismissed_" + v;
+      if (localStorage.getItem(key) === "1") {
+        var el = document.getElementById("announceModal");
+        if (el) el.style.display = "none";
+        return;
       }
-
-      overlay.hidden = false;
-
-      closeBtn.addEventListener("click", close);
-      okBtn.addEventListener("click", close);
-
-      // click outside to close
-      overlay.addEventListener("click", function(e){
-        if (e.target === overlay) close();
-      });
-
-      // ESC to close
-      document.addEventListener("keydown", function(e){
-        if (e.key === "Escape") close();
-      }, { once: true });
+      // show
+      var el = document.getElementById("announceModal");
+      if (el) el.style.display = "grid";
     })();
+
+    function announceClose(){
+      try{
+        var v = "<%= panelConfig.announceVersion || '' %>";
+        if(v) localStorage.setItem("announce_dismissed_" + v, "1");
+      }catch(e){}
+      var el = document.getElementById("announceModal");
+      if (el) el.style.display = "none";
+    }
+
+    function announceOverlayClose(e){
+      // only when clicking outside modal
+      if (e && e.target && e.target.id === "announceModal") announceClose();
+    }
   </script>
 <% } %>
 
