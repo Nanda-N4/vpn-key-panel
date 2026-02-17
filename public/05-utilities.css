@@ -1,6 +1,33 @@
-.mt-8{ margin-top:8px; }
-.mt-12{ margin-top:12px; }
-.mt-16{ margin-top:16px; }
-.center{ display:flex; align-items:center; justify-content:center; }
-.row{ display:flex; gap: 10px; align-items:center; flex-wrap:wrap; }
+/* ==========================================================================
+   05 — UTILITIES (helpers)
+   ========================================================================== */
+
+.mt-1{ margin-top: var(--s-1); }
+.mt-2{ margin-top: var(--s-2); }
+.mt-3{ margin-top: var(--s-3); }
+.mt-4{ margin-top: var(--s-4); }
+
+.mb-1{ margin-bottom: var(--s-1); }
+.mb-2{ margin-bottom: var(--s-2); }
+.mb-3{ margin-bottom: var(--s-3); }
+.mb-4{ margin-bottom: var(--s-4); }
+
+.p-1{ padding: var(--s-1); }
+.p-2{ padding: var(--s-2); }
+.p-3{ padding: var(--s-3); }
+.p-4{ padding: var(--s-4); }
+
+.center{ text-align:center; }
+.muted{ color: var(--muted); }
+.text2{ color: var(--text-2); }
+
+.row{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.wrap{ flex-wrap: wrap; }
+
 .hidden{ display:none !important; }
