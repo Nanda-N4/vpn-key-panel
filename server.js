@@ -148,7 +148,7 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.urlencoded({ extended: true, limit: "256kb" }));
 app.use(express.json({ limit: "256kb" }));
 app.use(cookieParser(COOKIE_SECRET));
-app.use("/public", express.static(path.join(__dirname, "public"), { maxAge: "7d" }));
+app.use("/public", express.static(path.join(__dirname, "public")));
 
 // ---------- Auth ----------
 function isAuthed(req) {
