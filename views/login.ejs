@@ -1,39 +1,23 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Admin Login • <%= panelConfig.brandName %></title>
-  <link rel="stylesheet" href="/public/style.css"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login</title>
+  <link rel="stylesheet" href="/public/00-tokens.css" />
+  <link rel="stylesheet" href="/public/01-base.css" />
+  <link rel="stylesheet" href="/public/02-layout.css" />
+  <link rel="stylesheet" href="/public/03-components.css" />
+  <link rel="stylesheet" href="/public/04-pages.css" />
+  <link rel="stylesheet" href="/public/05-utilities.css" />
 </head>
 <body>
-  <div class="bg"></div>
-
-  <header class="topbar">
-    <a class="brand" href="/">
-      <span class="brandMark">⚡</span>
-      <span class="brandText"><%= panelConfig.brandName %></span>
-    </a>
-  </header>
-
-  <main class="wrap">
-    <section class="card loginCard">
-      <h2 class="h2">Admin Login</h2>
-
-      <% if (error) { %>
-        <div class="errorBox"><%= error %></div>
-      <% } %>
-
-      <form method="POST" action="<%= ADMIN_PATH %>/login" class="form">
-        <div class="field">
-          <div class="label">Password</div>
-          <input type="password" name="password" class="input" required/>
-        </div>
-        <button class="btn btnPrimary w100" type="submit">Login</button>
-      </form>
-
-      <div class="hintSmall">Admin URL: <b><%= ADMIN_PATH %></b></div>
-    </section>
+  <div class="bg-aurora" aria-hidden="true"></div>
+  <main class="container main">
+    <div class="card">
+      <h2>Use /<%= adminPath %> to login</h2>
+      <a class="btn" href="/<%= adminPath %>">Go to Admin</a>
+    </div>
   </main>
 </body>
 </html>
