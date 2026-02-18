@@ -173,6 +173,7 @@ function mdToSafeHtml(md) {
 // ---------- App middleware ----------
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
+app.set("trust proxy", 1);
 
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.urlencoded({ extended: true, limit: "256kb" }));
