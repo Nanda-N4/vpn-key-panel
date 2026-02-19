@@ -41,7 +41,7 @@ sudo git clone "$REPO_URL" "$APP_DIR"
 sudo chown -R "$USER:$USER" "$APP_DIR"
 
 cd "$APP_DIR"
-
+export DEBIAN_FRONTEND=noninteractive
 # ---- .env ----
 if [[ ! -f ".env" ]]; then
   echo "📄 Creating .env..."
