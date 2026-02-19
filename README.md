@@ -1,29 +1,39 @@
 # 🚀 VPN Key Panel
 
-Simple Node.js based VPN key management panel.
+![Node.js](https://img.shields.io/badge/Node.js-20.x-green)
+![Nginx](https://img.shields.io/badge/Nginx-Reverse_Proxy-blue)
+![Systemd](https://img.shields.io/badge/Systemd-Auto_Start-orange)
+![License](https://img.shields.io/badge/License-MIT-lightgrey)
+![Deploy](https://img.shields.io/badge/Deploy-One_Command-success)
+
+Simple and lightweight **Node.js based VPN key management panel**  
+Built for fast VPS deployment with optional HTTPS.
 
 ---
 
 ## ✨ Features
 
-- Admin dashboard  
-- Key management  
-- Nginx reverse proxy  
-- systemd service auto-start  
-- Optional HTTPS (Let's Encrypt)
+- 🔐 Admin dashboard
+- 📦 Key management system
+- ⚡ Nginx reverse proxy
+- 🔁 systemd auto-start service
+- 🌍 Optional HTTPS (Let's Encrypt)
+- 🚀 One-command deployment
 
 ---
 
-## ✅ Quick Deploy
+# ⚡ Quick Deploy (Recommended)
 
-### With SSL (domain + email)
+## 🔒 With SSL (Domain + Email)
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/Nanda-N4/vpn-key-panel/main/deploy.sh) \
 https://github.com/Nanda-N4/vpn-key-panel.git free.n4vpn.xyz admin@example.com
 ```
 
-### Without SSL (IP only)
+---
+
+## 🌐 Without SSL (IP only)
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/Nanda-N4/vpn-key-panel/main/deploy.sh) \
@@ -32,18 +42,18 @@ https://github.com/Nanda-N4/vpn-key-panel.git
 
 ---
 
-## 🧠 What deploy.sh does
+# 🧠 What `deploy.sh` Does
 
-- Installs nginx, nodejs, git  
-- Clones repo to `/opt/vpn-key-panel`  
-- Installs npm packages  
-- Creates systemd service: `vpn-key-panel`  
-- Configures nginx reverse proxy to `127.0.0.1:3000`  
-- (Optional) Issues SSL certificate  
+1. Installs: `nginx`, `nodejs`, `git`
+2. Clones repository to `/opt/vpn-key-panel`
+3. Installs npm production packages
+4. Creates systemd service: `vpn-key-panel`
+5. Configures nginx reverse proxy → `127.0.0.1:3000`
+6. (Optional) Issues Let's Encrypt SSL certificate
 
 ---
 
-## 🔐 After Install (IMPORTANT)
+# 🔐 After Install (IMPORTANT)
 
 Edit environment file:
 
@@ -67,14 +77,16 @@ sudo systemctl restart vpn-key-panel
 
 ---
 
-## 🌐 URLs
+# 🌍 Access URLs
 
-- Site: `http://SERVER_IP/` or `https://DOMAIN/`
-- Admin: `/admin`
+| Type  | URL |
+|-------|------|
+| Site  | `http://SERVER_IP/` or `https://DOMAIN/` |
+| Admin | `/admin` |
 
 ---
 
-## 📂 Folder Layout
+# 📂 Project Structure
 
 ```
 vpn-key-panel/
@@ -88,15 +100,15 @@ vpn-key-panel/
 
 ---
 
-## 🛠 Useful Commands
+# 🛠 Useful Commands
 
-Check service:
+Check service status:
 
 ```bash
 sudo systemctl status vpn-key-panel --no-pager
 ```
 
-Test nginx:
+Test nginx config:
 
 ```bash
 sudo nginx -t
@@ -110,6 +122,18 @@ sudo journalctl -u vpn-key-panel -n 200 --no-pager
 
 ---
 
-## 📜 License
+# 🔄 Update Project
 
-MIT
+```bash
+cd /opt/vpn-key-panel
+sudo git pull
+sudo npm install --omit=dev
+sudo systemctl restart vpn-key-panel
+```
+
+---
+
+# 📜 License
+
+MIT License  
+Free to use and modify.
