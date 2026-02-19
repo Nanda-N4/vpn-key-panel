@@ -1,1 +1,0 @@
-nano deploy/setup.sh
