@@ -380,10 +380,10 @@ app.get("/k/:id", (req, res) => {
     ];
   } else {
     apps = [
-      { name: "Windows", sub: "V2Ray Client", icon: "windows", url: "https://github.com/2dust/v2rayN" },
-      { name: "macOS", sub: "V2Ray Client", icon: "apple", url: "https://github.com/2dust/v2rayN" },
-      { name: "Android", sub: "v2rayNG", icon: "android", url: "https://github.com/2dust/v2rayNG" },
-      { name: "iPhone / iPad", sub: "Client (iOS)", icon: "apple", url: "https://apps.apple.com/" }
+      { name: "Windows", sub: "V2Raytun Software", icon: "windows", url: "https://storage.v2raytun.com/v2RayTun_Setup.exe" },
+      { name: "macOS/iphone/Ipad", sub: "V2Raytun App", icon: "apple", url: "https://apps.apple.com/en/app/v2raytun/id6476628951" },
+      { name: "Android", sub: "v2raytun App", icon: "android", url: "https://play.google.com/store/apps/details?id=com.v2raytun.android" },
+      { name: "HowToAdded", sub: "ထည့်သွင်းအသုံးပြုနည်း", icon: "telegram", url: "https://t.me/n4vpn3/18?single" }
     ];
   }
 
